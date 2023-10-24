@@ -17,9 +17,6 @@ config :text_server,
   unsplash_access_key: System.get_env("UNSPLASH_ACCESS_KEY"),
   unsplash_secret_key: System.get_env("UNSPLASH_SECRET_KEY"),
   user_uploads_directory: System.get_env("USER_UPLOADS_DIRECTORY"),
-  exist_db_url: System.get_env("EXIST_DB_URL"),
-  exist_db_username: System.get_env("EXIST_DB_USERNAME"),
-  exist_db_password: System.get_env("EXIST_DB_PASSWORD"),
   env: config_env()
 
 # Configures AMQP for queueing Version parsing
@@ -69,7 +66,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "opencommentaries.org"
+  host = System.get_env("PHX_HOST") || "ajaxmulticommentary.org"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :text_server, TextServerWeb.Endpoint,
@@ -103,7 +100,7 @@ if config_env() == :prod do
   config :text_server, TextServer.Mailer,
     adapter: Swoosh.Adapters.Sendgrid,
     api_key: System.get_env("SENDGRID_API_KEY"),
-    domain: "opencommentaries.org"
+    domain: "ajaxmulticommentary.org"
 
   # For this example you need include a HTTP client required by Swoosh API client.
   # Swoosh supports Hackney and Finch out of the box:

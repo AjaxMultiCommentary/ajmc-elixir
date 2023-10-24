@@ -8,26 +8,42 @@ defmodule TextServerWeb.ReadLive.Reader.Navigation do
   attr :unit_labels, :list
 
   def navigation_menu(assigns) do
+    case length(assigns[:unit_labels]) do
+      3 ->
+        ~H"<.unit_labels_3 {assigns} />"
+
+      2 ->
+        ~H"<.unit_labels_2 {assigns} />"
+
+      1 ->
+        ~H"<span />"
+
+      0 ->
+        ~H"<span />"
+    end
+  end
+
+  attr :current_page, :integer
+  attr :passage_refs, :list
+  attr :unit_labels, :list
+
+  def unit_labels_2(assigns) do
     ~H"""
-    <%= if length(@unit_labels) == 3 do %>
-      <.unit_labels_3 current_page={@current_page} passage_refs={@passage_refs} unit_labels={@unit_labels} />
-    <% else %>
-      <nav>
-        <ul class="menu bg-base-200 w-56 rounded">
-          <%= for group <- @passage_refs do %>
-            <li>
-              <a
-                href={"?page=#{elem(List.first(group), 1)}"}
-                class={if(@current_page == elem(List.first(group), 1), do: "active")}
-              >
-                <%= List.first(@unit_labels) |> :string.titlecase() %>
-                <%= List.first(group) |> elem(0) |> elem(0) %>
-              </a>
-            </li>
-          <% end %>
-        </ul>
-      </nav>
-    <% end %>
+    <nav>
+      <ul class="menu bg-base-200 w-56 rounded">
+        <%= for group <- @passage_refs do %>
+          <li>
+            <a
+              href={"?page=#{elem(List.first(group), 1)}"}
+              class={if(@current_page == elem(List.first(group), 1), do: "active")}
+            >
+              <%= List.first(@unit_labels) |> :string.titlecase() %>
+              <%= List.first(group) |> elem(0) |> elem(0) %>
+            </a>
+          </li>
+        <% end %>
+      </ul>
+    </nav>
     """
   end
 

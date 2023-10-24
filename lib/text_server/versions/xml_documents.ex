@@ -11,6 +11,10 @@ defmodule TextServer.Versions.XmlDocuments do
     get_passage(document, refs_decl, passage_ref)
   end
 
+  def get_passage(%XmlDocument{} = document, %RefsDeclaration{} = _refs_decl, :all) do
+    {:ok, get_xpath_result(document, "//tei:text")}
+  end
+
   def get_passage(%XmlDocument{} = document, %RefsDeclaration{} = refs_decl, passage_ref) do
     c_ref_pattern_idx = max(length(refs_decl.unit_labels) - 2, 1)
     c_ref_pattern = Enum.at(refs_decl.c_ref_patterns, c_ref_pattern_idx)
@@ -22,7 +26,7 @@ defmodule TextServer.Versions.XmlDocuments do
       |> Map.new(fn {k, idx} -> {"$#{idx}", k} end)
 
     lookup_pattern =
-     replacement_pattern
+      replacement_pattern
       |> String.replace(Map.keys(replacements), fn match ->
         Map.get(replacements, match)
       end)
@@ -41,8 +45,8 @@ defmodule TextServer.Versions.XmlDocuments do
 
     unit_labels =
       encoding_desc.refs_declarations
-      |> Enum.find(fn ref -> length(ref.unit_labels) > 0 end)
-      |> Map.get(:unit_labels)
+      |> Enum.find(%{}, fn ref -> length(ref.unit_labels) > 0 end)
+      |> Map.get(:unit_labels, [])
 
     {:ok, Map.put(base_refs, :unit_labels, unit_labels)}
   end

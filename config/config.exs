@@ -20,7 +20,7 @@ config :text_server, TextServerWeb.Endpoint,
     layout: false
   ],
   pubsub_server: TextServer.PubSub,
-  live_view: [signing_salt: "Uy4jmRfq"]
+  live_view: [signing_salt: "4WrjkcL2l2grD1Uf6WSI6sD7OFjmGgN6"]
 
 # Configures the mailer
 #

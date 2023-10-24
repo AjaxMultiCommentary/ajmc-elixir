@@ -12,7 +12,7 @@ config :text_server, TextServer.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "text_server_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "ajax_multicommentary_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 

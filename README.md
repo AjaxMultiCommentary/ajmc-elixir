@@ -1,8 +1,8 @@
-# New Alexandria Foundation Text Server
+# Ajax Multi-Commentary 
 
 ## Development
 
-For now, enable S3 uploads by proxyin the MinIO server with `fly proxy 9000`.
+For now, enable S3 uploads by proxying the MinIO server with `fly proxy 9000`.
 
 ## What are we doing?
 
@@ -52,6 +52,7 @@ opted not to include them in our API. See also http://capitains.org/pages/vocabu
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
+  * Make sure your configuration ([./config](./config)) is correct
   * Create and migrate your database with `mix ecto.setup`
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 

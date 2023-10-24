@@ -61,7 +61,8 @@ defmodule TextServerWeb.ReadLive.Reader do
       {:ok, toc} = XmlDocuments.get_table_of_contents(document, refs_decl)
       {:ok, passage_refs} = Passages.list_passage_refs(toc)
 
-      passage_ref = Enum.at(passage_refs, current_page - 1)
+      passage_ref = Enum.at(passage_refs, current_page - 1, :all)
+
       {:ok, passage} = XmlDocuments.get_passage(document, refs_decl, passage_ref)
 
       {:noreply,

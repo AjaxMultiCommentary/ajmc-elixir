@@ -5,7 +5,7 @@ config :text_server, TextServer.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "text_server_dev",
+  database: "ajmc_multicommentary_dev",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 

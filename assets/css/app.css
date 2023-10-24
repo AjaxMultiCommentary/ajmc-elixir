@@ -247,6 +247,17 @@ tei-l {
 	margin-left: 3em;
 }
 
+tei-l::before {
+	content: attr(n);
+	display: inline;
+	padding-right: 1em;
+	color: lightgray;
+}
+
+tei-l:hover::before {
+	color: lightslategray;
+}
+
 tei-p {
 	counter-reset: line_breaks;
 	counter-increment: line_breaks;
