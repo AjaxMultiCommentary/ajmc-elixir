@@ -89,24 +89,19 @@ defmodule TextServer.Versions do
   def create_version(attrs, project) do
     urn = make_version_urn(attrs, project)
 
-    {:ok, version} =
-      Repo.transaction(fn ->
-        {:ok, version} =
-          %Version{}
-          |> Version.changeset(attrs |> Map.put("urn", urn))
-          |> Repo.insert()
+    Repo.transaction(fn ->
+      {:ok, version} =
+        %Version{}
+        |> Version.changeset(attrs |> Map.put("urn", urn))
+        |> Repo.insert()
 
-        {:ok, _project_version} =
-          %ProjectVersion{}
-          |> ProjectVersion.changeset(%{version_id: version.id, project_id: project.id})
-          |> Repo.insert()
+      {:ok, _project_version} =
+        %ProjectVersion{}
+        |> ProjectVersion.changeset(%{version_id: version.id, project_id: project.id})
+        |> Repo.insert()
 
-        version
-      end)
-
-    %{id: version.id}
-    |> TextServer.Workers.VersionWorker.new()
-    |> Oban.insert()
+      version
+    end)
   end
 
   def find_or_create_version(attrs \\ %{}) do
