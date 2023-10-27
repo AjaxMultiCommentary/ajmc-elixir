@@ -1,3 +1,5 @@
+<!-- livebook:{"file_entries":[{"name":"3467O2_tess_retrained.json","type":"attachment"}]} -->
+
 # Creating a TEI XML Version from Scratch
 
 ## Section
@@ -92,4 +94,14 @@ version = TextServer.Versions.get_version!(1) |> TextServer.Repo.preload(:xml_do
 lines = lloyd_jones_body.body.lines
 
 line_map = Map.new(lines, fn line -> {line.n, line} end)
+```
+
+## Schematizing AjMC Canonical JSON
+
+```elixir
+path = "/Users/pletcher/code/ajmc/ajmc-multicommentary/livebooks/files/3467O2_tess_retrained.json"
+s = File.read!(path)
+json = Jason.decode!(s)
+
+data = DataSchema.to_struct(json, DataSchemas.AjmcCanonicalCommentary)
 ```
