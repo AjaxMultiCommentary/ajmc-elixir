@@ -88,4 +88,8 @@ version = TextServer.Versions.get_version!(1) |> TextServer.Repo.preload(:xml_do
 {:ok, xml} = TextServer.Versions.XmlDocuments.get_text_body(version.xml_document)
 
 {:ok, lloyd_jones_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
+
+lines = lloyd_jones_body.body.lines
+
+line_map = Map.new(lines, fn line -> {line.n, line} end)
 ```
