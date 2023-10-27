@@ -77,14 +77,18 @@ defmodule TextServer.Languages do
     case get_language_by_iso_code(iso_code) do
       nil ->
         title = get_title_by_iso_code(iso_code)
+
         case create_language(%{slug: iso_code, title: title}) do
-          {:ok, language} -> language
+          {:ok, language} ->
+            {:ok, language}
+
           {:error, _reason} ->
             Logger.warning("Unable to create language iso_code: #{iso_code}, title: #{title}")
             nil
         end
+
       language ->
-        language
+        {:ok, language}
     end
   end
 
