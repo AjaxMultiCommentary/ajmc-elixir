@@ -31,7 +31,7 @@ defmodule CTS.ProcessingPipelines.XmlPipeline do
       file ->
         xml_raw = File.read!(file)
         md5 = :crypto.hash(:md5, xml_raw) |> Base.encode16(case: :lower)
-        language = Languages.find_or_create_language_by_iso_code(version_data.language)
+        {:ok, language} = Languages.find_or_create_language_by_iso_code(version_data.language)
 
         unless is_nil(language) do
           {:ok, version} =
