@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title prefix="Open Commentaries - ">
+    <.live_title prefix="Ajax Multicommentary – ">
       <%= assigns[:page_title] || "Home" %>
     </.live_title>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
@@ -19,10 +19,10 @@
             <div class="flex">
               <div class="hidden sm:-my-px sm:flex sm:space-x-8 sm:items-center">
                 <.link href={~p"/"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
-                  Open Commentaries
+                  Ajax Multicommentary
                 </.link>
                 <.link href={~p"/projects"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
-                  Projects
+                  Available commentaries
                 </.link>
               </div>
             </div>
@@ -87,10 +87,10 @@
           <div class="border-t border-gray-200 pb-3 pt-4">
             <div class="mt-3 space-y-1 pointer-events-auto">
               <.link href={~p"/"} class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
-                Open Commentaries
+                Ajax Multicommentary
               </.link>
               <.link href={~p"/projects"} class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
-                Projects
+                Available commentaries
               </.link>
               <%= if @current_user do %>
                 <.link

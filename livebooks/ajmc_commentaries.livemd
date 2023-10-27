@@ -1,0 +1,13 @@
+# AjMC Commentaries – An Introduction/Exploration
+
+## Defining a data model
+
+```elixir
+defmodule Ajmc.Annotation do
+  @moduledoc """
+  - lemmas
+  - regions
+  - text
+  """
+end
+```

@@ -2,8 +2,8 @@ defmodule TextServer.Versions.XmlDocuments do
   import Ecto.Query, warn: false
 
   alias TextServer.Repo
-  alias DataSchemata.Version.EncodingDescription
-  alias DataSchemata.Version.RefsDeclaration
+  alias DataSchemas.Version.EncodingDescription
+  alias DataSchemas.Version.RefsDeclaration
   alias TextServer.Versions.XmlDocuments.XmlDocument
 
   def get_passage(%XmlDocument{} = document, passage_ref) do
@@ -70,6 +70,24 @@ defmodule TextServer.Versions.XmlDocuments do
   end
 
   @doc """
+  Returns only the text body of the given `document`, provided
+  that the document conforms
+  Useful for working around xmerl errors related to the XML
+  declarations at the top of a many TEI XML files.
+
+  ## Examples
+
+      iex> get_text_body(%XmlDocument{document: "<?xml-model foo=\"bar\" ?><TEI><text><body>baz</body></text></TEI>"})
+      "<body>baz</body>"
+
+      iex> get_text_body(%XmlDocument{document: "<?xml-model foo=\"bar\" ?><TEI><text></text></TEI>"})
+      ""
+  """
+  def get_text_body(%XmlDocument{} = document) do
+    {:ok, get_xpath_result(document, text_body_xpath()) |> List.first()}
+  end
+
+  @doc """
   Queries the given version using PostgreSQL's built-in
   xpath support.
   """
@@ -89,6 +107,10 @@ defmodule TextServer.Versions.XmlDocuments do
       )
     )
     |> Repo.one()
+  end
+
+  defp text_body_xpath do
+    "/tei:TEI/tei:text/tei:body"
   end
 
   defp refs_decl_xpath do

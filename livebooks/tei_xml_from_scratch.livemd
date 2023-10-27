@@ -59,7 +59,9 @@ Application.ensure_all_started(:inets)
 {{_, 200, ~c"OK"}, _headers, body} = resp
 
 xml = String.trim(body)
+```
 
+```elixir
 {:ok, version} =
   Versions.find_or_create_version(%{
     description: "edited by Hugh Lloyd-Jones",
@@ -73,10 +75,64 @@ xml = String.trim(body)
   })
 
 version = TextServer.Repo.preload(version, :xml_document)
-```
 
-```elixir
 if is_nil(version.xml_document) do
   Versions.create_xml_document!(version, %{document: xml})
 end
+```
+
+## XML Spelunking with DataSchema
+
+```elixir
+defmodule DataSchemas.Version do
+  import DataSchema, only: [data_schema: 1]
+
+  @data_accessor DataSchemas.XPathAccessor
+  data_schema(has_one: {:body, "/TEI/text/body", DataSchemas.Version.Body})
+end
+
+defmodule DataSchemas.Version.Body do
+  import DataSchema, only: [data_schema: 1]
+
+  @data_accessor DataSchemas.XPathAccessor
+  data_schema(
+    has_many: {:notes, "/note", DataSchemas.Version.Body.Note},
+    has_many: {:speakers, "./sp", DataSchemas.Version.Body.Speaker}
+  )
+end
+
+defmodule DataSchemas.Version.Body.Note do
+  import DataSchema, only: [data_schema: 1]
+
+  @data_accessor DataSchemas.XPathAccessor
+  data_schema(
+    field: {:n, "./@n", &{:ok, &1}},
+    field: {:text, "./text", &{:ok, &1}}
+  )
+end
+
+defmodule DataSchemas.Version.Body.Speaker do
+  import DataSchema, only: [data_schema: 1]
+
+  @data_accessor DataSchemas.XPathAccessor
+  data_schema(
+    field: {:name, "./speaker/text()", &{:ok, &1}},
+    has_many: {:lines, "./l", DataSchemas.Version.Body.Speaker.Line}
+  )
+end
+
+defmodule DataSchemas.Version.Body.Speaker.Line do
+  import DataSchema, only: [data_schema: 1]
+
+  @data_accessor DataSchemas.XPathAccessor
+  data_schema(
+    field: {:n, "./@n", &{:ok, &1}},
+    field: {:text, "./text()", &{:ok, &1}}
+  )
+end
+```
+
+```elixir
+version = TextServer.Versions.get_version!(1) |> TextServer.Repo.preload(:xml_document)
+xml = TextServer.Versions.XmlDocuments.get_text_body(version.xml_document)
 ```

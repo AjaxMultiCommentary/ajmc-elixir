@@ -23,9 +23,11 @@ defmodule CTS.ProcessingPipelines.XmlPipeline do
 
   def create_version(work, version_data, version_type) do
     urn = Map.get(version_data, :urn) |> CTS.URN.parse()
+
     case get_version_file(urn) do
       :enoent ->
         {:error, "Could not find file for urn #{urn}."}
+
       file ->
         xml_raw = File.read!(file)
         md5 = :crypto.hash(:md5, xml_raw) |> Base.encode16(case: :lower)
@@ -55,6 +57,7 @@ defmodule CTS.ProcessingPipelines.XmlPipeline do
         Map.get(work_cts_data, :commentaries) |> Enum.each(&create_commentary(work, &1))
         Map.get(work_cts_data, :editions) |> Enum.each(&create_edition(work, &1))
         Map.get(work_cts_data, :translations) |> Enum.each(&create_translation(work, &1))
+
       {:error, reason} ->
         IO.puts(reason)
     end
@@ -74,9 +77,10 @@ defmodule CTS.ProcessingPipelines.XmlPipeline do
     case get_work_cts_file(work) do
       :enoent ->
         {:error, "Could not find file for #{work.english_title}."}
+
       cts_file ->
         cts_data_raw = File.read!(cts_file)
-        DataSchema.to_struct(cts_data_raw, DataSchemata.Work.CTSDocument)
+        DataSchema.to_struct(cts_data_raw, DataSchemas.Work.CTSDocument)
     end
   end
 

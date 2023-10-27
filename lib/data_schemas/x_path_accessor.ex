@@ -1,4 +1,4 @@
-defmodule DataSchemata.XPathAccessor do
+defmodule DataSchemas.XPathAccessor do
   @behaviour DataSchema.DataAccessBehaviour
 
   import SweetXml, only: [sigil_x: 2]

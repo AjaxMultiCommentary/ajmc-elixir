@@ -77,7 +77,7 @@ defmodule TextServer.Works do
   def get_work_cts_data(%Work{} = work) do
     cts_file = get_work_cts_file(work)
     cts_data_raw = File.read!(cts_file)
-    DataSchema.to_struct(cts_data_raw, DataSchemata.Work.CTSDocument)
+    DataSchema.to_struct(cts_data_raw, DataSchemas.Work.CTSDocument)
   end
 
   def get_work_cts_file(%Work{} = work) do

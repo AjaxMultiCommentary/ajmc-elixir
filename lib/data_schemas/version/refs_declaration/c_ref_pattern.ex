@@ -1,7 +1,7 @@
-defmodule DataSchemata.Version.RefsDeclaration.CRefPattern do
+defmodule DataSchemas.Version.RefsDeclaration.CRefPattern do
   import DataSchema, only: [data_schema: 1]
 
-  @data_accessor DataSchemata.XPathAccessor
+  @data_accessor DataSchemas.XPathAccessor
 
   @tei_ref_regex ~r/\[@n='\$\d+'\]/
   @tei_xpath_regex ~r/xpath\((?<path>.*)\)/
@@ -13,9 +13,10 @@ defmodule DataSchemata.Version.RefsDeclaration.CRefPattern do
   end
 
   def extract_and_clean_xpath_string(s) do
-    path = Regex.named_captures(@tei_xpath_regex, s)
-    |> Map.get("path")
-    |> String.replace(@tei_ref_regex, "")
+    path =
+      Regex.named_captures(@tei_xpath_regex, s)
+      |> Map.get("path")
+      |> String.replace(@tei_ref_regex, "")
 
     {:ok, path}
   end
@@ -24,6 +25,7 @@ defmodule DataSchemata.Version.RefsDeclaration.CRefPattern do
     field: {:description, "./p/text()", &{:ok, to_string(&1)}},
     field: {:match_pattern, "./@matchPattern", &{:ok, to_string(&1)}},
     field: {:replacement_pattern, "./@replacementPattern", &__MODULE__.extract_xpath_string/1},
-    field: {:reference_path, "./@replacementPattern", &__MODULE__.extract_and_clean_xpath_string/1}
+    field:
+      {:reference_path, "./@replacementPattern", &__MODULE__.extract_and_clean_xpath_string/1}
   )
 end
