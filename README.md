@@ -1,5 +1,7 @@
 # Ajax Multi-Commentary 
 
+This repository is a hard fork of the Open Commentaries' [main server](https://github.com/Open-Commentaries/open-commentaries) as of [fd2b294d1ff89a8d73aaeec53b316d31ce038572](https://github.com/Open-Commentaries/open-commentaries/commit/fd2b294d1ff89a8d73aaeec53b316d31ce038572).
+
 ## Development
 
 For now, enable S3 uploads by proxying the MinIO server with `fly proxy 9000`.
