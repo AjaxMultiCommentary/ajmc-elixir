@@ -82,8 +82,11 @@ defmodule TextServerWeb.ReadLive.Reader do
     ~H"""
     <div class="flex grow gap-y-5 overflow-y-auto px-6">
       <Navigation.navigation_menu current_page={@current_page} passage_refs={@passage_refs} unit_labels={@unit_labels} />
-      <div class="px-6">
-        <.live_component id={:reader_passage} module={Passage} passage={@passage} />
+      <div class="p-6">
+        <div class="grid grid-cols-2">
+          <.live_component id={:reader_passage} module={Passage} passage={@passage} />
+          <div id="iiif-viewer" phx-hook="IIIFHook" class="openseadragon" style="width: 800px; height: 600px;" />
+        </div>
       </div>
     </div>
     """

@@ -1,9 +1,12 @@
 import CETEI from 'CETEIcean';
+import OpenSeadragon from 'openseadragon'
 
 const DRAG_ATTRIBUTE_NAME = 'phx-drop-target';
 const DROP_TARGET_BG = 'bg-slate-50';
 
-const teiTransformer = new CETEI();
+/**
+ * Begin DragHook
+ */
 
 export const DragHook = {
 	isDropTarget(event) {
@@ -25,6 +28,32 @@ export const DragHook = {
 		})
 	}
 };
+
+/**
+ * Begin IIIFHook
+ */
+
+export const IIIFHook = {
+	mounted() {
+		OpenSeadragon({
+			id: "iiif-viewer",
+			prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+			preserveViewport: true,
+			tileSources: {
+				type: 'image',
+				url: 'https://ajaxmulticommentary.github.io/ajmc_iiif/sophoclesplaysa05campgoog/sophoclesplaysa05campgoog_0236/full/max/0/default.png',
+				crossOriginPolicy: 'Anonymous',
+				ajaxWithCredentials: false
+			}
+		});
+	},
+};
+
+/**
+ * 
+ * Begin TEIHook
+ */
+const teiTransformer = new CETEI();
 
 export async function transformTei(raw) {
 	if (!raw) {
@@ -54,5 +83,6 @@ export const TEIHook = {
 
 export default {
 	DragHook,
+	IIIFHook,
 	TEIHook,
 };

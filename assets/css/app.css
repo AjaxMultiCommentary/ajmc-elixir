@@ -258,42 +258,6 @@ tei-l:hover::before {
 	color: lightslategray;
 }
 
-tei-p {
-	counter-reset: line_breaks;
-	counter-increment: line_breaks;
-}
-
-tei-lb {
-	counter-increment: line_breaks 1;
-}
-
-tei-div:hover tei-lb::after {
-	display: block;
-	float: left;
-	opacity: 0.5;
-	content: counter(line_breaks);
-	margin-left: -3em;
-}
-
-tei-p tei-lb:nth-of-type(5n-1)::after {
-	display: block;
-	float: left;
-	content: counter(line_breaks);
-	margin-left: -3em;
-}
-
-tei-l {
-	counter-increment: lines 1;
-}
-
-tei-l:hover::after {
-	display: block;
-	float: right;
-	opacity: 0.5;
-	content: counter(lines);
-	margin-right: -5em;
-}
-
 tei-q {
 	display: block;
 	border-left: 4px solid #efefeffd;
