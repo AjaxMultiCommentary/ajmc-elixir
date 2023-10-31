@@ -4,7 +4,6 @@ defmodule TextServer.CommentaryLemmas.CommentaryLemma do
 
   @derive {Jason.Encoder,
            only: [
-             :anchor_target,
              :label,
              :selector,
              :shifts,

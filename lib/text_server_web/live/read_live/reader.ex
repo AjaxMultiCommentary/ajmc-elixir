@@ -24,10 +24,12 @@ defmodule TextServerWeb.ReadLive.Reader do
 
     version =
       get_version_by_urn!("urn:cts:#{collection_s}:#{text_group_s}.#{work_s}.#{version_s}")
+      |> Repo.preload(commentaries: :lemmas)
 
     {:ok,
      socket
      |> assign(
+       active_commentaries: [],
        current_page: current_page,
        version: version
      )}
@@ -78,13 +80,47 @@ defmodule TextServerWeb.ReadLive.Reader do
     end
   end
 
+  def handle_event("toggle-active-commentary", %{"commentary_id" => id}, socket) do
+    id = String.to_integer(id)
+    active_commentaries = socket.assigns.active_commentaries
+
+    if Enum.member?(active_commentaries, id) do
+      {:noreply,
+       socket
+       |> assign(:active_commentaries, Enum.reject(active_commentaries, &(&1 == id)))}
+    else
+      {:noreply, socket |> assign(:active_commentaries, [id | active_commentaries])}
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="flex grow gap-y-5 overflow-y-auto px-6">
       <Navigation.navigation_menu current_page={@current_page} passage_refs={@passage_refs} unit_labels={@unit_labels} />
       <div class="p-6">
+        <div>
+          <%= for commentary <- @version.commentaries do %>
+            <button
+              class={["btn btn-primary", unless(Enum.member?(@active_commentaries, commentary.id), do: "btn-outline")]}
+              phx-click="toggle-active-commentary"
+              phx-value-commentary_id={commentary.id}
+            >
+              <%= commentary.pid %>
+            </button>
+          <% end %>
+        </div>
         <div class="grid grid-cols-2">
-          <.live_component id={:reader_passage} module={Passage} passage={@passage} />
+          <div>
+            <.live_component
+              id={:reader_passage}
+              module={Passage}
+              lemmas={
+                Enum.filter(@version.commentaries, fn c -> Enum.member?(@active_commentaries, c.id) end)
+                |> Enum.flat_map(& &1.lemmas)
+              }
+              passage={@passage}
+            />
+          </div>
           <div id="iiif-viewer" phx-hook="IIIFHook" class="openseadragon" style="width: 800px; height: 600px;" />
         </div>
       </div>
