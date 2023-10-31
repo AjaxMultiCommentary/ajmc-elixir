@@ -54,10 +54,15 @@ defmodule DataSchemas.AjmcCanonicalCommentary.Lemma do
   import DataSchema, only: [data_schema: 1]
 
   data_schema(
-    field: {:anchor_target, "anchor_target", &{:ok, &1}, optional?: true},
+    field: {:anchor_target, "anchor_target", &{:ok, Jason.decode!(&1)}, optional?: true},
     field: {:label, "label", &{:ok, &1}},
+    field:
+      {:selector, "anchor_target", &{:ok, Jason.decode!(&1) |> Map.get("selector")},
+       optional?: true},
     field: {:shifts, "shifts", &{:ok, &1}},
-    field: {:text_anchor, "textAnchor", &{:ok, &1}, optional?: true},
+    field:
+      {:text_anchor, "anchor_target", &{:ok, Jason.decode!(&1) |> Map.get("textAnchor")},
+       optional?: true},
     field: {:transcript, "transcript", &{:ok, &1}, optional?: true}
   )
 end

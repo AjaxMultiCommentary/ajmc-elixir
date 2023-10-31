@@ -16,6 +16,11 @@ defmodule TextServerWeb.VersionController do
         "version" => version,
         "work" => work
       }) do
+    version =
+      Versions.get_version_by_urn!("urn:cts:#{collection}:#{text_group}.#{work}.#{version}")
+      |> Repo.preload(commentaries: :lemmas)
+
+    json(conn, Enum.map(version.commentaries, fn c -> c.lemmas end))
   end
 
   def show(conn, %{

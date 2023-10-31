@@ -57,16 +57,6 @@ defmodule TextServer.Commentaries do
 
   @doc """
   Inserts or updates a canonical commentary.
-
-  ## Examples
-      iex> upsert_canonical_commentary(%{pid: "commentary_id", filename: "/file/name.json"})
-      {:ok, %CanonicalCommentary{}}
-
-      iex> upsert_canonical_commentary(%{pid: "commentary_id", filename: "/new/file/name.json"})
-      {:ok, %CanonicalCommentary{}}
-
-      iex> upsert_canonical_commentary(%{pid: "commentary_id", filename: bad_or_null_value})
-      {:error, %Ecto.Changeset{}}
   """
   def upsert_canonical_commentary(attrs) do
     pid = Map.get(attrs, :pid, Map.get(attrs, "pid"))
