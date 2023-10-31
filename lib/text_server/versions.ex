@@ -214,8 +214,8 @@ defmodule TextServer.Versions do
   end
 
   def get_version_by_urn(%CTS.URN{} = urn) do
-    version_urn_s = "#{urn.prefix}:#{urn.protocol}:#{urn.namespace}:#{urn.work_component}"
-    Repo.get_by(Version, urn: version_urn_s)
+    # version_urn_s = "#{urn.prefix}:#{urn.protocol}:#{urn.namespace}:#{urn.work_component}"
+    Repo.get_by(Version, urn: urn)
   end
 
   defp make_version_urn(version_params, project) do

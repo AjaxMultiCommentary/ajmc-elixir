@@ -20,15 +20,22 @@ defmodule TextServerWeb.Router do
   end
 
   scope "/api", TextServerWeb do
-    pipe_through [:api, :authenticate_api_user]
+    pipe_through [:api]
 
-    get "/versions/:id/download", VersionController, :download
+    scope "/versions" do
+      pipe_through [:authenticate_api_user]
+
+      get "/:id/download", VersionController, :download
+    end
+
+    get "/:collection/:text_group/:work/:version", VersionController, :show
   end
 
   scope "/", TextServerWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :with_authenticated_user, on_mount: [{TextServerWeb.UserAuth, :ensure_authenticated}] do
+    live_session :with_authenticated_user,
+      on_mount: [{TextServerWeb.UserAuth, :ensure_authenticated}] do
       live "/collections/new", CollectionLive.Index, :new
       live "/collections/:id/edit", CollectionLive.Index, :edit
       live "/collections/:id/show/edit", CollectionLive.Show, :edit
@@ -62,7 +69,7 @@ defmodule TextServerWeb.Router do
   scope "/", TextServerWeb do
     pipe_through [:browser, :require_authenticated_user, :require_project_admin]
 
-    live_session :project_with_admin, on_mount: [{TextServerWeb.UserAuth, :mount_current_user}]  do
+    live_session :project_with_admin, on_mount: [{TextServerWeb.UserAuth, :mount_current_user}] do
       live "/projects/:project_id/edit", ProjectLive.Edit, :edit
     end
   end
