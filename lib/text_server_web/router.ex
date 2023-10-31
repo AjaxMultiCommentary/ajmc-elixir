@@ -29,6 +29,7 @@ defmodule TextServerWeb.Router do
     end
 
     get "/:collection/:text_group/:work/:version", VersionController, :show
+    get "/:collection/:text_group/:work/:version/lemmas", VersionController, :lemmas
   end
 
   scope "/", TextServerWeb do

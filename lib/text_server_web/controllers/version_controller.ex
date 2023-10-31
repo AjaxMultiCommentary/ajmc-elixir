@@ -10,6 +10,14 @@ defmodule TextServerWeb.VersionController do
     send_download(conn, {:file, version.filename})
   end
 
+  def lemmas(conn, %{
+        "collection" => collection,
+        "text_group" => text_group,
+        "version" => version,
+        "work" => work
+      }) do
+  end
+
   def show(conn, %{
         "collection" => collection,
         "text_group" => text_group,

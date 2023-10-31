@@ -213,9 +213,14 @@ defmodule TextServer.Versions do
     end
   end
 
+  @doc """
+  Returns the version for the given URN. We need to convert
+  the URN to a string that only goes up to the version fragment,
+  because longer URNs won't match.
+  """
   def get_version_by_urn(%CTS.URN{} = urn) do
-    # version_urn_s = "#{urn.prefix}:#{urn.protocol}:#{urn.namespace}:#{urn.work_component}"
-    Repo.get_by(Version, urn: urn)
+    version_urn_s = "#{urn.prefix}:#{urn.protocol}:#{urn.namespace}:#{urn.work_component}"
+    Repo.get_by(Version, urn: version_urn_s)
   end
 
   defp make_version_urn(version_params, project) do

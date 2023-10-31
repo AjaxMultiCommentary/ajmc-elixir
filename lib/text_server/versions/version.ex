@@ -17,6 +17,7 @@ defmodule TextServer.Versions.Version do
     belongs_to :language, TextServer.Languages.Language
     belongs_to :work, TextServer.Works.Work
 
+    has_many :commentaries, TextServer.Commentaries.CanonicalCommentary
     has_many :text_nodes, TextServer.TextNodes.TextNode
     has_one :xml_document, TextServer.Versions.XmlDocuments.XmlDocument
 

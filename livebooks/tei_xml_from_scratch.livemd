@@ -99,9 +99,21 @@ line_map = Map.new(lines, fn line -> {line.n, line} end)
 ## Schematizing AjMC Canonical JSON
 
 ```elixir
-path = "/Users/pletcher/code/ajmc/ajmc-multicommentary/livebooks/files/3467O2_tess_retrained.json"
+path =
+  "/Users/pletcher/code/ajmc/ajmc-multicommentary/priv/static/json/3467O2_tess_retrained.json"
+
 s = File.read!(path)
 json = Jason.decode!(s)
 
-data = DataSchema.to_struct(json, DataSchemas.AjmcCanonicalCommentary)
+{:ok, data} = DataSchema.to_struct(json, DataSchemas.AjmcCanonicalCommentary)
+```
+
+```elixir
+alias TextServer.Commentaries
+
+Commentaries.upsert_canonical_commentary(%{
+  pid: data.id,
+  filename: "3467O2_tess_retrained.json",
+  version_id: version.id
+})
 ```
