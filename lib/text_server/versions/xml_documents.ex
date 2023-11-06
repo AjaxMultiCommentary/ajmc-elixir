@@ -70,6 +70,29 @@ defmodule TextServer.Versions.XmlDocuments do
   end
 
   @doc """
+  Updates an XML document.
+  """
+  def update_xml_document(%XmlDocument{} = document, attrs \\ %{}) do
+    document
+    |> XmlDocument.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes an XML document.
+
+  ## Examples
+      iex> delete_xml_document(xml_document)
+      {:ok, %XmlDocument{}}
+
+      iex> delete_xml_document(invalid_doc)
+      {:error, %Ecto.Changeset{}}
+  """
+  def delete_xml_document(%XmlDocument{} = document) do
+    Repo.delete(document)
+  end
+
+  @doc """
   Returns only the text body of the given `document`, provided
   that the document conforms
   Useful for working around xmerl errors related to the XML

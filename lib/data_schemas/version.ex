@@ -23,13 +23,14 @@ end
 defmodule DataSchemas.Version.Body.Line do
   import DataSchema, only: [data_schema: 1]
 
-  @derive {Jason.Encoder, only: [:n, :raw, :text]}
+  @derive {Jason.Encoder, only: [:n, :raw, :text, :tokens]}
 
   @data_accessor DataSchemas.XPathAccessor
   data_schema(
     field: {:n, "./@n", &{:ok, &1}},
     field: {:raw, ".", &{:ok, &1}},
-    field: {:text, ".//text()", &{:ok, &1}}
+    field: {:text, ".//text()", &{:ok, &1}},
+    list_of: {:tokens, ".//text()", &{:ok, String.split(&1, ~r/[[:space:]]/)}}
   )
 end
 
