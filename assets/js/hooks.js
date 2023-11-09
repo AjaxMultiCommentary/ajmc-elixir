@@ -113,11 +113,7 @@ export const TEIHook = {
 	},
 
 	async updated() {
-		await replaceRawTei(this.el);
-
-		const lemmas = JSON.parse(this.lemmas());
-
-		lemmas.forEach(applyLemma);
+		return replaceRawTei(this.el);
 	},
 };
 

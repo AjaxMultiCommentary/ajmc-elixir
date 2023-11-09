@@ -46,14 +46,14 @@ language = Languages.find_or_create_language(%{slug: "grc", title: "Greek"})
 ```
 
 ```elixir
-xml = File.read!("./priv/static/xml/lloyd-jones1994/urn:cts:greekLit:tlg0011.tlg003.ajmc-lj.xml")
+xml = File.read!("./priv/static/xml/lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml")
 ```
 
 ```elixir
 {:ok, version} =
   Versions.find_or_create_version(%{
     description: "edited by Hugh Lloyd-Jones",
-    filename: "lloyd-jones1994/urn:cts:greekLit:tlg0011.tlg003.ajmc-lj.xml",
+    filename: "lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml",
     filemd5hash: :crypto.hash(:md5, xml) |> Base.encode16(case: :lower),
     label: "Sophocles' <i>Ajax</i>",
     language_id: language.id,
@@ -77,9 +77,39 @@ version = TextServer.Versions.get_version!(1) |> TextServer.Repo.preload(:xml_do
 
 {:ok, lloyd_jones_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
 
-lines = lloyd_jones_body.body.lines
+lloyd_jones_body.body.lines |> Enum.filter(fn l -> length(l.elements) > 0 end)
 
-line_map = Map.new(lines, fn line -> {line.n, line} end)
+# %{word_count: _word_count, lines: lines} =
+#   lloyd_jones_body.body.lines
+#   |> Enum.reduce(%{word_count: 0, lines: []}, fn line, acc ->
+#     text = line.text |> String.trim()
+#     word_count = acc.word_count
+
+#     words =
+#       Regex.split(~r/[[:space:]]+/, text)
+#       |> Enum.with_index()
+#       |> Enum.map(fn {word, index} ->
+#         offset = case String.split(text, word, parts: 2) do
+#           [left, _] -> String.length(left)
+#           [_] -> nil
+#         end
+#         %{
+#           xml_id: "word_index_#{word_count + index}",
+#           offset: offset,
+#           text: word
+#         }
+#       end)
+
+#     new_line = %{text: text, words: words}
+
+#     %{word_count: word_count + length(words), lines: [new_line | acc.lines]}
+#   end)
+
+# lines = Enum.reverse(lines)
+```
+
+```elixir
+
 ```
 
 ## Schematizing AjMC Canonical JSON
@@ -95,6 +125,30 @@ json = Jason.decode!(s)
 ```
 
 ```elixir
+children = json |> Map.get("children")
+lemmas = children |> Map.get("lemmas")
+words = children |> Map.get("words")
+regions = children |> Map.get("regions")
+
+# region_types = regions |> Enum.map(& Map.get(&1, "region_type")) |> Enum.into(MapSet.new())
+
+commentary =
+  regions
+  |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
+  |> Enum.map(fn comment ->
+    word_range = Map.get(comment, "word_range")
+
+    ws =
+      words
+      |> Enum.slice(Range.new(Enum.at(word_range, 0), Enum.at(word_range, 1)))
+      |> Enum.map(&Map.get(&1, "text"))
+      |> Enum.join(" ")
+
+    Map.put(comment, :words, ws)
+  end)
+```
+
+```elixir
 alias TextServer.Commentaries
 alias TextServer.CommentaryLemmas
 
@@ -105,11 +159,10 @@ alias TextServer.CommentaryLemmas
     version_id: version.id
   })
 
-data.lemmas
-|> Enum.each(fn lemma ->
-  attrs = Map.from_struct(lemma) |> Map.put(:canonical_commentary_id, commentary.id)
-  CommentaryLemmas.upsert_commentary_lemma(attrs)
+# |> Enum.each(fn lemma ->
+#   attrs = Map.from_struct(lemma) |> Map.put(:canonical_commentary_id, commentary.id)
+#   CommentaryLemmas.upsert_commentary_lemma(attrs)
 
-  IO.inspect(lemma)
-end)
+#   IO.inspect(lemma)
+# end)
 ```

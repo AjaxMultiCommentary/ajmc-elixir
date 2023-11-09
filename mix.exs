@@ -64,6 +64,7 @@ defmodule TextServer.MixProject do
       {:postgrex, "~> 0.16.3"},
       {:rambo, "~> 0.3.4"},
       {:recase, "~> 0.5"},
+      {:saxy, "~> 1.5"},
       {:scrivener_ecto, "~> 2.7"},
       {:sweet_xml, "~> 0.7.1"},
       {:swoosh, "~> 1.3"},
@@ -88,7 +89,7 @@ defmodule TextServer.MixProject do
       "ecto.setup": [
         "ecto.create",
         "ecto.load -d priv/repo/20230828_schema.sql -f --skip-if-loaded",
-        "ecto.migrate",
+        "ecto.migrate"
       ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
