@@ -29,7 +29,11 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
       <div :if={@sibling_node != nil} class="max-w-prose">
         <p class="mb-4 px-4" alt={@sibling_node.version.label}>
-          <.text_element :for={{graphemes, tags} <- @sibling_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
+          <.text_element
+            :for={{graphemes, tags} <- @sibling_node.graphemes_with_tags}
+            tags={tags}
+            text={Enum.join(graphemes)}
+          />
         </p>
       </div>
     </div>
@@ -112,9 +116,10 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             tags |> Enum.find(&(&1.name == "note")) |> Map.get(:metadata, %{})
           )
 
-        # NOTE: This element must be on a single line because we're preserving paragraph breaks from the original docx.
         ~H"""
-        <span class={@classes}><%= @text %><a href={"#_fn-#{@footnote[:id]}"} id={"_fn-ref-#{@footnote[:id]}"}><sup>*</sup></a></span>
+        <span class={@classes}>
+          <%= @text %><a href={"#_fn-#{@footnote[:id]}"} id={"_fn-ref-#{@footnote[:id]}"}><sup>*</sup></a>
+        </span>
         """
 
       true ->
@@ -124,7 +129,9 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   defp tag_classes(tag) do
     case tag.name do
+      "add" -> "bg-sky-400"
       "comment" -> "bg-blue-200 cursor-pointer"
+      "del" -> "line-through"
       "emph" -> "italic"
       "image" -> "image mt-10"
       "link" -> "link font-bold underline hover:opacity-75 visited:opacity-60"
