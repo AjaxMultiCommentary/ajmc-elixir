@@ -215,7 +215,7 @@ prepped_lemmas =
       glossa = (lemma_words <> no_next_lemma) |> String.trim()
 
       Map.merge(lemma, %{
-        "glossa" => glossa,
+        "content" => glossa,
         "words" => lemma_words,
         "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range"))
       })
@@ -254,6 +254,8 @@ prepped_lemmas
   with anchor_target when not is_nil(anchor_target) <- Map.get(lemma, "anchor_target") do
     j = Jason.decode!(anchor_target)
     selector = Map.get(j, "selector")
+    content = Map.get(lemma, "content")
+    {_, popped_content_lemma} = Map.pop(lemma, "content")
 
     with %{
            "first_line_n" => first_line_n,
@@ -277,7 +279,8 @@ prepped_lemmas
 
         {:ok, _text_element} =
           %{
-            attributes: lemma,
+            attributes: popped_content_lemma,
+            content: content,
             end_offset: String.length(first_text_node.text),
             element_type_id: comment_element_type.id,
             end_text_node_id: first_text_node.id,
@@ -291,7 +294,8 @@ prepped_lemmas
 
         {:ok, _text_element} =
           %{
-            attributes: lemma,
+            attributes: popped_content_lemma,
+            content: content,
             end_offset: last_offset,
             element_type_id: comment_element_type.id,
             end_text_node_id: last_text_node.id,
@@ -304,7 +308,8 @@ prepped_lemmas
 
         {:ok, _text_element} =
           %{
-            attributes: lemma,
+            attributes: popped_content_lemma,
+            content: content,
             end_offset: last_line_offset,
             element_type_id: comment_element_type.id,
             end_text_node_id: text_node.id,

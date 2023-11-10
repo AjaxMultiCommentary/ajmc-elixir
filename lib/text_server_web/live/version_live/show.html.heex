@@ -19,21 +19,27 @@
         top_level_toc={@top_level_toc}
         versions={@versions}
       />
-      <Components.floating_comments comments={@comments} highlighted_comments={@highlighted_comments} />
-      <.live_component
-        id={:reader}
-        module={TextServerWeb.ReadingEnvironment.Reader}
-        focused_text_node={@focused_text_node}
-        footnotes={@footnotes}
-        location={@location}
-        passage={@passage}
-        version_command_palette_open={@version_command_palette_open}
-        text_nodes={@text_nodes}
-        text_node_command_palette_open={@focused_text_node != nil}
-        top_level_toc={@top_level_toc}
-        second_level_toc={@second_level_toc}
-        version_urn={@version.urn}
-      />
+      <div class="flex">
+        <div class="flex-grow">
+          <.live_component
+            id={:reader}
+            module={TextServerWeb.ReadingEnvironment.Reader}
+            focused_text_node={@focused_text_node}
+            footnotes={@footnotes}
+            location={@location}
+            passage={@passage}
+            version_command_palette_open={@version_command_palette_open}
+            text_nodes={@text_nodes}
+            text_node_command_palette_open={@focused_text_node != nil}
+            top_level_toc={@top_level_toc}
+            second_level_toc={@second_level_toc}
+            version_urn={@version.urn}
+          />
+        </div>
+        <div class="flex-shrink">
+          <Components.floating_comments comments={@comments} highlighted_comments={@highlighted_comments} />
+        </div>
+      </div>
       <Components.pagination current_page={@passage.passage_number} total_pages={@passage.total_passages} />
     </div>
   </div>
