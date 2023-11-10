@@ -25,7 +25,9 @@ defmodule TextServer.TextElements do
 
   def list_text_elements_by_type(element_type) do
     case ElementTypes.get_element_type_by_name(element_type) do
-      nil -> []
+      nil ->
+        []
+
       el ->
         type_id = el.id
         query = from(t in TextElement, where: t.element_type_id == ^type_id)

@@ -19,6 +19,7 @@
         top_level_toc={@top_level_toc}
         versions={@versions}
       />
+      <Components.floating_comments comments={@comments} highlighted_comments={@highlighted_comments} />
       <.live_component
         id={:reader}
         module={TextServerWeb.ReadingEnvironment.Reader}

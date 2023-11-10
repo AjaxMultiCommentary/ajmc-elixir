@@ -127,7 +127,7 @@ lines
   |> Enum.each(fn element ->
     {:ok, element_type} = ElementTypes.find_or_create_element_type(%{name: element.name})
 
-    {:ok, text_element} =
+    {:ok, _text_element} =
       %{
         attributes: Map.new(element.attributes),
         end_offset: element.end_offset,
@@ -144,37 +144,181 @@ end)
 ## Schematizing AjMC Canonical JSON
 
 ```elixir
+defmodule WordText do
+  def get_words_for_range(words, %Range{} = range) do
+    words
+    |> Enum.slice(range)
+    |> Enum.map(&Map.get(&1, "text"))
+    |> Enum.join(" ")
+  end
+
+  def get_words_for_range(words, [first, last]), do: get_words_for_range(words, first..last)
+
+  def filter_commentaries_containing_range(commentaries, %Range{} = range) do
+    commentaries
+    |> Enum.filter(fn c ->
+      [f | [l]] = Map.get(c, "word_range")
+
+      !Range.disjoint?(f..l, range)
+    end)
+  end
+end
+```
+
+```elixir
 path =
   "/Users/pletcher/code/ajmc/ajmc-multicommentary/priv/static/json/3467O2_tess_retrained.json"
 
 s = File.read!(path)
 json = Jason.decode!(s)
 
-{:ok, data} = DataSchema.to_struct(json, DataSchemas.AjmcCanonicalCommentary)
-```
-
-```elixir
 children = json |> Map.get("children")
-lemmas = children |> Map.get("lemmas")
+lemmas = children |> Map.get("lemmas") |> Enum.filter(&(Map.get(&1, "label") == "word-anchor"))
 words = children |> Map.get("words")
 regions = children |> Map.get("regions")
 
-# region_types = regions |> Enum.map(& Map.get(&1, "region_type")) |> Enum.into(MapSet.new())
+regions
+|> Enum.drop_while(&(Map.get(&1, "region_type") != "primary_text"))
+|> Enum.chunk_by(&Map.get(&1, "region_type"))
 
-commentary =
-  regions
-  |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
-  |> Enum.map(fn comment ->
-    word_range = Map.get(comment, "word_range")
+commentaries = regions |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
 
-    ws =
-      words
-      |> Enum.slice(Range.new(Enum.at(word_range, 0), Enum.at(word_range, 1)))
-      |> Enum.map(&Map.get(&1, "text"))
-      |> Enum.join(" ")
+prepped_lemmas =
+  lemmas
+  |> Enum.with_index()
+  |> Enum.map(fn {lemma, index} ->
+    [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
+    lemma_range = lemma_first..lemma_last
+    lemma_words = WordText.get_words_for_range(words, lemma_range)
 
-    Map.put(comment, :words, ws)
+    with next_lemma when not is_nil(next_lemma) <- Enum.at(lemmas, index + 1) do
+      [next_lemma_first | [next_lemma_last]] = Map.get(next_lemma, "word_range")
+      next_lemma_range = next_lemma_first..next_lemma_last
+      next_lemma_words = WordText.get_words_for_range(words, next_lemma_range)
+
+      commentaries =
+        WordText.filter_commentaries_containing_range(
+          commentaries,
+          lemma_first..next_lemma_first
+        )
+
+      g =
+        commentaries
+        |> Enum.map(&WordText.get_words_for_range(words, Map.get(&1, "word_range")))
+        |> Enum.join(" ")
+
+      no_lemma = String.split(g, lemma_words, parts: 2, trim: true) |> List.last()
+
+      no_next_lemma =
+        String.split(no_lemma, next_lemma_words, parts: 2, trim: true) |> List.first()
+
+      glossa = (lemma_words <> no_next_lemma) |> String.trim()
+
+      Map.merge(lemma, %{
+        "glossa" => glossa,
+        "words" => lemma_words,
+        "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range"))
+      })
+    else
+      nil ->
+        commentaries =
+          WordText.filter_commentaries_containing_range(commentaries, lemma_range)
+
+        [_ | [g]] =
+          commentaries
+          |> Enum.map(&WordText.get_words_for_range(words, Map.get(&1, "word_range")))
+          |> Enum.join(" ")
+          |> String.split(lemma_words, parts: 2, trim: true)
+
+        glossa = (lemma_words <> g) |> String.trim()
+
+        Map.merge(lemma, %{
+          "content" => glossa,
+          "words" => lemma_words,
+          "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range"))
+        })
+    end
   end)
+```
+
+```elixir
+passage_regex =
+  ~r/tei-l@n=(?<first_line_n>\d+)\[(?<first_line_offset>\d+)\]:tei-l@n=(?<last_line_n>\d+)\[(?<last_line_offset>\d+)\]/
+
+urn = "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj"
+
+{:ok, comment_element_type} = ElementTypes.find_or_create_element_type(%{name: "comment"})
+
+prepped_lemmas
+|> Enum.each(fn lemma ->
+  with anchor_target when not is_nil(anchor_target) <- Map.get(lemma, "anchor_target") do
+    j = Jason.decode!(anchor_target)
+    selector = Map.get(j, "selector")
+
+    with %{
+           "first_line_n" => first_line_n,
+           "first_line_offset" => first_line_offset,
+           "last_line_n" => last_line_n,
+           "last_line_offset" => last_line_offset
+         } <- Regex.named_captures(passage_regex, selector) do
+      if first_line_n != last_line_n do
+        # If the lemma spans multiple lines, create two comments
+        # (This is essentially how Word handles block-spanning comments in their docx)
+        first_n = min(String.to_integer(first_line_n), String.to_integer(last_line_n))
+
+        [first_offset, last_offset] =
+          if first_n == String.to_integer(first_line_n) do
+            [first_line_offset, last_line_offset]
+          else
+            [last_line_offset, first_line_offset]
+          end
+
+        first_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_n}"})
+
+        {:ok, _text_element} =
+          %{
+            attributes: lemma,
+            end_offset: String.length(first_text_node.text),
+            element_type_id: comment_element_type.id,
+            end_text_node_id: first_text_node.id,
+            start_offset: first_offset,
+            start_text_node_id: first_text_node.id
+          }
+          |> TextElements.find_or_create_text_element()
+
+        last_n = max(String.to_integer(first_line_n), String.to_integer(last_line_n))
+        last_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{last_n}"})
+
+        {:ok, _text_element} =
+          %{
+            attributes: lemma,
+            end_offset: last_offset,
+            element_type_id: comment_element_type.id,
+            end_text_node_id: last_text_node.id,
+            start_offset: 0,
+            start_text_node_id: last_text_node.id
+          }
+          |> TextElements.find_or_create_text_element()
+      else
+        text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_line_n}"})
+
+        {:ok, _text_element} =
+          %{
+            attributes: lemma,
+            end_offset: last_line_offset,
+            element_type_id: comment_element_type.id,
+            end_text_node_id: text_node.id,
+            start_offset: first_line_offset,
+            start_text_node_id: text_node.id
+          }
+          |> TextElements.find_or_create_text_element()
+      end
+    else
+      nil ->
+        IO.warn("Invalid selector #{selector}.")
+    end
+  end
+end)
 ```
 
 ```elixir

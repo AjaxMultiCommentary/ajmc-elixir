@@ -207,7 +207,7 @@ defmodule TextServer.TextNodes do
     |> Repo.preload([:version, text_elements: [:element_type, :text_element_users]])
   end
 
-  def get_by(attrs \\ %{}) do
+  def get_text_node_by(attrs \\ %{}) do
     Repo.get_by(TextNode, attrs)
   end
 

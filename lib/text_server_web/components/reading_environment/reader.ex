@@ -66,19 +66,6 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
           text_node={text_node}
         />
       </section>
-      <.live_component
-        module={TextServerWeb.ReadingEnvironment.TextNodeCommandPalette}
-        id={:text_node_command_palette}
-        is_open={@text_node_command_palette_open}
-        text_node={@focused_text_node}
-        urn={@version_urn}
-      />
-      <.live_component
-        module={TextServerWeb.ReadingEnvironment.VersionCommandPalette}
-        id={:version_command_palette}
-        is_open={@version_command_palette_open}
-        urn={@version_urn}
-      />
       <Components.footnotes footnotes={@footnotes} />
     </article>
     """
