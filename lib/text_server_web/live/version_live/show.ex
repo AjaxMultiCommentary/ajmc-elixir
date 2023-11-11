@@ -118,7 +118,6 @@ defmodule TextServerWeb.VersionLive.Show do
     ids =
       comment_ids
       |> Jason.decode!()
-      |> Enum.map(&String.to_integer/1)
 
     {:noreply, socket |> assign(highlighted_comments: ids)}
   end

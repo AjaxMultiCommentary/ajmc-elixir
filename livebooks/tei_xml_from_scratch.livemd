@@ -294,8 +294,8 @@ prepped_lemmas
 
         {:ok, _text_element} =
           %{
-            attributes: popped_content_lemma,
-            content: content,
+            attributes: popped_content_lemma |> Map.put(:comment_end, true),
+            content: "",
             end_offset: last_offset,
             element_type_id: comment_element_type.id,
             end_text_node_id: last_text_node.id,

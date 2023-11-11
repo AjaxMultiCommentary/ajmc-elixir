@@ -126,45 +126,16 @@ defmodule TextServer.TextNodes.TextNode do
   end
 
   defp apply_comments(comments, graphemes) do
-    ranged_comments =
-      comments
-      |> Enum.map(fn c ->
-        author = comment_author(c)
-        date = comment_date(c)
-
-        Map.new(
-          id: Integer.to_string(c.id),
-          author: author,
-          content: c.content,
-          date: date,
-          end_offset: c.end_offset,
-          start_offset: c.start_offset,
-          range: c.start_offset..(c.end_offset - 1)
-        )
-      end)
-
     graphemes
     |> Enum.map(fn g ->
       {i, g, tags} = g
 
       applicable_comments =
-        ranged_comments
-        |> Enum.filter(fn c -> i in c.range end)
+        comments
+        |> Enum.filter(fn c -> i in c.start_offset..(c.end_offset - 1) end)
         |> Enum.map(fn c -> %Tag{name: "comment", metadata: c} end)
 
       {i, g, tags ++ applicable_comments}
     end)
-  end
-
-  defp comment_kv_pairs(comment), do: Map.get(comment.attributes, "key_value_pairs", %{})
-  defp comment_author(comment), do: comment_kv_pairs(comment) |> Map.get("author")
-
-  defp comment_date(comment) do
-    try do
-      {:ok, date, _} = comment_kv_pairs(comment) |> Map.get("date") |> DateTime.from_iso8601()
-      date
-    rescue
-      _ -> nil
-    end
   end
 end

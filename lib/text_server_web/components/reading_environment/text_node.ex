@@ -78,7 +78,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             :comments,
             tags
             |> Enum.filter(&(&1.name == "comment"))
-            |> Enum.map(& &1.metadata[:id])
+            |> Enum.map(& &1.metadata.id)
             |> Jason.encode!()
           )
 
