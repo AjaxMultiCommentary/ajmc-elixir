@@ -36,7 +36,7 @@ defmodule TextServer.TextNodes.TextNode do
 
   def search_changeset(attrs \\ %{}) do
     cast({%{}, @search_types}, attrs, [:location, :search_string, :urn])
-    |> validate_required([:search_string,])
+    |> validate_required([:search_string])
     |> update_change(:search_string, &String.trim/1)
     |> validate_length(:search_string, min: 2)
   end
@@ -86,7 +86,7 @@ defmodule TextServer.TextNodes.TextNode do
       end)
       |> Enum.reverse()
 
-      %{text_node | graphemes_with_tags: grouped_graphemes}
+    %{text_node | graphemes_with_tags: grouped_graphemes}
   end
 
   defp apply_tags(elements, graphemes) do
@@ -128,33 +128,19 @@ defmodule TextServer.TextNodes.TextNode do
   defp apply_comments(comments, graphemes) do
     ranged_comments =
       comments
-      |> Enum.group_by(
-        &comment_id/1,
-        fn c ->
-          author = comment_author(c)
-          date = comment_date(c)
+      |> Enum.map(fn c ->
+        author = comment_author(c)
+        date = comment_date(c)
 
-          Map.new(
-            id: Integer.to_string(c.id),
-            author: author,
-            content: c.content,
-            date: date,
-            offset: c.start_offset
-          )
-        end
-      )
-      |> Enum.map(fn {_id, start_and_end} ->
-        [h | t] = start_and_end
-
-        range =
-          unless t == [] do
-            t = hd(t)
-            h.offset..(t.offset - 1)
-          else
-            h.offset..Enum.count(graphemes)
-          end
-
-        Map.put(h, :range, range)
+        Map.new(
+          id: Integer.to_string(c.id),
+          author: author,
+          content: c.content,
+          date: date,
+          end_offset: c.end_offset,
+          start_offset: c.start_offset,
+          range: c.start_offset..(c.end_offset - 1)
+        )
       end)
 
     graphemes
@@ -181,6 +167,4 @@ defmodule TextServer.TextNodes.TextNode do
       _ -> nil
     end
   end
-
-  defp comment_id(comment), do: comment_kv_pairs(comment) |> Map.get("id")
 end
