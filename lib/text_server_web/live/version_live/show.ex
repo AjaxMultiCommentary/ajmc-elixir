@@ -6,6 +6,63 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServer.TextNodes
   alias TextServer.Versions
 
+  attr :second_level_toc, :list
+  attr :top_level_toc, :list, required: true
+  attr :version, TextServer.Versions.Version, required: true
+  attr :versions, :list, required: true
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <article class="container mx-auto p-4">
+      <h1 class="text-2xl font-bold"><%= @version.label %></h1>
+      <%= if @current_user do %>
+        <.link href={~p"/versions/#{@version.id}/edit"}>Edit</.link>
+      <% end %>
+
+      <p><%= @version.description %></p>
+
+      <p class="mb-4"><%= @version.urn %></p>
+
+      <hr class="mb-4" />
+
+      <div class="flex">
+        <div class="pr-4 text-justify">
+          <.live_component
+            id={:location}
+            module={TextServerWeb.ReadingEnvironment.LocationForm}
+            second_level_toc={@second_level_toc}
+            top_level_toc={@top_level_toc}
+            versions={@versions}
+          />
+          <div class="flex">
+            <div class="flex-grow">
+              <.live_component
+                id={:reader}
+                module={TextServerWeb.ReadingEnvironment.Reader}
+                focused_text_node={@focused_text_node}
+                footnotes={@footnotes}
+                location={@location}
+                passage={@passage}
+                version_command_palette_open={@version_command_palette_open}
+                text_nodes={@text_nodes}
+                text_node_command_palette_open={@focused_text_node != nil}
+                top_level_toc={@top_level_toc}
+                second_level_toc={@second_level_toc}
+                version_urn={@version.urn}
+              />
+            </div>
+            <div class="flex-shrink">
+              <Components.floating_comments comments={@comments} highlighted_comments={@highlighted_comments} />
+            </div>
+          </div>
+          <Components.pagination current_page={@passage.passage_number} total_pages={@passage.total_passages} />
+        </div>
+      </div>
+    </article>
+    """
+  end
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok,

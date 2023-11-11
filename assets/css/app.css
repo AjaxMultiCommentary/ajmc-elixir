@@ -222,6 +222,17 @@
 	margin-bottom: 0.9rem;
 }
 
+.text-node::before {
+	content: attr(data-location);
+	display: inline;
+	padding-right: 1em;
+	color: lightgray;
+}
+
+.text-node:hover::before {
+	color: lightslategray;
+}
+
 /** Begin tei.css --- based on work by Luke Hollis and the IIP Project */
 
 /* 2023-03-22 CR editing multiple elements */

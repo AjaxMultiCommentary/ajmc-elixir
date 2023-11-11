@@ -17,13 +17,11 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     ~H"""
     <div class="flex w-full">
       <p
-        class={["cursor-pointer", "max-w-prose", "mb-4", "px-4", "rounded", text_node_classes(@is_focused)]}
+        class="max-w-prose px-4 text-node"
+        data-location={Enum.join(@text_node.location, ".")}
         phx-click="text-node-click"
         phx-target={@myself}
       >
-        <span class="text-slate-500" title={"Location: #{@text_node.location |> Enum.join(".")}"}>
-          <%= @text_node.location |> Enum.join(".") %>
-        </span>
         <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
       </p>
 
@@ -38,15 +36,6 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
       </div>
     </div>
     """
-  end
-
-  @spec text_node_classes(boolean()) :: String.t()
-  defp text_node_classes(is_focused) do
-    if is_focused do
-      "ring-4"
-    else
-      "hover:ring-4"
-    end
   end
 
   @impl true

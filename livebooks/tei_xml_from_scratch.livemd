@@ -254,7 +254,7 @@ prepped_lemmas
   with anchor_target when not is_nil(anchor_target) <- Map.get(lemma, "anchor_target") do
     j = Jason.decode!(anchor_target)
     selector = Map.get(j, "selector")
-    content = Map.get(lemma, "content")
+    content = Map.get(lemma, "content") |> String.replace("- ", "")
     {_, popped_content_lemma} = Map.pop(lemma, "content")
 
     with %{

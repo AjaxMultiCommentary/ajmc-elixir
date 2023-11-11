@@ -56,7 +56,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
       >
         Select comparanda for entire page
       </button>
-      <section class="whitespace-break-spaces">
+      <section id="reading-page" class="py-4 leading-normal">
         <.live_component
           :for={text_node <- @text_nodes}
           module={TextServerWeb.ReadingEnvironment.TextNode}
