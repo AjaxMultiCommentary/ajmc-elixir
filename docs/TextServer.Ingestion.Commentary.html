@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.2">
+    <meta name="project" content="text_server v0.0.3">
+
+    <title>TextServer.Ingestion.Commentary — text_server v0.0.3</title>
+    <link rel="stylesheet" href="dist/html-elixir-ZA3CNPHL.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XRYTXUVD.js"></script>
+    <script src="dist/sidebar_items-5CCDF71C.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-3CAFJ3W7.js"></script>
+
+
+  </head>
+  <body data-type="modules" class="page-module">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName" translate="no">
+text_server
+      </a>
+      <strong class="sidebar-projectVersion" translate="no">
+        v0.0.3
+      </strong>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+        <li><a id="tasks-list-link" href="#full-list"><span translate="no">Mix</span> Tasks</a></li>
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+  <span translate="no">TextServer.Ingestion.Commentary</span> 
+  <small class="app-vsn" translate="no">(text_server v0.0.3)</small>
+
+</h1>
+
+
+  <section id="moduledoc">
+<p>The main pipeline for ingesting an AjMC Canonical Commentary.
+Exposes a single function, <a href="#ingest_commentary/2"><code class="inline">ingest_commentary/2</code></a>, but handles
+a lot of processing in order to apply the lemmata and glossae
+correctly.</p><p>Private functions are documented here in lieu of @doc annotations.</p><h2 id="module-private-functions" class="section-heading">
+  <a href="#module-private-functions" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">private-functions</p>
+  </a>
+  Private functions
+</h2>
+<h3 id="module-passage_regex-0" class="section-heading">
+  <a href="#module-passage_regex-0" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">passage_regex-0</p>
+  </a>
+  <code class="inline">passage_regex/0</code>
+</h3>
+<p>A regular expression for parsing the cited passage from
+<a href="https://mromanello.github.io/ReadableAjax/SophAjax_Lloyd-Jones.html">Readable Ajax</a>.</p><p>This regex is probably a bit verbose, but it means to be clear rather than clever.</p><h3 id="module-ingest_glossa-4" class="section-heading">
+  <a href="#module-ingest_glossa-4" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">ingest_glossa-4</p>
+  </a>
+  <code class="inline">ingest_glossa/4</code>
+</h3>
+<p>Ingests a glossa for a lemma that does not span more than a single
+TextNode. <code class="inline">captures</code> is the map of named captures from <code class="inline">Regex.named_captures(passage_regex(), selector)</code>,
+where <code class="inline">selector</code> is derived from the <code class="inline">anchor_target</code> of a canonical JSON lemma.</p><h3 id="module-ingest_multiline_glossa-4" class="section-heading">
+  <a href="#module-ingest_multiline_glossa-4" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">ingest_multiline_glossa-4</p>
+  </a>
+  <code class="inline">ingest_multiline_glossa/4</code>
+</h3>
+<p>Ingests a glossa for a lemma that spans more than a single TextNode. <code class="inline">captures</code> is
+the map of named captures from <code class="inline">Regex.named_captures(passage_regex(), selector)</code>,
+where <code class="inline">selector</code> is derived from the <code class="inline">anchor_target</code> of a canonical JSON lemma.</p><p>This function will swap <code class="inline">first_line_n</code> and <code class="inline">last_line_n</code> if they are reversed
+in <code class="inline">selector</code>.</p><p>Unlike <code class="inline">ingest_glossa/4</code>, <code class="inline">ingest_multiline_glossa/4</code> creates two
+TextElements, one for the start of the lemma containing the text <code class="inline">content</code>
+of the glossa, and another for the end of the lemma with empty <code class="inline">content</code>.</p><h3 id="module-ingest_lemma-3" class="section-heading">
+  <a href="#module-ingest_lemma-3" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">ingest_lemma-3</p>
+  </a>
+  <code class="inline">ingest_lemma/3</code>
+</h3>
+<p>Provides the internal interface for the <code class="inline">ingest_[multiline_]glossa/4</code> functions.
+Essentially determines if a lemma spans multiple lines and calls the appropriate
+glossa ingestion function accordingly.</p><h3 id="module-prepare_lemmas_from_canonical_json-1" class="section-heading">
+  <a href="#module-prepare_lemmas_from_canonical_json-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">prepare_lemmas_from_canonical_json-1</p>
+  </a>
+  <code class="inline">prepare_lemmas_from_canonical_json/1</code>
+</h3>
+<p>Reads the AjMC canonical JSON file provided by <code class="inline">path</code>, chunking
+based on the <code class="inline">lemma</code> objects that form the canonical JSON &quot;commentary&quot;
+(the <code class="inline">region</code>s for which <code class="inline">region_type == &quot;commentary&quot;</code>).</p><p>This function assumes that all lemmas have been identified in a given commentary.
+Making this assumption makes it possible to associate <code class="inline">word_range</code>s with
+a given <code class="inline">lemma</code> as <code class="inline">glossa</code> (the &quot;comment&quot;) by taking all of the non-<code class="inline">lemma</code>
+words between two <code class="inline">lemmas</code> as the first <code class="inline">lemma</code>'s gloss.</p><h3 id="module-prepare_lemma-3" class="section-heading">
+  <a href="#module-prepare_lemma-3" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">prepare_lemma-3</p>
+  </a>
+  <code class="inline">prepare_lemma/3</code>
+</h3>
+<p>Gets the words for the lemma and its associated glossa in the
+commentary.</p><p>This function assumes that all lemmas have been identified in a given commentary.
+Making this assumption makes it possible to associate <code class="inline">word_range</code>s with
+a given <code class="inline">lemma</code> as <code class="inline">glossa</code> (the &quot;comment&quot;) by taking all of the non-<code class="inline">lemma</code>
+words between two <code class="inline">lemmas</code> as the first <code class="inline">lemma</code>'s gloss.</p>
+  </section>
+
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+      Summary
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#ingest_commentary/2" translate="no">ingest_commentary(urn, path)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The public entrypoint for this module. Takes a URN, e.g.,
+<code class="inline">&quot;urn:cts:greekLit:tlg0011.tlg003.ajmc-lj&quot;</code> and a path
+to the AjMC canonical JSON file. Returns <code class="inline">:ok</code> on success.</p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+Functions
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="ingest_commentary/2">
+
+  <div class="detail-header">
+    <a href="#ingest_commentary/2" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">ingest_commentary(urn, path)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>The public entrypoint for this module. Takes a URN, e.g.,
+<code class="inline">&quot;urn:cts:greekLit:tlg0011.tlg003.ajmc-lj&quot;</code> and a path
+to the AjMC canonical JSON file. Returns <code class="inline">:ok</code> on success.</p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+      <footer class="footer">
+        <p>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="text_server.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.2) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

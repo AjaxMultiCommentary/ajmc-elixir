@@ -42,6 +42,7 @@ defmodule TextServer.MixProject do
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws, "~> 2.0"},
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
       {:floki, ">= 0.30.0", only: :test},
       {:gen_smtp, "~> 1.2.0"},
       {:gettext, "~> 0.18"},
