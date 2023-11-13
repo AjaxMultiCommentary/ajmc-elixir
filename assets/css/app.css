@@ -224,9 +224,9 @@
 
 .text-node::before {
 	content: attr(data-location);
-	display: inline;
-	padding-right: 1em;
 	color: lightgray;
+	display: inline-block;
+	width: 2em;
 }
 
 .text-node:hover::before {

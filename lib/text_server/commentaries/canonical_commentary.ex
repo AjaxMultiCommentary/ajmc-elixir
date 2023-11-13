@@ -8,8 +8,6 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
 
     belongs_to :version, TextServer.Versions.Version
 
-    has_many :lemmas, TextServer.CommentaryLemmas.CommentaryLemma
-
     timestamps()
   end
 

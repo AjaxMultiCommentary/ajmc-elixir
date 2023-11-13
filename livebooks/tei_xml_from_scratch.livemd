@@ -325,22 +325,3 @@ prepped_lemmas
   end
 end)
 ```
-
-```elixir
-alias TextServer.Commentaries
-alias TextServer.CommentaryLemmas
-
-{:ok, commentary} =
-  Commentaries.upsert_canonical_commentary(%{
-    pid: data.id,
-    filename: "3467O2_tess_retrained.json",
-    version_id: version.id
-  })
-
-# |> Enum.each(fn lemma ->
-#   attrs = Map.from_struct(lemma) |> Map.put(:canonical_commentary_id, commentary.id)
-#   CommentaryLemmas.upsert_commentary_lemma(attrs)
-
-#   IO.inspect(lemma)
-# end)
-```

@@ -15,7 +15,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
-    <div class="flex w-full">
+    <div class="flex">
       <p
         class="max-w-prose px-4 text-node"
         data-location={Enum.join(@text_node.location, ".")}
