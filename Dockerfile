@@ -56,6 +56,12 @@ RUN curl -sL https://deb.nodesource.com/setup_19.x | bash
 RUN apt-get update -y && apt-get install -y nodejs npm
 RUN cd assets && npm install && cd ..
 
+
+# Install Rust compiler -- needed for Panpipe (Pandoc-based
+# document parsing)
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 # compile assets
 RUN mix assets.deploy
 
