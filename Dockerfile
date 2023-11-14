@@ -59,8 +59,8 @@ RUN cd assets && npm install && cd ..
 
 # Install Rust compiler -- needed for Panpipe (Pandoc-based
 # document parsing)
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+ENV PATH="/app/.cargo/bin:${PATH}"
 
 RUN mix compile.rambo
 
