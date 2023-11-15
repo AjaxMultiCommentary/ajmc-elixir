@@ -19,16 +19,6 @@ config :text_server,
   user_uploads_directory: System.get_env("USER_UPLOADS_DIRECTORY"),
   env: config_env()
 
-# Configures AMQP for queueing Version parsing
-config :amqp,
-  connections: [
-    rabbitmq_naf: [url: System.get_env("RABBITMQ_URL")]
-  ],
-  channels: [
-    cts_xml_parser: [connection: :rabbitmq_naf]
-  ],
-  queue: System.get_env("RABBITMQ_QUEUE")
-
 config :ex_aws,
   access_key_id: System.get_env("S3_ACCESS_KEY"),
   secret_access_key: System.get_env("S3_SECRET_KEY")
