@@ -21,6 +21,10 @@ ARG RUNNER_IMAGE="ubuntu:${UBUNTU_VERSION}"
 
 FROM ${BUILDER_IMAGE} as builder
 
+# possible qemu fix https://github.com/plausible/analytics/pull/2879/files
+ARG ERL_FLAGS
+ENV ERL_FLAGS="+JPperf true"
+
 # install build dependencies
 RUN apt-get update -y && apt-get install -y build-essential git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
