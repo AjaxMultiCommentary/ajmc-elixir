@@ -88,7 +88,7 @@ defmodule TextServer.MixProject do
       # guidance on squashing migrations
       "ecto.setup": [
         "ecto.create",
-        "ecto.load -d priv/repo/20230828_schema.sql -f --skip-if-loaded",
+        "ecto.load -d priv/repo/schema/20230828_schema.sql -f --skip-if-loaded",
         "ecto.migrate"
       ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],

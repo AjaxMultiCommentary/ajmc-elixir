@@ -1,0 +1,5 @@
+FROM postgres:15
+
+ENV POSTGRES_DB ajmc
+
+COPY ./priv/repo/schema/*.sql /docker-entrypoint-initdb.d/
