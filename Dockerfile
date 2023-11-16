@@ -106,8 +106,9 @@ RUN mix release
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales pandoc \
-  && apt-get clean && rm -f /var/lib/apt/lists/*_*
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 \
+    locales pandoc postgresql-client \
+    && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -125,6 +126,8 @@ ENV MIX_ENV="prod"
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/text_server ./
 
+COPY --chmod=+x entrypoint.sh /app/entrypoint.sh
+
 USER nobody
 
-CMD ["/app/bin/server"]
+CMD ["sh", "/app/entrypoint.sh"]
