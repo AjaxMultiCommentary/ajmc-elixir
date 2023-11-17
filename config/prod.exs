@@ -16,8 +16,6 @@ config :text_server, TextServerWeb.Endpoint,
 config :logger, level: :info
 
 config :text_server, TextServerWeb.Endpoint,
-  url: [host: "ajaxmulticommentary.org", port: 443],
-  check_origin: ["//ajaxmulticommentary.org", "//*.ajaxmulticommentary.org"],
   force_ssl: [
     host: nil,
     rewrite_on: [:x_forwarded_port, :x_forwarded_proto],
