@@ -178,8 +178,6 @@ defmodule TextServer.Ingestion.Commentary do
 
   defp ingest_lemma(_urn, _element_type, _lemma), do: nil
 
-  defp line_anchor_regex, do: ~r/\d{0,4}\s+$/
-
   defp passage_regex,
     do:
       ~r/tei-l@n=(?<first_line_n>\d+)\[(?<first_line_offset>\d+)\]:tei-l@n=(?<last_line_n>\d+)\[(?<last_line_offset>\d+)\]/
@@ -191,7 +189,15 @@ defmodule TextServer.Ingestion.Commentary do
     children = json |> Map.get("children")
 
     lemmas =
-      children |> Map.get("lemmas") |> Enum.filter(&(Map.get(&1, "label") == "word-anchor"))
+      children
+      |> Map.get("lemmas")
+      |> Enum.filter(fn l ->
+        case Map.get(l, "label") do
+          "scope-anchor" -> true
+          "word-anchor" -> true
+          _ -> false
+        end
+      end)
 
     words = children |> Map.get("words")
     regions = children |> Map.get("regions")
@@ -260,10 +266,7 @@ defmodule TextServer.Ingestion.Commentary do
       String.split(no_lemma, next_lemma_words, parts: 2, trim: true)
       |> List.first()
 
-    no_line_anchor =
-      Regex.replace(line_anchor_regex(), no_next_lemma, "")
-
-    glossa = (lemma_words <> no_line_anchor) |> String.trim()
+    glossa = (lemma_words <> no_next_lemma) |> String.trim()
 
     Map.merge(lemma, %{
       "content" => glossa,
