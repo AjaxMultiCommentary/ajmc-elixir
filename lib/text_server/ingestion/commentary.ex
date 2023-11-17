@@ -159,7 +159,8 @@ defmodule TextServer.Ingestion.Commentary do
       |> TextElements.find_or_create_text_element()
   end
 
-  defp ingest_lemma(urn, element_type, %{"anchor_target" => anchor_target} = lemma) do
+  defp ingest_lemma(urn, element_type, %{"anchor_target" => anchor_target} = lemma)
+       when not is_nil(anchor_target) do
     j = Jason.decode!(anchor_target)
     selector = Map.get(j, "selector")
 
@@ -174,6 +175,10 @@ defmodule TextServer.Ingestion.Commentary do
       end
     end
   end
+
+  defp ingest_lemma(_urn, _element_type, _lemma), do: nil
+
+  defp line_anchor_regex, do: ~r/\d{0,4}\s+$/
 
   defp passage_regex,
     do:
@@ -245,12 +250,20 @@ defmodule TextServer.Ingestion.Commentary do
       |> Enum.map(&WordRange.get_words_for_range(words, Map.get(&1, "word_range")))
       |> Enum.join(" ")
 
-    no_lemma = String.split(g, lemma_words, parts: 2, trim: true) |> List.last()
+    # We need to split the string on the target lemma and take the substring
+    # after the split in case the lemma starts in the middle of a region.
+    no_lemma =
+      String.split(g, lemma_words, parts: 2, trim: true)
+      |> List.last()
 
     no_next_lemma =
-      String.split(no_lemma, next_lemma_words, parts: 2, trim: true) |> List.first()
+      String.split(no_lemma, next_lemma_words, parts: 2, trim: true)
+      |> List.first()
 
-    glossa = (lemma_words <> no_next_lemma) |> String.trim()
+    no_line_anchor =
+      Regex.replace(line_anchor_regex(), no_next_lemma, "")
+
+    glossa = (lemma_words <> no_line_anchor) |> String.trim()
 
     Map.merge(lemma, %{
       "content" => glossa,
