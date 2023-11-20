@@ -201,6 +201,7 @@ defmodule TextServer.Ingestion.Commentary do
         end
       end)
 
+    pages = children |> Map.get("pages")
     words = children |> Map.get("words")
     regions = children |> Map.get("regions")
 
@@ -214,16 +215,20 @@ defmodule TextServer.Ingestion.Commentary do
 
     lemmas
     |> Enum.chunk_every(2, 1)
-    |> Enum.map(&prepare_lemma(commentaries, words, &1))
+    |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
   end
 
-  defp prepare_lemma(commentaries, words, [lemma]) do
+  defp prepare_lemma(commentaries, pages, words, [lemma]) do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
 
     commentaries =
-      WordRange.filter_commentaries_containing_range(commentaries, lemma_range)
+      WordRange.filter_containers_within_range(commentaries, lemma_range)
+
+    commentary_range = Enum.map(commentaries, &Map.get(&1, "word_range")) |> List.flatten()
+    page_range = List.first(commentary_range)..List.last(commentary_range)
+    pages = WordRange.filter_containers_within_range(pages, page_range)
 
     [_ | [g]] =
       commentaries
@@ -236,11 +241,12 @@ defmodule TextServer.Ingestion.Commentary do
     Map.merge(lemma, %{
       "content" => glossa,
       "words" => lemma_words,
-      "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range"))
+      "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
+      "image_ids" => pages |> Enum.map(&Map.get(&1, "id"))
     })
   end
 
-  defp prepare_lemma(commentaries, words, [lemma, next_lemma]) do
+  defp prepare_lemma(commentaries, pages, words, [lemma, next_lemma]) do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
@@ -250,8 +256,14 @@ defmodule TextServer.Ingestion.Commentary do
     next_lemma_words = WordRange.get_words_for_range(words, next_lemma_range)
 
     commentaries =
-      WordRange.filter_commentaries_containing_range(
+      WordRange.filter_containers_within_range(
         commentaries,
+        lemma_first..next_lemma_first
+      )
+
+    pages =
+      WordRange.filter_containers_within_range(
+        pages,
         lemma_first..next_lemma_first
       )
 
@@ -284,7 +296,8 @@ defmodule TextServer.Ingestion.Commentary do
     Map.merge(lemma, %{
       "content" => glossa,
       "words" => lemma_words,
-      "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range"))
+      "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
+      "image_ids" => pages |> Enum.map(&Map.get(&1, "id"))
     })
   end
 end

@@ -26,25 +26,25 @@ defmodule TextServer.Ingestion.WordRange do
   def get_words_for_range(words, [f, l]), do: get_words_for_range(words, f..l)
 
   @doc """
-  Returns the `commentary` objects that contain (= whose `word_range`s are not disjoint with) the
+  Returns the container objects that contain (= whose `word_range`s are not disjoint with) the
   given `range`.
 
   ## Examples
 
-      iex> filter_commentaries_containing_range(
+      iex> filter_containers_within_range(
         [%{"id" => "my_commentary", "word_range" => [3, 10]}, %{"id" => "other_commentary", "word_range" => [11, 20]}],
         4..6
       )
       [%{"id" => "my_commentary", "word_range" => [3, 10]}]
 
-      iex> filter_commentaries_containing_range(
+      iex> filter_containers_within_range(
         [%{"id" => "my_commentary", "word_range" => [3, 10]}, %{"id" => "other_commentary", "word_range" => [11, 20]}],
         30..40
       )
       []
   """
-  def filter_commentaries_containing_range(commentaries, %Range{} = range) do
-    commentaries
+  def filter_containers_within_range(containers, %Range{} = range) do
+    containers
     |> Enum.filter(fn c ->
       [f | [l]] = Map.get(c, "word_range")
 
