@@ -195,7 +195,7 @@ defmodule TextServer.Ingestion.Commentary do
       |> Map.get("lemmas")
       |> Enum.filter(fn l ->
         case Map.get(l, "label") do
-          "scope-anchor" -> false
+          "scope-anchor" -> true
           "word-anchor" -> true
           _ -> false
         end
@@ -204,6 +204,8 @@ defmodule TextServer.Ingestion.Commentary do
     words = children |> Map.get("words")
     regions = children |> Map.get("regions")
 
+    # TODO: start by chunking by scope_anchor, then split on the lemmas (if they exist)
+    # within a given scope
     regions
     |> Enum.drop_while(&(Map.get(&1, "region_type") != "primary_text"))
     |> Enum.chunk_by(&Map.get(&1, "region_type"))
@@ -264,9 +266,15 @@ defmodule TextServer.Ingestion.Commentary do
       String.split(g, lemma_words, parts: 2, trim: true)
       |> List.last()
 
+    # Getting the string without the next lemma is a bit more complicated,
+    # because we don't just want the first (0th) substring after the split,
+    # but rather all but the last substring.
     no_next_lemma =
-      String.split(no_lemma, next_lemma_words, parts: 2, trim: true)
-      |> List.first()
+      String.split(no_lemma, next_lemma_words, trim: true)
+
+    {_v, no_next_lemma} = List.pop_at(no_next_lemma, -1)
+
+    no_next_lemma = Enum.join(no_next_lemma, " ")
 
     no_line_anchor =
       Regex.replace(dangling_line_anchor_regex(), no_next_lemma, "")
