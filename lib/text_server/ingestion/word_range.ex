@@ -1,11 +1,11 @@
 defmodule TextServer.Ingestion.WordRange do
   @moduledoc """
-  This module provides a shared interface for working with
-  the `words` arrays in AjMC's canonical JSON representation.
+  This module provides a shared interface for working with the `words` and other text container arrays in AjMC's
+  canonical JSON representation.
   """
 
   @doc """
-  Stringifies the given `range` of `words`. Also accepts a tuple of
+  Returns the given `range` of `words`. Also accepts a tuple of
   `[first, last]` instead of a range.
 
   ## Examples
@@ -14,16 +14,24 @@ defmodule TextServer.Ingestion.WordRange do
       "Ajax Tecmessa"
 
       iex> get_words_for_range([%{"text" => "Ajax"}, %{"text" => "Tecmessa"}, %{"text" => "Eurysaces"}], [0, 2])
-      "Ajax Tecmessa"
+     [%{"text" => "Ajax"}, %{"text" => "Tecmessa"}]
+
   """
   def get_words_for_range(words, %Range{} = range) do
     words
     |> Enum.slice(range)
-    |> Enum.map(&Map.get(&1, "text"))
-    |> Enum.join(" ")
   end
 
   def get_words_for_range(words, [f, l]), do: get_words_for_range(words, f..l)
+
+  @doc """
+  Stringifies the `words` for the given range. Useful for building glossae.
+  """
+  def get_word_text_for_range(words, [f, l]) do
+    get_words_for_range(words, f..l)
+    |> Enum.map(&Map.get(&1, "text"))
+    |> Enum.join(" ")
+  end
 
   @doc """
   Returns the container objects that contain (= whose `word_range`s are not disjoint with) the

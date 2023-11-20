@@ -1,6 +1,8 @@
 defmodule TextServerWeb.Components do
   use TextServerWeb, :component
 
+  alias TextServerWeb.Icons
+
   attr :item, :map, required: true
   attr :url, :string, required: true
 
@@ -33,11 +35,17 @@ defmodule TextServerWeb.Components do
 
   def floating_comments(assigns) do
     ~H"""
-    <div class="bg-white sm:rounded-lg">
+    <div>
       <div :for={c <- @comments} class={comment_class(c, @highlighted_comments)}>
         <h3 class="text-lg font-medium leading-6 text-gray-900"><%= c.author %></h3>
         <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= c.date %></small>
         <p class="mt-1 max-w-2xl text-sm text-gray-800"><%= c.content %></p>
+        <a
+          :for={p <- Map.get(c, :attributes) |> Map.get("image_paths")}
+          href={"#{Application.get_env(:text_server, :iiif_root_url)}/#{p}"}
+        >
+          <Icons.book_icon />
+        </a>
       </div>
     </div>
     """

@@ -222,6 +222,7 @@ defmodule TextServer.Ingestion.Commentary do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
+    lemma_text = lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
     commentaries =
       WordRange.filter_containers_within_range(commentaries, lemma_range)
@@ -232,17 +233,25 @@ defmodule TextServer.Ingestion.Commentary do
 
     [_ | [g]] =
       commentaries
-      |> Enum.map(&WordRange.get_words_for_range(words, Map.get(&1, "word_range")))
+      |> Enum.map(&WordRange.get_word_text_for_range(words, Map.get(&1, "word_range")))
       |> Enum.join(" ")
-      |> String.split(lemma_words, parts: 2, trim: true)
+      |> String.split(lemma_text, parts: 2, trim: true)
 
-    glossa = (lemma_words <> g) |> String.trim()
+    glossa =
+      (lemma_text <> g) |> String.trim()
 
     Map.merge(lemma, %{
       "content" => glossa,
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
-      "image_ids" => pages |> Enum.map(&Map.get(&1, "id"))
+      "image_paths" =>
+        pages
+        |> Enum.map(fn p ->
+          page_id = Map.get(p, "id")
+          commentary_id = page_id |> String.split("_") |> List.first()
+
+          "#{commentary_id}/#{page_id}/full/max/0/default.png"
+        end)
     })
   end
 
@@ -250,10 +259,12 @@ defmodule TextServer.Ingestion.Commentary do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
+    lemma_text = lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
     [next_lemma_first | [next_lemma_last]] = Map.get(next_lemma, "word_range")
     next_lemma_range = next_lemma_first..next_lemma_last
     next_lemma_words = WordRange.get_words_for_range(words, next_lemma_range)
+    next_lemma_text = next_lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
     commentaries =
       WordRange.filter_containers_within_range(
@@ -269,35 +280,42 @@ defmodule TextServer.Ingestion.Commentary do
 
     g =
       commentaries
-      |> Enum.map(&WordRange.get_words_for_range(words, Map.get(&1, "word_range")))
+      |> Enum.map(&WordRange.get_word_text_for_range(words, Map.get(&1, "word_range")))
       |> Enum.join(" ")
 
     # We need to split the string on the target lemma and take the substring
     # after the split in case the lemma starts in the middle of a region.
     no_lemma =
-      String.split(g, lemma_words, parts: 2, trim: true)
+      String.split(g, lemma_text, parts: 2, trim: true)
       |> List.last()
 
     # Getting the string without the next lemma is a bit more complicated,
     # because we don't just want the first (0th) substring after the split,
     # but rather all but the last substring.
     no_next_lemma =
-      String.split(no_lemma, next_lemma_words, trim: true)
+      String.split(no_lemma, next_lemma_text, trim: true)
 
-    {_v, no_next_lemma} = List.pop_at(no_next_lemma, -1)
+    {_last_substring, no_next_lemma} = List.pop_at(no_next_lemma, -1)
 
     no_next_lemma = Enum.join(no_next_lemma, " ")
 
     no_line_anchor =
       Regex.replace(dangling_line_anchor_regex(), no_next_lemma, "")
 
-    glossa = (lemma_words <> no_line_anchor) |> String.trim()
+    glossa = (lemma_text <> no_line_anchor) |> String.trim()
 
     Map.merge(lemma, %{
       "content" => glossa,
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
-      "image_ids" => pages |> Enum.map(&Map.get(&1, "id"))
+      "image_paths" =>
+        pages
+        |> Enum.map(fn p ->
+          page_id = Map.get(p, "id")
+          commentary_id = page_id |> String.split("_") |> List.first()
+
+          "#{commentary_id}/#{page_id}/full/max/0/default.png"
+        end)
     })
   end
 end

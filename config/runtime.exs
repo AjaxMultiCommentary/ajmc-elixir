@@ -13,6 +13,8 @@ if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
 end
 
 config :text_server,
+  iiif_root_url:
+    System.get_env("IIIF_ROOT_URL") || "https://ajaxmulticommentary.github.io/ajmc_iiif/",
   text_repo_destination: System.get_env("TEXT_REPO_DESTINATION"),
   unsplash_access_key: System.get_env("UNSPLASH_ACCESS_KEY"),
   unsplash_secret_key: System.get_env("UNSPLASH_SECRET_KEY"),
