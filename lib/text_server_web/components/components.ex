@@ -34,28 +34,37 @@ defmodule TextServerWeb.Components do
   attr :highlighted_comments, :list, default: []
 
   def floating_comments(assigns) do
+    IO.inspect(assigns.comments)
+
     ~H"""
     <div>
-      <div :for={c <- @comments} class={comment_class(c, @highlighted_comments)}>
-        <h3 class="text-lg font-medium leading-6 text-gray-900"><%= c.author %></h3>
-        <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= c.date %></small>
-        <p class="mt-1 max-w-2xl text-sm text-gray-800"><%= c.content %></p>
-        <a
-          :for={p <- Map.get(c, :attributes) |> Map.get("image_paths")}
-          href={"#{Application.get_env(:text_server, :iiif_root_url)}/#{p}"}
-        >
-          <Icons.book_icon />
-        </a>
-      </div>
+      <details :for={c <- @comments} class={comment_class(c, @highlighted_comments)}>
+        <input type="checkbox" class="min-h-0" />
+        <summary class="collapse-title">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">
+            <%= c.attributes |> Map.get("lemma") %>
+          </h3>
+          <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= c.author %></small>
+        </summary>
+        <div class="collapse-content">
+          <p class="mt-1 max-w-2xl text-sm text-gray-800"><%= c.content %></p>
+          <a
+            :for={p <- Map.get(c, :attributes) |> Map.get("image_paths")}
+            href={"#{Application.get_env(:text_server, :iiif_root_url)}/#{p}"}
+          >
+            <Icons.book_icon />
+          </a>
+        </div>
+      </details>
     </div>
     """
   end
 
   defp comment_class(comment, highlighted_comments) do
     if Enum.member?(highlighted_comments, Map.get(comment, :id, nil)) do
-      "border-2 border-stone-800 p-4 rounded-lg mb-2"
+      "border-2 border-stone-800 collapse rounded-md mb-2"
     else
-      "border-2 rounded-lg p-4 mb-2"
+      "border-2 collapse rounded-md mb-2"
     end
   end
 

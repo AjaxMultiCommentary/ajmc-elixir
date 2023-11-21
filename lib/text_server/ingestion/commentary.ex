@@ -237,11 +237,11 @@ defmodule TextServer.Ingestion.Commentary do
       |> Enum.join(" ")
       |> String.split(lemma_text, parts: 2, trim: true)
 
-    glossa =
-      (lemma_text <> g) |> String.trim()
+    glossa = g |> String.trim()
 
     Map.merge(lemma, %{
       "content" => glossa,
+      "lemma" => lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" "),
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
       "image_paths" =>
@@ -302,10 +302,11 @@ defmodule TextServer.Ingestion.Commentary do
     no_line_anchor =
       Regex.replace(dangling_line_anchor_regex(), no_next_lemma, "")
 
-    glossa = (lemma_text <> no_line_anchor) |> String.trim()
+    glossa = no_line_anchor |> String.trim()
 
     Map.merge(lemma, %{
       "content" => glossa,
+      "lemma" => lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" "),
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
       "image_paths" =>
