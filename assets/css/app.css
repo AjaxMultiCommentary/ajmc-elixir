@@ -153,6 +153,15 @@
 	}
 }
 
+/* OpenSeadragon requires that its
+ * viewer have width and height set.
+ */
+.openseadragon-iiif-viewer {
+	height: 800px;
+	width: 600px;
+}
+
+
 /* Styles for markdown copy (on project homepages)
  * Note that these styles must be descended from a node
  * with the .@@oc/user-markdown class, otherwise they will override

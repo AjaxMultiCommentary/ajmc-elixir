@@ -35,16 +35,58 @@ export const DragHook = {
 
 export const IIIFHook = {
 	mounted() {
-		OpenSeadragon({
-			id: "iiif-viewer",
+		this._updateViewer();
+	},
+
+	updated() {
+		this._updateViewer();
+	},
+
+	_updateViewer() {	
+		const comments = JSON.parse(this.el.dataset.comments);
+		const highlightedComments = JSON.parse(this.el.dataset.highlightedComments);
+		const tiles = JSON.parse(this.el.dataset.tiles).map(tile => {
+			const relevantComments = comments.filter(comment => {
+				return comment.image_paths.includes(tile.imagePath);
+			});
+
+			const overlays = relevantComments.map(comment => {
+				// FIXME: to handle coords better, get the left-most, top-most,
+				// right-most, and bottom-most, and built the rectangle out of
+				// those points.
+				const bboxCoords = comment.words.flatMap(word => word.bbox).sort((a, b) => {
+					  if (a[0] === b[0]) {
+					    return b[1] - a[1];
+					  }
+					  return a[0] - b[0];
+				});
+				
+				const topLeft = bboxCoords[0];
+				const maxXY = bboxCoords.at(-1);
+
+				const coords = {
+					px: topLeft[0], 
+					py: topLeft[1], 
+					width: maxXY[0] - topLeft[0], 
+					height: 50,
+					className: highlightedComments.includes(comment.id) ? 'outline outline-yellow-600 opacity-90' : 'outline outline-sky-600 opacity-80',
+				}
+		
+				return coords;
+			});
+
+			tile.overlays = overlays;
+
+			return tile;
+		});
+
+
+		this.viewer = OpenSeadragon({
+			element: this.el,
 			prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
 			preserveViewport: true,
-			tileSources: {
-				type: 'image',
-				url: 'https://ajaxmulticommentary.github.io/ajmc_iiif/sophoclesplaysa05campgoog/sophoclesplaysa05campgoog_0236/full/max/0/default.png',
-				crossOriginPolicy: 'Anonymous',
-				ajaxWithCredentials: false
-			}
+			tileSources: tiles,
+			sequenceMode: true
 		});
 	}
 };

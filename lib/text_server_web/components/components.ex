@@ -46,12 +46,6 @@ defmodule TextServerWeb.Components do
         </summary>
         <div class="collapse-content">
           <p class="mt-1 max-w-2xl text-sm text-gray-800"><%= c.content %></p>
-          <a
-            :for={p <- Map.get(c, :attributes) |> Map.get("image_paths")}
-            href={"#{Application.get_env(:text_server, :iiif_root_url)}/#{p}"}
-          >
-            <Icons.book_icon />
-          </a>
         </div>
       </details>
     </div>
