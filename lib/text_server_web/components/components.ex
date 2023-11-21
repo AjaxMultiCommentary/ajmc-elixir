@@ -34,8 +34,6 @@ defmodule TextServerWeb.Components do
   attr :highlighted_comments, :list, default: []
 
   def floating_comments(assigns) do
-    IO.inspect(assigns.comments)
-
     ~H"""
     <div>
       <details :for={c <- @comments} class={comment_class(c, @highlighted_comments)}>
@@ -62,9 +60,9 @@ defmodule TextServerWeb.Components do
 
   defp comment_class(comment, highlighted_comments) do
     if Enum.member?(highlighted_comments, Map.get(comment, :id, nil)) do
-      "border-2 border-stone-800 collapse rounded-md mb-2"
+      "border-2 border-stone-800 collapse collapse-arrow rounded-md mb-2"
     else
-      "border-2 collapse rounded-md mb-2"
+      "border-2 collapse collapse-arrow rounded-md mb-2"
     end
   end
 
