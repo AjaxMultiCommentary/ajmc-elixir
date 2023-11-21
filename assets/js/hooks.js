@@ -42,7 +42,7 @@ export const IIIFHook = {
 		this._updateViewer();
 	},
 
-	_updateViewer() {	
+	_updateViewer() {
 		const comments = JSON.parse(this.el.dataset.comments);
 		const highlightedComments = JSON.parse(this.el.dataset.highlightedComments);
 		const tiles = JSON.parse(this.el.dataset.tiles).map(tile => {
@@ -51,27 +51,22 @@ export const IIIFHook = {
 			});
 
 			const overlays = relevantComments.map(comment => {
-				// FIXME: to handle coords better, get the left-most, top-most,
-				// right-most, and bottom-most, and built the rectangle out of
-				// those points.
-				const bboxCoords = comment.words.flatMap(word => word.bbox).sort((a, b) => {
-					  if (a[0] === b[0]) {
-					    return b[1] - a[1];
-					  }
-					  return a[0] - b[0];
-				});
-				
-				const topLeft = bboxCoords[0];
-				const maxXY = bboxCoords.at(-1);
+				const bboxes = comment.words.flatMap(word => word.bbox);
+				const xs = bboxes.map(bbox => bbox[0]);
+				const ys = bboxes.map(bbox => bbox[1]);
+				const leftMost = Math.min(...xs);
+				const rightMost = Math.max(...xs);
+				const topMost = Math.min(...ys);
+				const bottomMost = Math.max(...ys);
 
 				const coords = {
-					px: topLeft[0], 
-					py: topLeft[1], 
-					width: maxXY[0] - topLeft[0], 
-					height: 50,
-					className: highlightedComments.includes(comment.id) ? 'outline outline-yellow-600 opacity-90' : 'outline outline-sky-600 opacity-80',
+					px: leftMost,
+					py: topMost,
+					width: rightMost - leftMost,
+					height: bottomMost - topMost,
+					className: overlayClassName(highlightedComments.includes(comment.id)),
 				}
-		
+
 				return coords;
 			});
 
@@ -90,6 +85,15 @@ export const IIIFHook = {
 		});
 	}
 };
+
+
+function overlayClassName(isHighlighted) {
+	if (isHighlighted) {
+		return 'outline outline-yellow-600 opacity-90';
+	}
+
+	return 'outline outline-sky-600 opacity-80';
+}
 
 /**
  * 
