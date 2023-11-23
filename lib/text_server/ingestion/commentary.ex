@@ -178,8 +178,6 @@ defmodule TextServer.Ingestion.Commentary do
 
   defp ingest_lemma(_urn, _element_type, _lemma), do: nil
 
-  defp dangling_line_anchor_regex, do: ~r/\d{0,4}\s{0,2}$/
-
   defp passage_regex,
     do:
       ~r/tei-l@n=(?<first_line_n>\d+)\[(?<first_line_offset>\d+)\]:tei-l@n=(?<last_line_n>\d+)\[(?<last_line_offset>\d+)\]/
@@ -210,8 +208,6 @@ defmodule TextServer.Ingestion.Commentary do
 
     regions = children |> Map.get("regions")
 
-    # TODO: start by chunking by scope_anchor, then split on the lemmas (if they exist)
-    # within a given scope
     regions
     |> Enum.drop_while(&(Map.get(&1, "region_type") != "primary_text"))
     |> Enum.chunk_by(&Map.get(&1, "region_type"))
@@ -227,7 +223,6 @@ defmodule TextServer.Ingestion.Commentary do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
-    lemma_text = lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
     commentaries =
       WordRange.filter_containers_within_range(commentaries, lemma_range)
@@ -250,7 +245,7 @@ defmodule TextServer.Ingestion.Commentary do
         end)
       end)
 
-    glossa_overlays = calculate_overlays(pages, glossa_words)
+    glossa_overlays = calculate_overlays(pages, [lemma_words | glossa_words])
 
     glossa =
       glossa_words
@@ -287,12 +282,10 @@ defmodule TextServer.Ingestion.Commentary do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
-    lemma_text = lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
     [next_lemma_first | [next_lemma_last]] = Map.get(next_lemma, "word_range")
     next_lemma_range = next_lemma_first..next_lemma_last
     next_lemma_words = WordRange.get_words_for_range(words, next_lemma_range)
-    next_lemma_text = next_lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
     commentaries =
       WordRange.filter_containers_within_range(
@@ -323,7 +316,7 @@ defmodule TextServer.Ingestion.Commentary do
         end)
       end)
 
-    glossa_overlays = calculate_overlays(pages, glossa_words)
+    glossa_overlays = calculate_overlays(pages, [lemma_words | glossa_words])
 
     glossa =
       glossa_words

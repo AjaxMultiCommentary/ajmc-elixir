@@ -248,7 +248,7 @@ defmodule TextServerWeb.VersionLive.Show do
     comments =
       elements
       |> Enum.filter(fn te ->
-        te.element_type.name == "comment" && !is_nil(te.content)
+        te.element_type.name == "comment"
       end)
       |> Enum.map(fn c ->
         Map.merge(c, %{
