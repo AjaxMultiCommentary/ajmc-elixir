@@ -12,7 +12,7 @@ defmodule TextServer.Ingestion.Versions do
     {:ok, collection} = create_collection()
     {:ok, text_group} = create_text_group(collection)
     {:ok, work} = create_work(text_group)
-    {:ok, language} = create_language()
+    language = create_language()
 
     for xml_file <- xml_files() do
       xml = File.read!(xml_file)
