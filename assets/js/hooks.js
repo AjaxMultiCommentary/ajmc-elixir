@@ -51,24 +51,11 @@ export const IIIFHook = {
 			});
 
 			const overlays = relevantComments.map(comment => {
-				const bboxes = comment.words.flatMap(word => word.bbox);
-				const xs = bboxes.map(bbox => bbox[0]);
-				const ys = bboxes.map(bbox => bbox[1]);
-				const leftMost = Math.min(...xs);
-				const rightMost = Math.max(...xs);
-				const topMost = Math.min(...ys);
-				const bottomMost = Math.max(...ys);
-
-				const coords = {
-					px: leftMost,
-					py: topMost,
-					width: rightMost - leftMost,
-					height: bottomMost - topMost,
-					className: overlayClassName(highlightedComments.includes(comment.id)),
-				}
-
-				return coords;
-			});
+				return comment.overlays.filter(overlay => tile.url.indexOf(overlay.page_id) > -1).map(overlay => ({
+					...overlay,
+					className: overlayClassName(highlightedComments.includes(comment.id))
+				}))
+			}).flat();
 
 			tile.overlays = overlays;
 
@@ -89,10 +76,8 @@ export const IIIFHook = {
 
 function overlayClassName(isHighlighted) {
 	if (isHighlighted) {
-		return 'outline outline-yellow-600 opacity-90';
+		return 'bg-sky-400 opacity-50';
 	}
-
-	return 'outline outline-sky-600 opacity-80';
 }
 
 /**

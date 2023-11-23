@@ -42,6 +42,13 @@ defmodule TextServerWeb.VersionLive.Show do
           version_urn={@version.urn}
         />
         <Components.floating_comments comments={@comments} highlighted_comments={@highlighted_comments} />
+
+        <.live_component
+          id={:iiif_viewer}
+          module={TextServerWeb.Components.IiifViewer}
+          comments={@comments}
+          highlighted_comments={@highlighted_comments}
+        />
       </div>
       <Components.pagination current_page={@passage.passage_number} total_pages={@passage.total_passages} />
     </article>

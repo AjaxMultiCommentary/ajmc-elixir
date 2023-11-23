@@ -202,7 +202,12 @@ defmodule TextServer.Ingestion.Commentary do
       end)
 
     pages = children |> Map.get("pages")
-    words = children |> Map.get("words")
+
+    words =
+      children
+      |> Map.get("words")
+      |> Enum.with_index(fn el, index -> Map.put(el, :index, index) end)
+
     regions = children |> Map.get("regions")
 
     # TODO: start by chunking by scope_anchor, then split on the lemmas (if they exist)
@@ -227,17 +232,32 @@ defmodule TextServer.Ingestion.Commentary do
     commentaries =
       WordRange.filter_containers_within_range(commentaries, lemma_range)
 
-    commentary_range = Enum.map(commentaries, &Map.get(&1, "word_range")) |> List.flatten()
-    page_range = List.first(commentary_range)..List.last(commentary_range)
+    commentary_ranges = Enum.map(commentaries, &Map.get(&1, "word_range")) |> List.flatten()
+    page_range = List.first(commentary_ranges)..List.last(commentary_ranges)
     pages = WordRange.filter_containers_within_range(pages, page_range)
 
-    [_ | [g]] =
+    glossa_words =
       commentaries
-      |> Enum.map(&WordRange.get_word_text_for_range(words, Map.get(&1, "word_range")))
-      |> Enum.join(" ")
-      |> String.split(lemma_text, parts: 2, trim: true)
+      |> Enum.flat_map(&WordRange.get_words_for_range(words, Map.get(&1, "word_range")))
+      |> Enum.drop_while(fn w -> !Enum.member?(lemma_words, w) end)
+      |> Enum.chunk_by(fn w ->
+        index = Map.get(w, :index)
 
-    glossa = g |> String.trim()
+        Enum.find(commentaries, fn c ->
+          [cf, cl] = Map.get(c, "word_range")
+
+          index in cf..cl
+        end)
+      end)
+
+    glossa_overlays = calculate_overlays(pages, glossa_words)
+
+    glossa =
+      glossa_words
+      |> List.flatten()
+      |> Enum.map(&Map.get(&1, "text"))
+      |> Enum.join(" ")
+      |> String.trim()
 
     lemma_transcript =
       if is_nil(Map.get(lemma, "transcript")) do
@@ -249,6 +269,7 @@ defmodule TextServer.Ingestion.Commentary do
     Map.merge(lemma, %{
       "content" => glossa,
       "lemma" => lemma_transcript,
+      "overlays" => glossa_overlays,
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
       "image_paths" =>
@@ -285,31 +306,31 @@ defmodule TextServer.Ingestion.Commentary do
         lemma_first..next_lemma_first
       )
 
-    g =
+    glossa_words =
       commentaries
-      |> Enum.map(&WordRange.get_word_text_for_range(words, Map.get(&1, "word_range")))
+      |> Enum.flat_map(fn c ->
+        WordRange.get_words_for_range(words, Map.get(c, "word_range"))
+      end)
+      |> Enum.drop_while(fn w -> !Enum.member?(lemma_words, w) end)
+      |> Enum.take_while(fn w -> !Enum.member?(next_lemma_words, w) end)
+      |> Enum.chunk_by(fn w ->
+        index = Map.get(w, :index)
+
+        Enum.find(commentaries, fn c ->
+          [cf, cl] = Map.get(c, "word_range")
+
+          index in cf..cl
+        end)
+      end)
+
+    glossa_overlays = calculate_overlays(pages, glossa_words)
+
+    glossa =
+      glossa_words
+      |> List.flatten()
+      |> Enum.map(&Map.get(&1, "text"))
       |> Enum.join(" ")
-
-    # We need to split the string on the target lemma and take the substring
-    # after the split in case the lemma starts in the middle of a region.
-    no_lemma =
-      String.split(g, lemma_text, parts: 2, trim: true)
-      |> List.last()
-
-    # Getting the string without the next lemma is a bit more complicated,
-    # because we don't just want the first (0th) substring after the split,
-    # but rather all but the last substring.
-    no_next_lemma =
-      String.split(no_lemma, next_lemma_text, trim: true)
-
-    {_last_substring, no_next_lemma} = List.pop_at(no_next_lemma, -1)
-
-    no_next_lemma = Enum.join(no_next_lemma, " ")
-
-    no_line_anchor =
-      Regex.replace(dangling_line_anchor_regex(), no_next_lemma, "")
-
-    glossa = no_line_anchor |> String.trim()
+      |> String.trim()
 
     lemma_transcript =
       if is_nil(Map.get(lemma, "transcript")) do
@@ -323,6 +344,7 @@ defmodule TextServer.Ingestion.Commentary do
       "lemma" => lemma_transcript,
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
+      "overlays" => glossa_overlays,
       "image_paths" =>
         pages
         |> Enum.map(fn p ->
@@ -332,5 +354,61 @@ defmodule TextServer.Ingestion.Commentary do
           "#{commentary_id}/#{page_id}/full/max/0/default.png"
         end)
     })
+  end
+
+  defp calculate_overlays(pages, words_grouped_by_region) do
+    words_grouped_by_region
+    |> Enum.flat_map(fn words ->
+      words
+      |> Enum.chunk_by(fn word ->
+        index = Map.get(word, :index)
+
+        Enum.find(pages, fn page ->
+          [p_f, p_l] = Map.get(page, "word_range")
+
+          index in p_f..p_l
+        end)
+      end)
+    end)
+    |> Enum.map(fn words ->
+      word = List.first(words)
+
+      index = Map.get(word, :index)
+
+      page_id =
+        Enum.find(pages, fn page ->
+          [p_f, p_l] = Map.get(page, "word_range")
+
+          index in p_f..p_l
+        end)
+        |> Map.get("id")
+
+      bboxes = words |> Enum.map(&Map.get(&1, "bbox"))
+
+      xs =
+        bboxes
+        |> Enum.flat_map(fn bbox_pair ->
+          bbox_pair |> Enum.map(&Enum.at(&1, 0))
+        end)
+
+      ys =
+        bboxes
+        |> Enum.flat_map(fn bbox_pair ->
+          bbox_pair |> Enum.map(&Enum.at(&1, 1))
+        end)
+
+      left_most = Enum.min(xs)
+      right_most = Enum.max(xs)
+      top_most = Enum.min(ys)
+      bottom_most = Enum.max(ys)
+
+      %{
+        px: left_most,
+        py: top_most,
+        width: right_most - left_most,
+        height: bottom_most - top_most,
+        page_id: page_id
+      }
+    end)
   end
 end
