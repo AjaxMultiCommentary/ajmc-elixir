@@ -16,12 +16,12 @@ config :text_server, TextServerWeb.Endpoint,
 config :logger, level: :info
 
 config :text_server, TextServerWeb.Endpoint,
-  force_ssl: [
-    host: nil,
-    rewrite_on: [:x_forwarded_port, :x_forwarded_proto],
-    # maybe true when we use this for real
-    hsts: false
-  ],
+  # force_ssl: [
+  #   host: nil,
+  #   rewrite_on: [:x_forwarded_port, :x_forwarded_proto],
+  #   # maybe true when we use this for real
+  #   hsts: false
+  # ],
   url: [host: "localhost", port: 4000]
 
 config :swoosh, :api_client, Swoosh.ApiClient.Hackney
