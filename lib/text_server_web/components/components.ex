@@ -1,8 +1,6 @@
 defmodule TextServerWeb.Components do
   use TextServerWeb, :component
 
-  alias TextServerWeb.Icons
-
   attr :item, :map, required: true
   attr :url, :string, required: true
 
@@ -36,28 +34,26 @@ defmodule TextServerWeb.Components do
   def floating_comments(assigns) do
     ~H"""
     <div>
-      <details :for={c <- @comments} class={comment_class(c, @highlighted_comments)}>
+      <details
+        :for={c <- @comments}
+        class={[
+          "border-2 collapse collapse-arrow rounded-md mb-2",
+          if(Enum.member?(@highlighted_comments, Map.get(c, :id, nil)), do: "border-stone-800", else: "")
+        ]}
+      >
         <input type="checkbox" class="min-h-0" />
         <summary class="collapse-title">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">
+          <h3 class="text-md font-medium leading-6 text-gray-900">
             <%= c.attributes |> Map.get("lemma") %>
           </h3>
           <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= c.author %></small>
         </summary>
-        <div class="collapse-content">
+        <div class="collapse-content float-right">
           <p class="mt-1 max-w-2xl text-sm text-gray-800"><%= c.content %></p>
         </div>
       </details>
     </div>
     """
-  end
-
-  defp comment_class(comment, highlighted_comments) do
-    if Enum.member?(highlighted_comments, Map.get(comment, :id, nil)) do
-      "border-2 border-stone-800 collapse collapse-arrow rounded-md mb-2"
-    else
-      "border-2 collapse collapse-arrow rounded-md mb-2"
-    end
   end
 
   attr :footnotes, :list, default: []

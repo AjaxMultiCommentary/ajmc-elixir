@@ -239,9 +239,16 @@ defmodule TextServer.Ingestion.Commentary do
 
     glossa = g |> String.trim()
 
+    lemma_transcript =
+      if is_nil(Map.get(lemma, "transcript")) do
+        lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
+      else
+        Map.get(lemma, "transcript")
+      end
+
     Map.merge(lemma, %{
       "content" => glossa,
-      "lemma" => lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" "),
+      "lemma" => lemma_transcript,
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
       "image_paths" =>
@@ -304,9 +311,16 @@ defmodule TextServer.Ingestion.Commentary do
 
     glossa = no_line_anchor |> String.trim()
 
+    lemma_transcript =
+      if is_nil(Map.get(lemma, "transcript")) do
+        lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
+      else
+        Map.get(lemma, "transcript")
+      end
+
     Map.merge(lemma, %{
       "content" => glossa,
-      "lemma" => lemma_words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" "),
+      "lemma" => lemma_transcript,
       "words" => lemma_words,
       "commentary_word_ranges" => commentaries |> Enum.map(&Map.get(&1, "word_range")),
       "image_paths" =>
