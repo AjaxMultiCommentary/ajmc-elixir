@@ -25,7 +25,6 @@ defmodule TextServer.Ingestion.Versions do
         Versions.create_xml_document!(version, %{document: xml})
       end
 
-      version = TextServer.Repo.preload(version, :xml_document)
       create_text_nodes(version)
 
       version
@@ -53,6 +52,10 @@ defmodule TextServer.Ingestion.Versions do
   end
 
   defp create_text_nodes(%Versions.Version{} = version) do
+    # make sure we have a fresh version
+    version =
+      TextServer.Repo.get(Versions.Version, version.id) |> TextServer.Repo.preload(:xml_document)
+
     {:ok, lloyd_jones_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
 
     %{word_count: _word_count, lines: lines} =
