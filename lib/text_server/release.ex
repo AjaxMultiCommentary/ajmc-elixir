@@ -20,6 +20,7 @@ defmodule TextServer.Release do
 
   def seed_database do
     load_app()
+    TextServer.Repo.start_link()
     TextServer.Ingestion.Ajmc.run()
   end
 
