@@ -1,9 +1,12 @@
 defmodule TextServer.Ingestion.Versions do
   alias TextServer.Collections
+  alias TextServer.ElementTypes
   alias TextServer.Languages
+  alias TextServer.TextElements
   alias TextServer.TextGroups
-  alias TextServer.Works
+  alias TextServer.TextNodes
   alias TextServer.Versions
+  alias TextServer.Works
 
   def create_versions do
     {:ok, collection} = create_collection()
@@ -21,6 +24,9 @@ defmodule TextServer.Ingestion.Versions do
       if is_nil(version.xml_document) do
         Versions.create_xml_document!(version, %{document: xml})
       end
+
+      version = TextServer.Repo.preload(version, :xml_document)
+      create_text_nodes(version)
 
       version
     end
@@ -44,6 +50,67 @@ defmodule TextServer.Ingestion.Versions do
       urn: "urn:cts:greekLit:tlg0011",
       collection_id: collection.id
     })
+  end
+
+  defp create_text_nodes(%Versions.Version{} = version) do
+    {:ok, lloyd_jones_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
+
+    %{word_count: _word_count, lines: lines} =
+      lloyd_jones_body.body.lines
+      |> Enum.reduce(%{word_count: 0, lines: []}, fn line, acc ->
+        text = line.text |> String.trim()
+        word_count = acc.word_count
+
+        words =
+          Regex.split(~r/[[:space:]]+/, text)
+          |> Enum.with_index()
+          |> Enum.map(fn {word, index} ->
+            offset =
+              case String.split(text, word, parts: 2) do
+                [left, _] -> String.length(left)
+                [_] -> nil
+              end
+
+            %{
+              xml_id: "word_index_#{word_count + index}",
+              offset: offset,
+              text: word
+            }
+          end)
+
+        new_line = %{elements: line.elements, location: [line.n], text: text, words: words}
+
+        %{word_count: word_count + length(words), lines: [new_line | acc.lines]}
+      end)
+
+    lines = Enum.reverse(lines)
+
+    lines
+    |> Enum.each(fn line ->
+      {:ok, text_node} =
+        TextNodes.find_or_create_text_node(%{
+          location: line.location,
+          text: line.text,
+          urn: "#{version.urn}:#{Enum.at(line.location, 0)}",
+          version_id: version.id
+        })
+
+      line.elements
+      |> Enum.each(fn element ->
+        {:ok, element_type} = ElementTypes.find_or_create_element_type(%{name: element.name})
+
+        {:ok, _text_element} =
+          %{
+            attributes: Map.new(element.attributes),
+            end_offset: element.end_offset,
+            element_type_id: element_type.id,
+            end_text_node_id: text_node.id,
+            start_offset: element.start_offset,
+            start_text_node_id: text_node.id
+          }
+          |> TextElements.find_or_create_text_element()
+      end)
+    end)
   end
 
   defp create_version(%Works.Work{} = work, %Languages.Language{} = language, xml) do
