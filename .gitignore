@@ -47,5 +47,3 @@ priv/static/uploads/exemplar_files/*
 !test/support/fixtures/exemplar.docx
 
 *.db
-
-*tess_retrained.json

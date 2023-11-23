@@ -8,4 +8,5 @@ do
 done
 
 /app/bin/migrate
+/app/bin/text_server eval "TextServer.Ingestion.Ajmc.run"
 /app/bin/server
