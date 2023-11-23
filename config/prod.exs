@@ -21,7 +21,8 @@ config :text_server, TextServerWeb.Endpoint,
     rewrite_on: [:x_forwarded_port, :x_forwarded_proto],
     # maybe true when we use this for real
     hsts: false
-  ]
+  ],
+  url: [host: "localhost", port: 4000]
 
 config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 
