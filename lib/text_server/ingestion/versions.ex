@@ -70,6 +70,9 @@ defmodule TextServer.Ingestion.Versions do
   end
 
   defp xml_files do
-    ["priv/static/xml/lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml"]
+    [
+      "priv/static/xml/lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml"
+    ]
+    |> Enum.map(&Application.app_dir(:text_server, &1))
   end
 end

@@ -8,8 +8,6 @@ defmodule TextServer.Ingestion.Ajmc do
   end
 
   defp commentary_paths do
-    {:ok, files} = File.ls("priv/static/json")
-
-    files |> Enum.map(&("priv/static/json/" <> &1))
+    Path.wildcard(Application.app_dir(:text_server, "priv/static/json/*.json"))
   end
 end
