@@ -99,7 +99,7 @@ defmodule TextServer.Languages do
         create_language(%{slug: slug, title: title})
 
       language ->
-        language
+        {:ok, language}
     end
   end
 

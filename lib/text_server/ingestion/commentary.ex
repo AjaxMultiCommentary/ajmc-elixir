@@ -78,6 +78,8 @@ defmodule TextServer.Ingestion.Commentary do
   def ingest_commentary(urn, path) do
     {:ok, comment_element_type} = ElementTypes.find_or_create_element_type(%{name: "comment"})
 
+    TextServer.Repo.delete_all(TextElements.TextElement)
+
     prepare_lemmas_from_canonical_json(path)
     |> Enum.each(&ingest_lemma(urn, comment_element_type, &1))
 

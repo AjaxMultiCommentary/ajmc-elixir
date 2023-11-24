@@ -12,7 +12,7 @@ defmodule TextServer.Ingestion.Versions do
     {:ok, collection} = create_collection()
     {:ok, text_group} = create_text_group(collection)
     {:ok, work} = create_work(text_group)
-    language = create_language()
+    {:ok, language} = create_language()
 
     for xml_file <- xml_files() do
       xml = File.read!(xml_file)
@@ -40,11 +40,7 @@ defmodule TextServer.Ingestion.Versions do
   end
 
   defp create_language do
-    # FIXME: this should always return the tuple form
-    case Languages.find_or_create_language(%{slug: "grc", title: "Greek"}) do
-      {:ok, language} -> language
-      language -> language
-    end
+    Languages.find_or_create_language(%{slug: "grc", title: "Greek"})
   end
 
   defp create_text_group(%Collections.Collection{} = collection) do
