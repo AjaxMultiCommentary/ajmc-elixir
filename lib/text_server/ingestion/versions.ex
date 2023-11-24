@@ -40,7 +40,11 @@ defmodule TextServer.Ingestion.Versions do
   end
 
   defp create_language do
-    Languages.find_or_create_language(%{slug: "grc", title: "Greek"})
+    # FIXME: this should always return the tuple form
+    case Languages.find_or_create_language(%{slug: "grc", title: "Greek"}) do
+      {:ok, language} -> language
+      language -> language
+    end
   end
 
   defp create_text_group(%Collections.Collection{} = collection) do
