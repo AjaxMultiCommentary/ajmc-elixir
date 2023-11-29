@@ -1,4 +1,6 @@
 defmodule TextServer.Ingestion.Commentary do
+  require Logger
+  alias TextServer.Commentaries
   alias TextServer.ElementTypes
   alias TextServer.Ingestion.WordRange
   alias TextServer.TextElements
@@ -71,22 +73,28 @@ defmodule TextServer.Ingestion.Commentary do
   """
 
   @doc """
-  The public entrypoint for this module. Takes a URN, e.g.,
+  The public entrypoint for this module. Takes a URN for the version
+  (critical text) to which the comments should apply, e.g.,
   `"urn:cts:greekLit:tlg0011.tlg003.ajmc-lj"` and a path
   to the AjMC canonical JSON file. Returns `:ok` on success.
   """
-  def ingest_commentary(urn, path) do
+  def ingest_commentary(critical_text_urn, path) do
     {:ok, comment_element_type} = ElementTypes.find_or_create_element_type(%{name: "comment"})
 
-    TextServer.Repo.delete_all(TextElements.TextElement)
+    basename = path |> Path.basename() |> Path.rootname()
+    s = File.read!(path)
+    json = Jason.decode!(s)
+    pid = json |> Map.get("id")
 
-    prepare_lemmas_from_canonical_json(path)
-    |> Enum.each(&ingest_lemma(urn, comment_element_type, &1))
+    {:ok, commentary} = Commentaries.upsert_canonical_commentary(%{filename: basename, pid: pid})
+
+    prepare_lemmas_from_canonical_json(json)
+    |> Enum.each(&ingest_lemma(commentary, critical_text_urn, comment_element_type, &1))
 
     :ok
   end
 
-  defp ingest_glossa(urn, element_type, captures, lemma) do
+  defp ingest_glossa(commentary, urn, element_type, captures, lemma) do
     %{
       "first_line_n" => first_line_n,
       "first_line_offset" => first_line_offset,
@@ -100,6 +108,7 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, _text_element} =
       %{
         attributes: popped_content_lemma,
+        commentary_id: commentary.id,
         content: content,
         end_offset: last_line_offset,
         element_type_id: element_type.id,
@@ -110,7 +119,7 @@ defmodule TextServer.Ingestion.Commentary do
       |> TextElements.find_or_create_text_element()
   end
 
-  defp ingest_multiline_glossa(urn, element_type, captures, lemma) do
+  defp ingest_multiline_glossa(commentary, urn, element_type, captures, lemma) do
     %{
       "first_line_n" => first_line_n,
       "first_line_offset" => first_line_offset,
@@ -136,6 +145,7 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, _text_element} =
       %{
         attributes: popped_content_lemma,
+        commentary_id: commentary.id,
         content: content,
         end_offset: String.length(first_text_node.text),
         element_type_id: element_type.id,
@@ -161,33 +171,42 @@ defmodule TextServer.Ingestion.Commentary do
       |> TextElements.find_or_create_text_element()
   end
 
-  defp ingest_lemma(urn, element_type, %{"anchor_target" => anchor_target} = lemma)
+  defp ingest_lemma(commentary, urn, element_type, %{"anchor_target" => anchor_target} = lemma)
        when not is_nil(anchor_target) do
-    j = Jason.decode!(anchor_target)
-    selector = Map.get(j, "selector")
-
-    with %{
-           "first_line_n" => first_line_n,
-           "last_line_n" => last_line_n
-         } = captures <- Regex.named_captures(passage_regex(), selector) do
-      if first_line_n != last_line_n do
-        ingest_multiline_glossa(urn, element_type, captures, lemma)
-      else
-        ingest_glossa(urn, element_type, captures, lemma)
+    j =
+      try do
+        Jason.decode!(anchor_target)
+      rescue
+        _ ->
+          Logger.warning(anchor_target: anchor_target, commentary: commentary)
+          nil
       end
+
+    if is_map(j) do
+      selector = Map.get(j, "selector")
+
+      with %{
+             "first_line_n" => first_line_n,
+             "last_line_n" => last_line_n
+           } = captures <- Regex.named_captures(passage_regex(), selector) do
+        if first_line_n != last_line_n do
+          ingest_multiline_glossa(commentary, urn, element_type, captures, lemma)
+        else
+          ingest_glossa(commentary, urn, element_type, captures, lemma)
+        end
+      end
+    else
+      Logger.warning(anchor_target: j, commentary: commentary)
     end
   end
 
-  defp ingest_lemma(_urn, _element_type, _lemma), do: nil
+  defp ingest_lemma(_commentary, _urn, _element_type, _lemma), do: nil
 
   defp passage_regex,
     do:
       ~r/tei-l@n=(?<first_line_n>\d+)\[(?<first_line_offset>\d+)\]:tei-l@n=(?<last_line_n>\d+)\[(?<last_line_offset>\d+)\]/
 
-  defp prepare_lemmas_from_canonical_json(path) do
-    s = File.read!(path)
-    json = Jason.decode!(s)
-
+  defp prepare_lemmas_from_canonical_json(json) do
     children = json |> Map.get("children")
 
     lemmas =
