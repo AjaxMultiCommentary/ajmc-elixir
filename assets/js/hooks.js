@@ -43,25 +43,17 @@ export const IIIFHook = {
 	},
 
 	_updateViewer() {
-		const comments = JSON.parse(this.el.dataset.comments);
-		const highlightedComments = JSON.parse(this.el.dataset.highlightedComments);
+		const comment = JSON.parse(this.el.dataset.comment);
 		const tiles = JSON.parse(this.el.dataset.tiles).map(tile => {
-			const relevantComments = comments.filter(comment => {
-				return comment.image_paths.includes(tile.imagePath);
-			});
-
-			const overlays = relevantComments.map(comment => {
-				return comment.overlays.filter(overlay => tile.url.indexOf(overlay.page_id) > -1).map(overlay => ({
-					...overlay,
-					className: overlayClassName(highlightedComments.includes(comment.id))
-				}))
-			}).flat();
+			const overlays = comment.overlays.filter(overlay => tile.url.indexOf(overlay.page_id) > -1).map(overlay => ({
+				...overlay,
+				className: overlayClassName()
+			}));
 
 			tile.overlays = overlays;
 
 			return tile;
 		});
-
 
 		this.viewer = OpenSeadragon({
 			element: this.el,
@@ -70,14 +62,21 @@ export const IIIFHook = {
 			tileSources: tiles,
 			sequenceMode: true
 		});
+
+		this.viewer.addOnceHandler('add-overlay', ({ eventSource }) => {
+			const overlay = eventSource.currentOverlays[0];
+			const viewport = eventSource.viewport;
+
+			window.requestAnimationFrame(() => {
+				viewport.fitBounds(overlay.getBounds(viewport));
+			});
+		});
 	}
 };
 
 
-function overlayClassName(isHighlighted) {
-	if (isHighlighted) {
-		return 'bg-sky-400 opacity-50';
-	}
+function overlayClassName() {
+	return 'bg-sky-400 opacity-50';
 }
 
 /**

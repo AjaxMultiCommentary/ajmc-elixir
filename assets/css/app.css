@@ -157,10 +157,9 @@
  * viewer have width and height set.
  */
 .openseadragon-iiif-viewer {
-	height: 800px;
-	width: 600px;
+	height: 300px;
+	width: 300px;
 }
-
 
 /* Styles for markdown copy (on project homepages)
  * Note that these styles must be descended from a node

@@ -136,7 +136,10 @@ defmodule TextServer.TextNodes do
             t.location >= ^start_location and
             t.location <= ^end_location,
         order_by: [asc: t.location],
-        preload: [:version, text_elements: [:element_type, :text_element_users]]
+        preload: [
+          :version,
+          text_elements: [:canonical_commentary, :element_type, :text_element_users]
+        ]
       )
 
     Repo.all(query)
@@ -174,7 +177,7 @@ defmodule TextServer.TextNodes do
             fragment("location[?] = ?", ^cardinality - 1, ^pseudo_page_number) and
             fragment("location[1] = ?", ^List.first(start_location)),
         order_by: [asc: t.location],
-        preload: [text_elements: [:element_type, :text_element_users]]
+        preload: [text_elements: [:canonical_commentary, :element_type, :text_element_users]]
       )
 
     Repo.all(query)

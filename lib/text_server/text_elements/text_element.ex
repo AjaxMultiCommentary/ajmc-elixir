@@ -2,6 +2,8 @@ defmodule TextServer.TextElements.TextElement do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:attributes, :content, :canonical_commentary]}
+
   schema "text_elements" do
     field :attributes, :map
     field :content, :string

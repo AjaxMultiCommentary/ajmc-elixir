@@ -42,7 +42,7 @@ defmodule TextServerWeb.VersionLive.Show do
 
       <hr class="mb-4" />
 
-      <div class="grid grid-cols-3">
+      <div class="grid grid-cols-2">
         <.live_component
           id={:reader}
           module={TextServerWeb.ReadingEnvironment.Reader}
@@ -67,12 +67,6 @@ defmodule TextServerWeb.VersionLive.Show do
             />
           <% end %>
         </div>
-        <.live_component
-          id={:iiif_viewer}
-          module={TextServerWeb.Components.IiifViewer}
-          comments={@comments}
-          highlighted_comments={@highlighted_comments}
-        />
       </div>
       <Components.pagination current_page={@passage.passage_number} total_pages={@passage.total_passages} />
     </article>

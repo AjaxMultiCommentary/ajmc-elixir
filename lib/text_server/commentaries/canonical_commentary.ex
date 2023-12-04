@@ -2,6 +2,8 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:filename, :pid]}
+
   schema "canonical_commentaries" do
     field :filename, :string
     field :pid, :string
