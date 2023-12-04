@@ -108,7 +108,7 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, _text_element} =
       %{
         attributes: popped_content_lemma,
-        commentary_id: commentary.id,
+        canonical_commentary_id: commentary.id,
         content: content,
         end_offset: last_line_offset,
         element_type_id: element_type.id,
@@ -145,7 +145,7 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, _text_element} =
       %{
         attributes: popped_content_lemma,
-        commentary_id: commentary.id,
+        canonical_commentary_id: commentary.id,
         content: content,
         end_offset: String.length(first_text_node.text),
         element_type_id: element_type.id,
@@ -161,6 +161,7 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, _text_element} =
       %{
         attributes: popped_content_lemma |> Map.put(:comment_end, true),
+        canonical_commentary_id: commentary.id,
         content: "",
         end_offset: last_offset,
         element_type_id: element_type.id,
@@ -252,10 +253,16 @@ defmodule TextServer.Ingestion.Commentary do
     page_range = List.first(commentary_ranges)..List.last(commentary_ranges)
     pages = WordRange.filter_containers_within_range(pages, page_range)
 
+    # The two `Enum.drop_while/2`'s in a row look a bit strange, but we
+    # can't combine them: first, we need to drop all words from the
+    # commentary region up to the lemma; then, we need to drop the lemma.
+    # If we combined them, it would drop all of the words up to the lemma, then
+    # drop the lemma, then also drop all of the words after the lemma.
     glossa_words =
       commentaries
       |> Enum.flat_map(&WordRange.get_words_for_range(words, Map.get(&1, "word_range")))
       |> Enum.drop_while(fn w -> !Enum.member?(lemma_words, w) end)
+      |> Enum.drop_while(fn w -> Enum.member?(lemma_words, w) end)
       |> Enum.chunk_by(fn w ->
         index = Map.get(w, :index)
 
@@ -320,12 +327,18 @@ defmodule TextServer.Ingestion.Commentary do
         lemma_first..next_lemma_first
       )
 
+    # The two `Enum.drop_while/2`'s in a row look a bit strange, but we
+    # can't combine them: first, we need to drop all words from the
+    # commentary region up to the lemma; then, we need to drop the lemma.
+    # If we combined them, it would drop all of the words up to the lemma, then
+    # drop the lemma, then also drop all of the words after the lemma.
     glossa_words =
       commentaries
       |> Enum.flat_map(fn c ->
         WordRange.get_words_for_range(words, Map.get(c, "word_range"))
       end)
       |> Enum.drop_while(fn w -> !Enum.member?(lemma_words, w) end)
+      |> Enum.drop_while(fn w -> Enum.member?(lemma_words, w) end)
       |> Enum.take_while(fn w -> !Enum.member?(next_lemma_words, w) end)
       |> Enum.chunk_by(fn w ->
         index = Map.get(w, :index)

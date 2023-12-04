@@ -6,9 +6,28 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServer.TextNodes
   alias TextServer.Versions
 
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok,
+     socket
+     |> assign_new(:current_user, fn -> nil end)
+     |> assign(
+       focused_text_node: nil,
+       version_command_palette_open: false
+     )}
+  end
+
+  attr :comments, :list
+  attr :focused_text_node, TextNodes.TextNode
+  attr :footnotes, :list, default: []
+  attr :highlighted_comments, :list
+  attr :location, :list, default: []
+  attr :passage, Versions.Passage
   attr :second_level_toc, :list
+  attr :text_nodes, :list, default: []
   attr :top_level_toc, :list, required: true
-  attr :version, TextServer.Versions.Version, required: true
+  attr :version, Versions.Version, required: true
+  attr :version_command_palette_open, :boolean
   attr :versions, :list, required: true
 
   @impl true
@@ -38,8 +57,16 @@ defmodule TextServerWeb.VersionLive.Show do
           second_level_toc={@second_level_toc}
           version_urn={@version.urn}
         />
-        <Components.floating_comments comments={@comments} highlighted_comments={@highlighted_comments} />
-
+        <div>
+          <%= for comment <- @comments do %>
+            <.live_component
+              id={comment.id}
+              module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
+              comment={comment}
+              is_highlighted={Enum.member?(@highlighted_comments, Map.get(comment, :id))}
+            />
+          <% end %>
+        </div>
         <.live_component
           id={:iiif_viewer}
           module={TextServerWeb.Components.IiifViewer}
@@ -50,14 +77,6 @@ defmodule TextServerWeb.VersionLive.Show do
       <Components.pagination current_page={@passage.passage_number} total_pages={@passage.total_passages} />
     </article>
     """
-  end
-
-  @impl true
-  def mount(_params, _session, socket) do
-    {:ok,
-     socket
-     |> assign_new(:current_user, fn -> nil end)
-     |> assign(focused_text_node: nil, version_command_palette_open: false)}
   end
 
   @impl true
