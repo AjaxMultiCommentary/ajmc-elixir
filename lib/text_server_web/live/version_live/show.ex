@@ -16,9 +16,6 @@ defmodule TextServerWeb.VersionLive.Show do
     ~H"""
     <article class="mx-auto">
       <h1 class="text-2xl font-bold"><%= @version.label %></h1>
-      <%= if @current_user do %>
-        <.link href={~p"/versions/#{@version.id}/edit"}>Edit</.link>
-      <% end %>
 
       <p><%= @version.description %></p>
 
@@ -64,19 +61,22 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id, "page" => passage_number}, _, socket) do
-    create_response(socket, id, get_passage(id, passage_number))
+  def handle_params(%{"urn" => urn, "page" => passage_number}, _, socket) do
+    version = Versions.get_version_by_urn!(urn)
+    create_response(socket, version, get_passage(version.id, passage_number))
   end
 
-  def handle_params(%{"id" => id, "location" => raw_location}, _session, socket) do
+  def handle_params(%{"urn" => urn, "location" => raw_location}, _session, socket) do
+    version = Versions.get_version_by_urn!(urn)
+
     location = raw_location |> String.split(".") |> Enum.map(&String.to_integer/1)
 
-    passage_page = get_passage_by_location(id, location)
+    passage_page = get_passage_by_location(version.id, location)
 
     if is_nil(passage_page) do
       {:noreply, socket |> put_flash(:error, "No text nodes found for the given passage.")}
     else
-      create_response(socket, id, passage_page)
+      create_response(socket, version, passage_page)
     end
   end
 
@@ -88,10 +88,8 @@ defmodule TextServerWeb.VersionLive.Show do
     )
   end
 
-  defp create_response(socket, version_id, page) do
+  defp create_response(socket, version, page) do
     %{comments: comments, footnotes: footnotes, passage: passage} = page
-
-    version = Versions.get_version!(version_id)
 
     sibling_versions =
       Versions.list_sibling_versions(version)
@@ -103,7 +101,7 @@ defmodule TextServerWeb.VersionLive.Show do
     location = List.first(text_nodes).location
     top_level_location = List.first(location)
     second_level_location = Enum.at(location, 1)
-    toc = Versions.get_table_of_contents(version_id)
+    toc = Versions.get_table_of_contents(version.id)
 
     {top_level_toc, second_level_toc} =
       if length(location) > 2 do

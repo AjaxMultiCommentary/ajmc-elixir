@@ -119,6 +119,9 @@ defmodule TextServerWeb.ReadLive.Index do
   end
 
   defp list_versions(collection, text_group, work, opts) do
-    Versions.list_versions_for_urn(CTS.URN.parse("urn:cts:#{collection}:#{text_group}.#{work}"), opts)
+    Versions.list_versions_for_urn(
+      CTS.URN.parse("urn:cts:#{collection}:#{text_group}.#{work}"),
+      opts
+    )
   end
 end

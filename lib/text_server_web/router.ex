@@ -102,10 +102,13 @@ defmodule TextServerWeb.Router do
       live "/text_nodes/:id", TextNodeLive.Show, :show
 
       live "/versions", VersionLive.Index, :index
-      live "/versions/:id", VersionLive.Show, :show
+      live "/versions/:urn", VersionLive.Show, :show
 
       live "/works", WorkLive.Index, :index
       live "/works/:id", WorkLive.Show, :show
+
+      # TODO: These routes should ultimately point to the :show routes
+      # of their respective CTS URN leaves
 
       live "/read", ReadLive.Index, :index
       live "/read/:collection", ReadLive.Index, :collection
