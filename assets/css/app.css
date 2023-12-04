@@ -158,7 +158,7 @@
  */
 .openseadragon-iiif-viewer {
 	height: 300px;
-	width: 300px;
+	width: 500px;
 }
 
 /* Styles for markdown copy (on project homepages)
@@ -228,6 +228,14 @@
 
 .\@\@oc\/user-markdown ul {
 	margin-bottom: 0.9rem;
+}
+
+.\@\@ajmc\/comment-box-shadow {
+	box-shadow: inset 1px 1px 10px rgba(135, 206, 250, 0.2),
+				inset -1px -1px 10px rgba(135, 206, 250, 0.2),
+				inset 1px -1px 10px rgba(135, 206, 250, 0.2),
+				inset -1px 1px 10px rgba(135, 206, 250, 0.2);
+		
 }
 
 .text-node::before {

@@ -44,6 +44,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     {:noreply, socket}
   end
 
+  attr :classes, :string, default: ""
   attr :tags, :list, default: []
   attr :text, :string
 
@@ -72,7 +73,9 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
           )
 
         ~H"""
-        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments}><%= @text %></span>
+        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments}>
+          <%= @text %>
+        </span>
         """
 
       Enum.member?(tags |> Enum.map(& &1.name), "image") ->
@@ -119,7 +122,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   defp tag_classes(tag) do
     case tag.name do
       "add" -> "bg-sky-400"
-      "comment" -> "bg-blue-200 cursor-pointer"
+      "comment" -> "@@ajmc/comment-box-shadow cursor-pointer"
       "del" -> "line-through"
       "emph" -> "italic"
       "image" -> "image mt-10"
