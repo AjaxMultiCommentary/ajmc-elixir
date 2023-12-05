@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title prefix="Ajax Multicommentary – ">
+    <.live_title prefix="Ajax Multi-Commentary – ">
       <%= assigns[:page_title] || "Home" %>
     </.live_title>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
@@ -19,39 +19,12 @@
             <div class="flex">
               <div class="hidden sm:-my-px sm:flex sm:space-x-8 sm:items-center">
                 <.link href={~p"/"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
-                  Ajax Multicommentary
+                  Ajax Multi-Commentary
                 </.link>
                 <.link href={~p"/projects"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
                   Available commentaries
                 </.link>
               </div>
-            </div>
-            <div class="hidden sm:ml-6 sm:flex sm:items-center">
-              <%= if @current_user do %>
-                <.link
-                  href={~p"/#{@current_user.id}/projects"}
-                  class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
-                >
-                  My Projects
-                </.link>
-                <.link href={~p"/users/settings"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
-                  Settings
-                </.link>
-                <.link
-                  href={~p"/users/log_out"}
-                  method="delete"
-                  class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
-                >
-                  Log out
-                </.link>
-              <% else %>
-                <.link href={~p"/users/register"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
-                  Sign up
-                </.link>
-                <.link href={~p"/users/log_in"} class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
-                  Log in
-                </.link>
-              <% end %>
             </div>
             <div class="-mr-2 flex items-center sm:hidden">
               <label
@@ -92,41 +65,6 @@
               <.link href={~p"/projects"} class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
                 Available commentaries
               </.link>
-              <%= if @current_user do %>
-                <.link
-                  href={~p"/#{@current_user.id}/projects"}
-                  class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-                >
-                  My Projects
-                </.link>
-
-                <.link
-                  href={~p"/users/settings"}
-                  class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-                >
-                  Settings
-                </.link>
-                <.link
-                  href={~p"/users/log_out"}
-                  method="delete"
-                  class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-                >
-                  Log out
-                </.link>
-              <% else %>
-                <.link
-                  href={~p"/users/register"}
-                  class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-                >
-                  Sign up
-                </.link>
-                <.link
-                  href={~p"/users/log_in"}
-                  class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-                >
-                  Log in
-                </.link>
-              <% end %>
             </div>
           </div>
         </div>

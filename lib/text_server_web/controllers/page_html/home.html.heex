@@ -11,46 +11,20 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <link phx-track-static async rel="stylesheet" href={~p"/assets/app.css"} />
   </head>
-  <body>
-    <nav class="bg-alexandria-scrolls">
+  <body class="bg-slate-50 min-h-screen">
+    <nav>
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex sm:h-64 h-24 justify-between">
           <div class="flex">
             <div class="hidden sm:-my-px sm:flex sm:space-x-8 sm:items-center">
-              <.link href={~p"/"} class="text-white hover:text-gray-300 px-3 py-2 font-medium">
-                Open Commentaries
-              </.link>
-              <.link href={~p"/projects"} class="text-white hover:text-gray-300 px-3 py-2 font-medium">
-                Projects
+              <.link href={~p"/"} class="text-slate-700 hover:text-gray-300 px-3 py-2 font-medium">
+                Ajax Multi-Commentary
               </.link>
             </div>
           </div>
-          <div class="hidden sm:ml-6 sm:flex sm:items-center">
-            <%= if @current_user do %>
-              <.link
-                href={~p"/#{@current_user.id}/projects"}
-                class="text-white hover:text-gray-300 px-3 py-2 font-medium"
-              >
-                My Projects
-              </.link>
-              <.link href={~p"/users/settings"} class="text-white hover:text-gray-300 px-3 py-2 font-medium">
-                Settings
-              </.link>
-              <.link href={~p"/users/log_out"} method="delete" class="text-white hover:text-gray-300 px-3 py-2 font-medium">
-                Log out
-              </.link>
-            <% else %>
-              <.link href={~p"/users/register"} class="text-white hover:text-gray-300 px-3 py-2 font-medium">
-                Sign up
-              </.link>
-              <.link href={~p"/users/log_in"} class="text-white hover:text-gray-300 px-3 py-2 font-medium">
-                Log in
-              </.link>
-            <% end %>
-          </div>
           <div class="-mr-2 flex items-center sm:hidden">
             <label
-              class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 opacity-75"
+              class="relative inline-flex items-center justify-center rounded-md p-2 text-stone-600 hover:bg-stone-100 hover:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 opacity-75"
               for="mobile-menu-button"
             >
               <span class="absolute -inset-0.5"></span>
@@ -78,132 +52,46 @@
         aria-controls="mobile-menu"
         id="mobile-menu-button"
       />
-      <div class="sm:hidden absolute -top-72 transition duration-500 peer-checked:top-0 peer-checked:relative" id="mobile-menu">
+      <div
+        class="sm:hidden absolute -top-72 transition duration-500 peer-checked:top-0 peer-checked:relative"
+        id="mobile-menu"
+      >
         <div class="border-t border-gray-200 pb-3 pt-4">
           <div class="mt-3 space-y-1 pointer-events-auto">
             <.link href={~p"/"} class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
-              Open Commentaries
+              Ajax Multi-Commentary
             </.link>
             <.link href={~p"/projects"} class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
               Projects
             </.link>
-            <%= if @current_user do %>
-              <.link
-                href={~p"/#{@current_user.id}/projects"}
-                class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-              >
-                My Projects
-              </.link>
-
-              <.link
-                href={~p"/users/settings"}
-                class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-              >
-                Settings
-              </.link>
-              <.link href={~p"/users/log_out"} method="delete" class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
-                Log out
-              </.link>
-            <% else %>
-              <.link
-                href={~p"/users/register"}
-                class="block px-4 py-2 text-base font-medium text-white hover:opacity-75"
-              >
-                Sign up
-              </.link>
-              <.link href={~p"/users/log_in"} class="block px-4 py-2 text-base font-medium text-white hover:opacity-75">
-                Log in
-              </.link>
-            <% end %>
           </div>
         </div>
       </div>
     </nav>
 
     <article class="mx-auto max-w-7xl px-6 lg:px-8 py-24">
-      <h2 class="text-7xl font-semibold mb-4 text-stone-800">
-        Open and accessible philology for the Information Age
+      <h1 class="text-7xl font-semibold mb-4 text-stone-700">
+        The <span class="italic">Ajax</span> Multi-Commentary Project
+      </h1>
+      <h2 class="text-xl text-stone-600">
+        How does a classical hero die in the digital age? Using Sophocles&rsquo; <span class="italic">Ajax</span>
+        to create a commentary on commentaries.
       </h2>
-      <h3 class="text-xl text-stone-600">
-        Collaborative digital editions, commentaries, and translations for pre-medieval works in 14 languages
-        with support from the <a class="font-semibold" href="https://newalexandria.info">New Alexandria Foundation</a>
-      </h3>
-
       <section>
-        <div class="mt-20 max-w-lg sm:mx-auto md:max-w-none">
-          <div class="grid grid-cols-1 gap-y-16 md:grid-cols-2 md:gap-x-12 md:gap-y-16">
-            <div class="relative flex flex-col gap-6 sm:flex-row md:flex-col lg:flex-row">
-              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-stone-500 text-white sm:shrink-0">
-                <!-- tabler-icons/brand-office -->
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon icon-tabler icon-tabler-brand-office"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M4 18h9v-12l-5 2v5l-4 2v-8l9 -4l7 2v13l-7 3z"></path>
-                </svg>
-              </div>
-              <div class="sm:min-w-0 sm:flex-1">
-                <p class="text-lg font-semibold leading-8 text-gray-900">Work with the tools you know</p>
-                <p class="mt-2 text-base leading-7 text-gray-600">
-                  The Open Commentaries platform allows you to upload documents with the docx encoding,
-                  meaning you can continue to write in Word, Pages, OpenOffice, Google Docs, or any
-                  platform that supports saving to docx.
-                  With Open Commentaries, your work can reach a broader audience quickly. We'll handle parsing comments,
-                  footnotes, and citations (coming soon), and we're working on additional support for
-                  cross-references and named entity recognition.
-                </p>
-              </div>
-            </div>
-
-            <div class="relative flex flex-col gap-6 sm:flex-row md:flex-col lg:flex-row">
-              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-stone-500 text-white sm:shrink-0">
-                <!-- tabler-icons/source-code -->
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon icon-tabler icon-tabler-source-code"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M14.5 4h2.5a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3v-5"></path>
-                  <path d="M6 5l-2 2l2 2"></path>
-                  <path d="M10 9l2 -2l-2 -2"></path>
-                </svg>
-              </div>
-              <div class="sm:min-w-0 sm:flex-1">
-                <p class="text-lg font-semibold leading-8 text-gray-900">Bring your TEI XML to life</p>
-                <p class="mt-2 text-base leading-7 text-gray-600">
-                  The Open Commentaries Platform also works with and enhances
-                  the <a href="//tei-c.org" title="TEI website">Text Encoding Initiative</a>'s XML.
-                  Unlike TEI, however, our <a href="https://codeberg.org/charles/open-commentaries">open-source</a> data
-                  structures free your texts from a rigid document hierarchy, allowing you to map relationships across
-                  corpora without having to dive into a miles-deep XML tree.
-                </p>
-              </div>
-            </div>
-          </div>
+        <div class="mt-20 max-w-2xl sm:mx-auto md:max-w-none flex justify-center">
+          <figure class="max-w-full">
+            <img class="h-auto max-w-full rounded-sm" src="/images/multicommentary_guy_HR.jpg" alt="image description" />
+            <figcaption class="mt-2 text-sm text-center text-gray-500 dark:text-gray-400">
+              Photo credits: © <a href="https://www.fondationhardt.ch/">Fondation Hardt</a>, Vandoeuvres, 2019.
+            </figcaption>
+          </figure>
         </div>
       </section>
     </article>
     <footer class="mx-auto mt-32 w-full max-w-container px-4 sm:px-6 lg:px-8">
       <div class="border-t border-slate-900/5 py-10">
         <p class="mt-5 text-center text-sm leading-6 text-slate-500">
-          © Open Commentaries and the New Alexandria Foundation 2022
+          © Matteo Romanello 2023
         </p>
       </div>
       <div class="mb-8 flex items-center justify-center space-x-4 text-sm font-semibold leading-6 text-slate-700">
@@ -211,6 +99,7 @@
         <a href="https://accessibility.huit.harvard.edu/digital-accessibility-policy">Digital Accessibility</a>
       </div>
     </footer>
-    <script defer type="text/javascript" src={~p"/assets/app.js"}></script>
+    <script defer type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
   </body>
 </html>

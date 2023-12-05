@@ -23,7 +23,8 @@ defmodule TextServer.TextElements do
     Repo.all(TextElement)
   end
 
-  def list_text_elements_by_type(element_type) do
+  @spec list_text_elements_by_type(binary()) :: any()
+  def list_text_elements_by_type(element_type) when is_binary(element_type) do
     case ElementTypes.get_element_type_by_name(element_type) do
       nil ->
         []
