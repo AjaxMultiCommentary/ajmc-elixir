@@ -212,7 +212,7 @@ defmodule TextServer.Ingestion.Commentary do
 
     lemmas =
       children
-      |> Map.get("lemmas")
+      |> Map.get("lemmas", [])
       |> Enum.filter(fn l ->
         case Map.get(l, "label") do
           "scope-anchor" -> true

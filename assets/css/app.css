@@ -231,11 +231,39 @@
 }
 
 .\@\@ajmc-comment-box-shadow.comments-1 {
-	box-shadow: 0 0.4rem 2px rgb(135, 206, 235, 0.2)
+	background-color: rgb(99, 162, 187, 0.2);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-2 {
-	box-shadow: 0 0.4rem 2px rgba(99, 162, 187, 0.4)
+	background-color: rgba(99, 162, 187, 0.4);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-3 {
+	background-color: rgba(99, 162, 187, 0.6);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-4 {
+	background-color: rgba(99, 162, 187, 0.8);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-6 {
+	background-color: rgba(99, 162, 187, 1);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-7 {
+	background-color: rgba(67, 121, 142, 0.8);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-8 {
+	background-color: rgba(67, 121, 142, 0.9);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-9 {
+	background-color: rgba(67, 121, 142, 1);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-10 {
+	background-color: rgb(67, 121, 142, 1);
 }
 
 .text-node::before {

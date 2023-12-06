@@ -57,7 +57,7 @@ defmodule TextServerWeb.VersionLive.Show do
           second_level_toc={@second_level_toc}
           version_urn={@version.urn}
         />
-        <div>
+        <div class="overflow-y-scroll max-h-screen">
           <%= for comment <- @comments do %>
             <.live_component
               id={comment.id}

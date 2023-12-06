@@ -78,7 +78,11 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
           )
 
         ~H"""
-        <span class={[@classes, "comments-#{Enum.count(@commentary_ids)}"]} phx-click="highlight-comments" phx-value-comments={@comments}>
+        <span
+          class={[@classes, "comments-#{min(Enum.count(@commentary_ids), 10)}"]}
+          phx-click="highlight-comments"
+          phx-value-comments={@comments}
+        >
           <%= @text %>
         </span>
         """
