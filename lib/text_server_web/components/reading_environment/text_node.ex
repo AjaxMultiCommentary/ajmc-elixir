@@ -65,15 +65,20 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         assigns =
           assign(
             assigns,
-            :comments,
-            tags
-            |> Enum.filter(&(&1.name == "comment"))
-            |> Enum.map(& &1.metadata.id)
-            |> Jason.encode!()
+            comments:
+              tags
+              |> Enum.filter(&(&1.name == "comment"))
+              |> Enum.map(& &1.metadata.id)
+              |> Jason.encode!(),
+            commentary_ids:
+              tags
+              |> Enum.filter(&(&1.name == "comment"))
+              |> Enum.map(& &1.metadata.canonical_commentary.pid)
+              |> Enum.dedup()
           )
 
         ~H"""
-        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments}>
+        <span class={[@classes, "comments-#{Enum.count(@commentary_ids)}"]} phx-click="highlight-comments" phx-value-comments={@comments}>
           <%= @text %>
         </span>
         """
@@ -122,7 +127,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   defp tag_classes(tag) do
     case tag.name do
       "add" -> "bg-sky-400"
-      "comment" -> "@@ajmc/comment-box-shadow cursor-pointer"
+      "comment" -> "@@ajmc-comment-box-shadow cursor-pointer"
       "del" -> "line-through"
       "emph" -> "italic"
       "image" -> "image mt-10"

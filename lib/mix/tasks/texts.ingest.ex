@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Texts.Ingest do
 
     Mix.shell().info("... Ingesting repositories ... \n")
 
-    TextServer.Texts.ingest_repos()
+    TextServer.Ingestion.Ajmc.run()
 
     Mix.shell().info("... Finished ingesting repositories ... ")
   end
