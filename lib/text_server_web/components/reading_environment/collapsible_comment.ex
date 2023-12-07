@@ -18,7 +18,11 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     ]}>
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium text-gray-900 cursor-pointer">
-          <%= @comment.attributes |> Map.get("lemma") %>
+          <span class="text-sm font-light text-gray-600">
+            <%= citation(@comment.attributes) %>
+          </span>
+          <%= @comment.attributes
+          |> Map.get("lemma") %>
         </h3>
         <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= @comment.canonical_commentary.pid %></small>
       </div>
@@ -55,5 +59,15 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   def handle_event("show-iiif-viewer", _, socket) do
     {:noreply, socket |> assign(:is_iiif_viewer_shown, true)}
+  end
+
+  defp citation(attributes) do
+    citation = attributes |> Map.get("citation")
+
+    if Enum.count(citation) > 1 do
+      "Lines #{Enum.join(citation, "–")}."
+    else
+      "Line #{List.first(citation)}."
+    end
   end
 end

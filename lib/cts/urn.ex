@@ -77,6 +77,22 @@ defmodule CTS.URN do
   @excluded_characters '\\"&<>^`|{}~'
   """
 
+  @derive {Jason.Encoder,
+           only: [
+             :prefix,
+             :protocol,
+             :namespace,
+             :work_component,
+             :text_group,
+             :work,
+             :version,
+             :exemplar,
+             :passage_component,
+             :citations,
+             :subsections,
+             :indexes
+           ]}
+
   defstruct prefix: "urn",
             protocol: "cts",
             namespace: nil,

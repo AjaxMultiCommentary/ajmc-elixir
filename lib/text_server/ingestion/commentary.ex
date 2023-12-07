@@ -104,10 +104,11 @@ defmodule TextServer.Ingestion.Commentary do
     content = Map.get(lemma, "content") |> String.replace("- ", "")
     {_, popped_content_lemma} = Map.pop(lemma, "content")
     text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_line_n}"})
+    attributes = Map.put(popped_content_lemma, :citation, [first_line_n])
 
     {:ok, _text_element} =
       %{
-        attributes: popped_content_lemma,
+        attributes: attributes,
         canonical_commentary_id: commentary.id,
         content: content,
         end_offset: last_line_offset,
@@ -140,11 +141,14 @@ defmodule TextServer.Ingestion.Commentary do
         [last_line_offset, first_line_offset]
       end
 
+    last_n = max(String.to_integer(first_line_n), String.to_integer(last_line_n))
+
     first_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_n}"})
+    attributes = Map.put(popped_content_lemma, :citation, [first_n, last_n])
 
     {:ok, _text_element} =
       %{
-        attributes: popped_content_lemma,
+        attributes: attributes,
         canonical_commentary_id: commentary.id,
         content: content,
         end_offset: String.length(first_text_node.text),
@@ -155,12 +159,11 @@ defmodule TextServer.Ingestion.Commentary do
       }
       |> TextElements.find_or_create_text_element()
 
-    last_n = max(String.to_integer(first_line_n), String.to_integer(last_line_n))
     last_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{last_n}"})
 
     {:ok, _text_element} =
       %{
-        attributes: popped_content_lemma |> Map.put(:comment_end, true),
+        attributes: attributes |> Map.put(:comment_end, true),
         canonical_commentary_id: commentary.id,
         content: "",
         end_offset: last_offset,
