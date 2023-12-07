@@ -17,23 +17,13 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     ~H"""
     <div class="flex">
       <p
-        class="max-w-prose px-4 text-node"
+        class="max-w-prose text-node"
         data-location={Enum.join(@text_node.location, ".")}
         phx-click="text-node-click"
         phx-target={@myself}
       >
         <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
       </p>
-
-      <div :if={@sibling_node != nil} class="max-w-prose">
-        <p class="mb-4 px-4" alt={@sibling_node.version.label}>
-          <.text_element
-            :for={{graphemes, tags} <- @sibling_node.graphemes_with_tags}
-            tags={tags}
-            text={Enum.join(graphemes)}
-          />
-        </p>
-      </div>
     </div>
     """
   end

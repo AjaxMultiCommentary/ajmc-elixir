@@ -34,7 +34,7 @@ defmodule TextServerWeb.VersionLive.Show do
   def render(assigns) do
     ~H"""
     <article class="mx-auto">
-      <h1 class="text-2xl font-bold"><%= @version.label %></h1>
+      <h1 class="text-2xl font-bold"><%= raw @version.label %></h1>
 
       <p><%= @version.description %></p>
 

@@ -48,7 +48,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
   def render(assigns) do
     ~H"""
     <article id="reading-environment-reader">
-      <section id="reading-page" class="leading-normal">
+      <section id="reading-page" class="text-xl leading-normal">
         <.live_component
           :for={text_node <- @text_nodes}
           module={TextServerWeb.ReadingEnvironment.TextNode}
