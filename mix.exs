@@ -63,6 +63,7 @@ defmodule TextServer.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:postgrex, "~> 0.16.3"},
       {:rambo, "~> 0.3.4"},
+      {:req, "~> 0.4.0"},
       {:recase, "~> 0.5"},
       {:saxy, "~> 1.5"},
       {:scrivener_ecto, "~> 2.7"},
@@ -70,8 +71,7 @@ defmodule TextServer.MixProject do
       {:swoosh, "~> 1.3"},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"},
-      {:tesla, "~> 1.4"}
+      {:telemetry_poller, "~> 1.0"}
     ]
   end
 

@@ -25,7 +25,10 @@ defmodule TextServer.Ingestion.Versions do
         Versions.create_xml_document!(version, %{document: xml})
       end
 
+      TextServer.Versions.Passage |> TextServer.Repo.delete_all()
+
       create_text_nodes(version)
+      create_navigation(version)
 
       version
     end
@@ -41,6 +44,28 @@ defmodule TextServer.Ingestion.Versions do
 
   defp create_language do
     Languages.find_or_create_language(%{slug: "grc", title: "Greek"})
+  end
+
+  def create_navigation(%Versions.Version{} = version) do
+    raw_synopsis = File.read!(synopsis_json())
+    {:ok, synopsis} = Jason.decode(raw_synopsis)
+
+    synopsis
+    |> Map.get("synopsis", [])
+    |> Enum.with_index(1)
+    |> Enum.map(fn {passage, i} ->
+      passage_urn = passage |> Map.get("passage_urn") |> CTS.URN.parse()
+      passage_label = passage |> Map.get("label") |> Map.get("en") |> String.trim()
+
+      Versions.Passages.create_passage!(%{
+        version_id: version.id,
+        urn: passage_urn,
+        label: passage_label,
+        end_location: [List.last(passage_urn.citations)],
+        start_location: [List.first(passage_urn.citations)],
+        passage_number: i
+      })
+    end)
   end
 
   defp create_text_group(%Collections.Collection{} = collection) do
@@ -144,5 +169,9 @@ defmodule TextServer.Ingestion.Versions do
       "priv/static/xml/lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml"
     ]
     |> Enum.map(&Application.app_dir(:text_server, &1))
+  end
+
+  defp synopsis_json do
+    Application.app_dir(:text_server, "priv/static/json/ajax_synopsis.json")
   end
 end

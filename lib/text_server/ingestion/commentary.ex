@@ -216,13 +216,14 @@ defmodule TextServer.Ingestion.Commentary do
     lemmas =
       children
       |> Map.get("lemmas", [])
-      |> Enum.filter(fn l ->
-        case Map.get(l, "label") do
-          "scope-anchor" -> true
-          "word-anchor" -> true
-          _ -> false
-        end
-      end)
+
+    lemmaless_comments =
+      lemmas
+      |> Enum.filter(&(Map.get(&1, "label") == "scope-anchor"))
+
+    lemmas =
+      lemmas
+      |> Enum.filter(&(Map.get(&1, "label") == "word-anchor"))
 
     pages = children |> Map.get("pages")
 
@@ -239,9 +240,10 @@ defmodule TextServer.Ingestion.Commentary do
 
     commentaries = regions |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
 
-    lemmas
-    |> Enum.chunk_every(2, 1)
-    |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
+    prepared_lemmas =
+      lemmas
+      |> Enum.chunk_every(2, 1)
+      |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
   end
 
   defp prepare_lemma(commentaries, pages, words, [lemma]) do

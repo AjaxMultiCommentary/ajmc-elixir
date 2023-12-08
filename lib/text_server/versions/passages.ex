@@ -8,8 +8,48 @@ defmodule TextServer.Versions.Passages do
   efficient ways to fetch from the XML documents.
   """
 
+  import Ecto.Query, warn: false
+  alias TextServer.Repo
+
+  alias TextServer.Versions.Passage
+  alias TextServer.Versions.Version
   alias TextServer.Versions.XmlDocuments
   alias TextServer.Versions.XmlDocuments.XmlDocument
+
+  def create_passage!(attrs \\ %{}) do
+    %Passage{}
+    |> Passage.changeset(attrs)
+    |> Repo.insert!()
+  end
+
+  def create_passage(attrs \\ %{}) do
+    %Passage{}
+    |> Passage.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def find_or_create_passage(attrs \\ %{}) do
+    query =
+      from(p in Passage, where: p.urn == ^attrs[:urn])
+
+    case Repo.one(query) do
+      nil -> create_passage(attrs)
+      passage -> {:ok, passage}
+    end
+  end
+
+  def list_passages() do
+    Repo.all(Passage)
+  end
+
+  def list_passages_for_version(%Version{} = version) do
+    from(
+      p in Passage,
+      where: p.version_id == ^version.id,
+      order_by: p.passage_number
+    )
+    |> Repo.all()
+  end
 
   @doc """
   Returns a list of tuples representing possible passage references. The index + 1

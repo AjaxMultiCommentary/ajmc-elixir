@@ -10,6 +10,6 @@ defmodule TextServer.Ingestion.Ajmc do
   end
 
   defp commentary_paths do
-    Path.wildcard(Application.app_dir(:text_server, "priv/static/json/*.json"))
+    Path.wildcard(Application.app_dir(:text_server, "priv/static/json/*_tess_retrained.json"))
   end
 end

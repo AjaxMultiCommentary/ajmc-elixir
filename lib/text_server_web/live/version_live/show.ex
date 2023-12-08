@@ -2,9 +2,11 @@ defmodule TextServerWeb.VersionLive.Show do
   use TextServerWeb, :live_view
 
   alias TextServerWeb.Components
+  alias TextServerWeb.ReadingEnvironment.Navigation
 
   alias TextServer.TextNodes
   alias TextServer.Versions
+  alias TextServer.Versions.Passages
 
   @impl true
   def mount(_params, _session, socket) do
@@ -23,6 +25,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :highlighted_comments, :list
   attr :location, :list, default: []
   attr :passage, Versions.Passage
+  attr :passages, :list, default: []
   attr :second_level_toc, :list
   attr :text_nodes, :list, default: []
   attr :top_level_toc, :list, required: true
@@ -34,7 +37,7 @@ defmodule TextServerWeb.VersionLive.Show do
   def render(assigns) do
     ~H"""
     <article class="mx-auto">
-      <h1 class="text-2xl font-bold"><%= raw @version.label %></h1>
+      <h1 class="text-2xl font-bold"><%= raw(@version.label) %></h1>
 
       <p><%= @version.description %></p>
 
@@ -42,22 +45,27 @@ defmodule TextServerWeb.VersionLive.Show do
 
       <hr class="mb-4" />
 
-      <div class="grid grid-cols-2">
-        <.live_component
-          id={:reader}
-          module={TextServerWeb.ReadingEnvironment.Reader}
-          focused_text_node={@focused_text_node}
-          footnotes={@footnotes}
-          location={@location}
-          passage={@passage}
-          version_command_palette_open={@version_command_palette_open}
-          text_nodes={@text_nodes}
-          text_node_command_palette_open={@focused_text_node != nil}
-          top_level_toc={@top_level_toc}
-          second_level_toc={@second_level_toc}
-          version_urn={@version.urn}
-        />
-        <div class="overflow-y-scroll max-h-screen">
+      <div class="grid grid-cols-8 gap-8">
+        <div class="col-span-2">
+          <Navigation.nav_menu passages={@passages} current_passage={@passage} />
+        </div>
+        <div class="col-span-3">
+          <.live_component
+            id={:reader}
+            module={TextServerWeb.ReadingEnvironment.Reader}
+            focused_text_node={@focused_text_node}
+            footnotes={@footnotes}
+            location={@location}
+            passage={@passage}
+            version_command_palette_open={@version_command_palette_open}
+            text_nodes={@text_nodes}
+            text_node_command_palette_open={@focused_text_node != nil}
+            top_level_toc={@top_level_toc}
+            second_level_toc={@second_level_toc}
+            version_urn={@version.urn}
+          />
+        </div>
+        <div class="col-span-3 overflow-y-scroll max-h-screen">
           <%= for comment <- @comments do %>
             <.live_component
               id={comment.id}
@@ -134,6 +142,7 @@ defmodule TextServerWeb.VersionLive.Show do
          "second_level_location" => second_level_location
        },
        passage: Map.delete(passage, :text_nodes),
+       passages: Passages.list_passages_for_version(version),
        page_title: version.label,
        versions: sibling_versions,
        text_nodes: text_nodes |> TextNodes.tag_text_nodes(),

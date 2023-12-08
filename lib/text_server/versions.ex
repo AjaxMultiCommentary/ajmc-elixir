@@ -310,12 +310,28 @@ defmodule TextServer.Versions do
       |> Repo.one()
 
     if is_nil(passage) do
-      version = get_version!(version_id)
+      Logger.warning("""
+      No passage found, providing the first 20 text nodes.
 
-      case paginate_version(version.id) do
-        {:ok, _} -> get_version_passage(version_id, passage_number)
-        {:error, message} -> raise message
-      end
+      version_id: #{version_id}
+
+      passage_number: #{passage_number}
+      """)
+
+      text_nodes =
+        TextNodes.list_text_nodes_by_version_between_locations(
+          version_id,
+          [1],
+          [20]
+        )
+
+      %VersionPassage{
+        version_id: version_id,
+        passage: passage,
+        passage_number: 1,
+        text_nodes: text_nodes,
+        total_passages: total_passages
+      }
     else
       text_nodes =
         TextNodes.list_text_nodes_by_version_between_locations(

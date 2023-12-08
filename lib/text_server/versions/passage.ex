@@ -4,6 +4,8 @@ defmodule TextServer.Versions.Passage do
 
   schema "version_passages" do
     field :passage_number, :integer
+    field :label, :string
+    field :urn, TextServer.Ecto.Types.CTS_URN
     field :end_location, {:array, :integer}
     field :start_location, {:array, :integer}
 
@@ -17,6 +19,8 @@ defmodule TextServer.Versions.Passage do
     passage
     |> cast(attrs, [
       :end_location,
+      :label,
+      :urn,
       :version_id,
       :passage_number,
       :start_location
@@ -24,9 +28,11 @@ defmodule TextServer.Versions.Passage do
     |> validate_required([
       :end_location,
       :passage_number,
+      :urn,
       :start_location
     ])
     |> assoc_constraint(:version)
     |> unique_constraint([:version_id, :passage_number])
+    |> unique_constraint(:urn)
   end
 end
