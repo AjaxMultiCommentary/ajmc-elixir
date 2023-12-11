@@ -70,14 +70,6 @@ defmodule TextServerWeb.Router do
   end
 
   scope "/", TextServerWeb do
-    pipe_through [:browser, :require_authenticated_user, :require_project_admin]
-
-    live_session :project_with_admin, on_mount: [{TextServerWeb.UserAuth, :mount_current_user}] do
-      live "/projects/:project_id/edit", ProjectLive.Edit, :edit
-    end
-  end
-
-  scope "/", TextServerWeb do
     pipe_through :browser
 
     get "/", PageController, :home
