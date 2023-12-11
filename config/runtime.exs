@@ -64,7 +64,7 @@ if config_env() == :prod do
   config :text_server, TextServerWeb.Endpoint,
     url: [host: host, port: port],
     http: [
-      ip: {127, 0, 0, 1},
+      ip: {0, 0, 0, 0},
       port: port
     ],
     check_origin: false,
