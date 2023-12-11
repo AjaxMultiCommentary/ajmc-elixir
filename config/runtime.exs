@@ -69,8 +69,7 @@ if config_env() == :prod do
     ],
     check_origin: false,
     secret_key_base: secret_key_base,
-    server: true,
-    cache_static_manifest: "priv/static/cache_manifest.json",
+    server: true
 
   # ## Using releases
   #
