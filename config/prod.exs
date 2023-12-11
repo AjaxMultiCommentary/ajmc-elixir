@@ -15,8 +15,6 @@ config :text_server, TextServerWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
-# config :text_server, TextServerWeb.Endpoint, url: [host: "localhost", port: 4000]
-
 config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 
 # ## SSL Support

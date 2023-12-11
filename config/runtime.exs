@@ -64,11 +64,13 @@ if config_env() == :prod do
   config :text_server, TextServerWeb.Endpoint,
     url: [host: host, port: port],
     http: [
-      ip: {0, 0, 0, 0},
+      ip: {127, 0, 0, 1},
       port: port
     ],
-    check_origin: :conn,
-    secret_key_base: secret_key_base
+    check_origin: false,
+    secret_key_base: secret_key_base,
+    server: true,
+    cache_static_manifest: "priv/static/cache_manifest.json",
 
   # ## Using releases
   #
