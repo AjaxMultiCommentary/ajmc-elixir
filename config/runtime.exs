@@ -68,8 +68,7 @@ if config_env() == :prod do
       port: port
     ],
     check_origin: false,
-    secret_key_base: secret_key_base,
-    server: true
+    secret_key_base: secret_key_base
 
   # ## Using releases
   #
