@@ -62,9 +62,9 @@ if config_env() == :prod do
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :text_server, TextServerWeb.Endpoint,
-    url: [host: host, port: port],
+    # url: [host: host, port: port],
     http: [
-      ip: {127, 0, 0, 1},
+      ip: {0, 0, 0, 0},
       port: port
     ],
     check_origin: false,
