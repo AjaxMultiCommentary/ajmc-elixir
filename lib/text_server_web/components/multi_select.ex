@@ -5,7 +5,7 @@ defmodule TextServerWeb.Components.MultiSelect do
 
   def render(assigns) do
     ~H"""
-    <div class="flex justify-center">
+    <div class="justify-center">
       <div
         class="border border-gray-200 dark:border-gray-700 w-96 h-12 pb-2 m-2 w-96 flex relative"
         id={"selected-options-container-#{@id}"}
@@ -13,7 +13,7 @@ defmodule TextServerWeb.Components.MultiSelect do
         <%= for option <- @selected_options do %>
           <div
             id={"option_#{option.label}"}
-            class="bg-purple-500 shadow-lg rounded-lg mt-2 ml-1 text-white dark:bg-sky-500 inline-block pl-2 pr-2 text-center"
+            class="bg-slate-700 shadow-lg rounded-lg mt-2 ml-1 text-white inline-block pl-2 pr-2 text-center"
           >
             <%= option.label %>
           </div>
@@ -49,10 +49,7 @@ defmodule TextServerWeb.Components.MultiSelect do
           </svg>
         </div>
       </div>
-      <div
-        class="hidden w-96 mt-4 p-4 ml-2 mt-16 absolute z-10 bg-stone-50 shadow-2xl rounded-lg"
-        id={"options-container-#{@id}"}
-      >
+      <div class="hidden w-96 p-4 ml-2 absolute z-10 bg-stone-50 shadow-2xl rounded-lg" id={"options-container-#{@id}"}>
         <%= inputs_for @form, :options, fn value -> %>
           <div class="form-check">
             <label class="form-check-label inline-block text-gray-800">
