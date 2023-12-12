@@ -2,8 +2,10 @@ defmodule TextServerWeb.VersionLive.Show do
   use TextServerWeb, :live_view
 
   alias TextServerWeb.Components
+  alias TextServerWeb.CoreComponents
   alias TextServerWeb.ReadingEnvironment.Navigation
 
+  alias TextServer.Commentaries
   alias TextServer.TextNodes
   alias TextServer.Versions
   alias TextServer.Versions.Passages
@@ -19,6 +21,7 @@ defmodule TextServerWeb.VersionLive.Show do
      )}
   end
 
+  attr :available_commentaries, :list
   attr :comments, :list
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
@@ -37,13 +40,18 @@ defmodule TextServerWeb.VersionLive.Show do
   def render(assigns) do
     ~H"""
     <article class="mx-auto">
-      <h1 class="text-2xl font-bold"><%= raw(@version.label) %></h1>
+      <div class="flex justify-between">
+        <div>
+          <h1 class="text-2xl font-bold"><%= raw(@version.label) %></h1>
 
-      <p><%= @version.description %></p>
+          <p><%= @version.description %></p>
 
-      <p class="mb-4"><%= @version.urn %></p>
+          <p><%= @version.urn %></p>
+        </div>
+        <div></div>
+      </div>
 
-      <hr class="mb-4" />
+      <hr class="my-4" />
 
       <div class="grid grid-cols-8 gap-8">
         <div class="col-span-2">
@@ -82,12 +90,12 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   @impl true
-  def handle_params(%{"urn" => urn, "page" => passage_number}, _, socket) do
+  def handle_params(%{"urn" => urn, "page" => passage_number} = params, _, socket) do
     version = Versions.get_version_by_urn!(urn)
-    create_response(socket, version, get_passage(version.id, passage_number))
+    create_response(socket, params, version, get_passage(version.id, passage_number))
   end
 
-  def handle_params(%{"urn" => urn, "location" => raw_location}, _session, socket) do
+  def handle_params(%{"urn" => urn, "location" => raw_location} = params, _session, socket) do
     version = Versions.get_version_by_urn!(urn)
 
     location = raw_location |> String.split(".") |> Enum.map(&String.to_integer/1)
@@ -97,7 +105,7 @@ defmodule TextServerWeb.VersionLive.Show do
     if is_nil(passage_page) do
       {:noreply, socket |> put_flash(:error, "No text nodes found for the given passage.")}
     else
-      create_response(socket, version, passage_page)
+      create_response(socket, params, version, passage_page)
     end
   end
 
@@ -109,7 +117,7 @@ defmodule TextServerWeb.VersionLive.Show do
     )
   end
 
-  defp create_response(socket, version, page) do
+  defp create_response(socket, params, version, page) do
     %{comments: comments, footnotes: footnotes, passage: passage} = page
 
     sibling_versions =
@@ -134,8 +142,10 @@ defmodule TextServerWeb.VersionLive.Show do
     {:noreply,
      socket
      |> assign(
+       available_commentaries: Commentaries.list_canonical_commentaries(),
        comments: comments,
        footnotes: footnotes,
+       form: to_form(params),
        highlighted_comments: [],
        location: %{
          "top_level_location" => top_level_location,
