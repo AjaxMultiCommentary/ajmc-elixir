@@ -17,6 +17,16 @@ config :logger, level: :info
 
 config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 
+config :text_server, TextServerWeb.Endpoint,
+  url: [host: "ajmc.unil.ch", port: 443],
+  check_origin: ["//ajmc.unil.ch.org"],
+  force_ssl: [
+    host: nil,
+    rewrite_on: [:x_forwarded_port, :x_forwarded_proto],
+    # maybe true when we use this for real
+    hsts: false
+  ]
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
