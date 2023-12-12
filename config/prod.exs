@@ -19,7 +19,7 @@ config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 
 force_ssl = System.get_env("FORCE_SSL")
 
-if force_ssl do
+if force_ssl == "FORCE_SSL" do
   config :text_server, TextServerWeb.Endpoint,
     url: [host: "ajmc.unil.ch", port: 443],
     check_origin: ["//ajmc.unil.ch.org"],
