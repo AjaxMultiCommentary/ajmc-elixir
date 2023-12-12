@@ -21,6 +21,12 @@ defmodule TextServer.Commentaries do
     Repo.all(CanonicalCommentary)
   end
 
+  def filter_canonical_commentaries(opts \\ []) do
+    IO.inspect(opts)
+
+    list_canonical_commentaries()
+  end
+
   @doc """
   Gets a single canonical_commentary.
 
