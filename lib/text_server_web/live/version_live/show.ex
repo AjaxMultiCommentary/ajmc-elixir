@@ -102,7 +102,7 @@ defmodule TextServerWeb.VersionLive.Show do
 
     commentaries =
       Commentaries.list_canonical_commentaries()
-      |> Enum.map(fn c -> %{id: c.id, label: c.pid, selected: false} end)
+      |> Enum.map(fn c -> %{id: c.id, label: c.creator_last_name, selected: false} end)
       |> build_options()
 
     comments = filter_comments(text_nodes, commentaries)

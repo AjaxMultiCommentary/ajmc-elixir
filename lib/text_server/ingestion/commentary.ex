@@ -77,18 +77,52 @@ defmodule TextServer.Ingestion.Commentary do
   `"urn:cts:greekLit:tlg0011.tlg003.ajmc-lj"` and a path
   to the AjMC canonical JSON file. Returns `:ok` on success.
   """
-  def ingest_commentary(critical_text_urn, path) do
-    basename = path |> Path.basename() |> Path.rootname()
+  def ingest_commentary(critical_text_urn, path, commentaries_meta) do
     s = File.read!(path)
     json = Jason.decode!(s)
     pid = json |> Map.get("id")
 
-    {:ok, commentary} = Commentaries.upsert_canonical_commentary(%{filename: basename, pid: pid})
+    commentary_meta =
+      commentaries_meta |> Enum.find(&(Map.get(&1, "ajmc_id") == pid))
+
+    commentary = create_commentary(path, pid, commentary_meta)
 
     prepare_lemmas_from_canonical_json(json)
     |> Enum.each(&ingest_lemma(commentary, critical_text_urn, &1))
 
     :ok
+  end
+
+  defp create_commentary(path, pid, commentary_meta) do
+    basename = path |> Path.basename() |> Path.rootname()
+    zotero_id = commentary_meta |> Map.get("zotero_id")
+    zotero_data = Zotero.API.item(zotero_id) |> Map.get("data")
+    creator = zotero_data |> Map.get("creators") |> List.first()
+    creator_first_name = creator |> Map.get("firstName")
+    creator_last_name = creator |> Map.get("lastName")
+    languages = zotero_data |> Map.get("language") |> String.split(", ")
+    publication_date = zotero_data |> Map.get("date")
+    source_url = zotero_data |> Map.get("url")
+    title = zotero_data |> Map.get("title")
+
+    zotero_link =
+      zotero_data |> Map.get("links", %{}) |> Map.get("alternate", %{}) |> Map.get("href")
+
+    {:ok, commentary} =
+      Commentaries.upsert_canonical_commentary(%{
+        creator_first_name: creator_first_name,
+        creator_last_name: creator_last_name,
+        filename: basename,
+        languages: languages,
+        pid: pid,
+        publication_date: publication_date,
+        source_url: source_url,
+        title: title,
+        zotero_id: zotero_id,
+        zotero_link: zotero_link
+      })
+
+    commentary
   end
 
   defp ingest_glossa(commentary, urn, captures, lemma) do
