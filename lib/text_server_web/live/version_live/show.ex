@@ -31,11 +31,8 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :location, :list, default: []
   attr :passage, Versions.Passage
   attr :passages, :list, default: []
-  attr :second_level_toc, :list
   attr :text_nodes, :list, default: []
-  attr :top_level_toc, :list, required: true
   attr :version, Versions.Version, required: true
-  attr :version_command_palette_open, :boolean
   attr :versions, :list, required: true
 
   @impl true
@@ -77,11 +74,7 @@ defmodule TextServerWeb.VersionLive.Show do
             footnotes={@footnotes}
             location={@location}
             passage={@passage}
-            version_command_palette_open={@version_command_palette_open}
             text_nodes={@text_nodes}
-            text_node_command_palette_open={@focused_text_node != nil}
-            top_level_toc={@top_level_toc}
-            second_level_toc={@second_level_toc}
             version_urn={@version.urn}
           />
         </div>
@@ -144,17 +137,6 @@ defmodule TextServerWeb.VersionLive.Show do
       |> build_options()
 
     text_nodes = passage.text_nodes
-    location = List.first(text_nodes).location
-    top_level_location = List.first(location)
-    second_level_location = Enum.at(location, 1)
-    toc = Versions.get_table_of_contents(version.id)
-
-    {top_level_toc, second_level_toc} =
-      if length(location) > 2 do
-        format_toc(toc, top_level_location, second_level_location)
-      else
-        format_toc(toc, top_level_location)
-      end
 
     {:noreply,
      socket
@@ -167,19 +149,11 @@ defmodule TextServerWeb.VersionLive.Show do
        footnotes: footnotes,
        form: to_form(params),
        highlighted_comments: [],
-       location: %{
-         "top_level_location" => top_level_location,
-         "second_level_location" => second_level_location
-       },
        passage: Map.delete(passage, :text_nodes),
        passages: Passages.list_passages_for_version(version),
        page_title: version.label,
        versions: sibling_versions,
        text_nodes: text_nodes |> TextNodes.tag_text_nodes(),
-       top_level_location: top_level_location,
-       top_level_toc: top_level_toc,
-       second_level_location: second_level_location,
-       second_level_toc: second_level_toc,
        version: version
      )}
   end

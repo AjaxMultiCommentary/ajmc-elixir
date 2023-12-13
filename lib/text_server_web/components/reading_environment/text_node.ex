@@ -2,7 +2,6 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
   attr :is_focused, :boolean, default: false
-  attr :sibling_node, :map, default: nil
   attr :text_node, :map, required: true
 
   @impl true

@@ -228,3 +228,7 @@ end
 defimpl String.Chars, for: CTS.URN do
   def to_string(s), do: CTS.URN.to_string(s)
 end
+
+defimpl Phoenix.Param, for: CTS.URN do
+  def to_param(data), do: CTS.URN.to_string(data)
+end
