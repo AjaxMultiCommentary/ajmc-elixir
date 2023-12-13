@@ -32,6 +32,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
 
   alias TextServerWeb.Components
 
+  attr :comments, :list, default: []
   attr :focused_text_node, :any, default: nil
   attr :text_nodes, :list, required: true
   attr :version_urn, :string, required: true
@@ -44,6 +45,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
           :for={text_node <- @text_nodes}
           module={TextServerWeb.ReadingEnvironment.TextNode}
           id={text_node.id}
+          comments={@comments}
           is_focused={is_focused(@focused_text_node, text_node)}
           text_node={text_node}
         />

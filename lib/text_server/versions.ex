@@ -294,7 +294,13 @@ defmodule TextServer.Versions do
     TextNodes.list_text_nodes_by_version_between_locations(version, start_location, end_location)
   end
 
-  def get_version_passage(version_id, passage_number \\ 1) do
+  def get_version_passage(version_id, passage_number \\ 1)
+
+  def get_version_passage(version_id, passage_number) when is_binary(passage_number) do
+    get_version_passage(version_id, String.to_integer(passage_number))
+  end
+
+  def get_version_passage(version_id, passage_number) do
     total_passages = get_total_passages(version_id)
 
     n =

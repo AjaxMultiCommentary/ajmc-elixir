@@ -21,6 +21,43 @@ defmodule TextServer.Comments do
     Repo.all(Comment)
   end
 
+  def list_comments(start_text_node_ids) do
+    Comment
+    |> where([c], c.start_text_node_id in ^start_text_node_ids)
+    |> preload(:canonical_commentary)
+    |> preload(:start_text_node)
+    |> preload(:end_text_node)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns a list of comments that have canonical_commentary_ids matching the given
+  list.
+
+  ## Examples
+
+      iex> filter_comments([1, 2, 3])
+      [%Comment{canonical_commentary_id: 1}, %Comment{canonical_commentary_id: 2}, ...]
+  """
+
+  def filter_comments(start_text_node_ids, canonical_commentary_ids)
+      when length(canonical_commentary_ids) == 0 do
+    list_comments(start_text_node_ids)
+  end
+
+  def filter_comments(start_text_node_ids, canonical_commentary_ids) do
+    Comment
+    |> where(
+      [c],
+      c.start_text_node_id in ^start_text_node_ids and
+        c.canonical_commentary_id in ^canonical_commentary_ids
+    )
+    |> preload(:canonical_commentary)
+    |> preload(:start_text_node)
+    |> preload(:end_text_node)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single comment.
 
@@ -53,6 +90,26 @@ defmodule TextServer.Comments do
     %Comment{}
     |> Comment.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Upserts a comment.
+  """
+  def upsert_comment(attrs) do
+    query =
+      from(c in Comment,
+        where:
+          c.canonical_commentary_id == ^attrs.canonical_commentary_id and
+            c.end_offset == ^attrs.end_offset and
+            c.end_text_node_id == ^attrs.end_text_node_id and
+            c.start_offset == ^attrs.start_offset and
+            c.start_text_node_id == ^attrs.start_text_node_id
+      )
+
+    case Repo.one(query) do
+      nil -> create_comment(attrs)
+      comment -> update_comment(comment, attrs)
+    end
   end
 
   @doc """

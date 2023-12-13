@@ -1,6 +1,7 @@
 defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
+  attr :comments, :list, default: []
   attr :is_focused, :boolean, default: false
   attr :text_node, :map, required: true
 

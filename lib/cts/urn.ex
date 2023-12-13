@@ -116,9 +116,9 @@ defmodule CTS.URN do
           version: nil | binary,
           exemplar: nil | binary,
           passage_component: nil | binary,
-          citations: nil | {binary, nil | binary},
-          subsections: nil | {binary, nil | binary},
-          indexes: nil | {integer(), nil | integer()}
+          citations: nil | list(binary),
+          subsections: nil | list(binary),
+          indexes: nil | list(integer())
         }
 
   @spec parse(binary | CTS.URN.t()) :: CTS.URN.t()

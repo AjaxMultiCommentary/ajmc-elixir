@@ -26,7 +26,8 @@ defmodule TextServerWeb.TextNodeLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    text_node = TextNodes.get_text_node!(id) |> TextNodes.tag_text_node()
+    text_node = TextNodes.get_text_node!(id)
+    text_node = TextNodes.tag_text_nodes([text_node])
 
     {:noreply,
      socket

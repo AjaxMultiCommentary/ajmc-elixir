@@ -8,7 +8,7 @@ defmodule TextServer.CommentsTest do
 
     import TextServer.CommentsFixtures
 
-    @invalid_attrs %{attributes: nil, content: nil, lemma: nil, lemma_urn: nil}
+    @invalid_attrs %{attributes: nil, content: nil, lemma: nil}
 
     test "list_comments/0 returns all comments" do
       comment = comment_fixture()
@@ -25,7 +25,6 @@ defmodule TextServer.CommentsTest do
         attributes: %{},
         content: "some content",
         lemma: "some lemma",
-        lemma_urn: "urn:cts:collection:text_group:version:1@foo",
         start_offset: 0,
         end_offset: 8
       }
@@ -34,21 +33,6 @@ defmodule TextServer.CommentsTest do
       assert comment.attributes == %{}
       assert comment.content == "some content"
       assert comment.lemma == "some lemma"
-
-      assert comment.lemma_urn == %CTS.URN{
-               citations: ["version", nil],
-               exemplar: nil,
-               indexes: [nil, nil],
-               namespace: "collection",
-               passage_component: "version",
-               prefix: "urn",
-               protocol: "cts",
-               subsections: [nil, nil],
-               text_group: "text_group",
-               version: nil,
-               work: nil,
-               work_component: "text_group"
-             }
     end
 
     test "create_comment/1 with invalid data returns error changeset" do
@@ -61,29 +45,13 @@ defmodule TextServer.CommentsTest do
       update_attrs = %{
         attributes: %{},
         content: "some updated content",
-        lemma: "some updated lemma",
-        lemma_urn: "urn:cts:collection:text_group:version:1@foo"
+        lemma: "some updated lemma"
       }
 
       assert {:ok, %Comment{} = comment} = Comments.update_comment(comment, update_attrs)
       assert comment.attributes == %{}
       assert comment.content == "some updated content"
       assert comment.lemma == "some updated lemma"
-
-      assert comment.lemma_urn == %CTS.URN{
-               citations: ["version", nil],
-               exemplar: nil,
-               indexes: [nil, nil],
-               namespace: "collection",
-               passage_component: "version",
-               prefix: "urn",
-               protocol: "cts",
-               subsections: [nil, nil],
-               text_group: "text_group",
-               version: nil,
-               work: nil,
-               work_component: "text_group"
-             }
     end
 
     test "update_comment/2 with invalid data returns error changeset" do

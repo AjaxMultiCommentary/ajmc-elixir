@@ -6,7 +6,6 @@ defmodule TextServer.Comments.Comment do
     field :attributes, :map
     field :content, :string
     field :lemma, :string
-    field :lemma_urn, TextServer.Ecto.Types.CTS_URN
     field :start_offset, :integer
     field :end_offset, :integer
 
@@ -20,8 +19,26 @@ defmodule TextServer.Comments.Comment do
   @doc false
   def changeset(comment, attrs) do
     comment
-    |> cast(attrs, [:attributes, :content, :lemma, :lemma_urn, :start_offset, :end_offset])
-    |> validate_required([:attributes, :content, :lemma, :lemma_urn, :start_offset, :end_offset])
+    |> cast(attrs, [
+      :attributes,
+      :canonical_commentary_id,
+      :content,
+      :end_offset,
+      :end_text_node_id,
+      :lemma,
+      :start_offset,
+      :start_text_node_id
+    ])
+    |> validate_required([
+      :attributes,
+      :canonical_commentary_id,
+      :content,
+      :end_offset,
+      :end_text_node_id,
+      :lemma,
+      :start_offset,
+      :start_text_node_id
+    ])
     |> assoc_constraint(:canonical_commentary)
     |> assoc_constraint(:start_text_node)
     |> assoc_constraint(:end_text_node)

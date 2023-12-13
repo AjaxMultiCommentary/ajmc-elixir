@@ -1,9 +1,9 @@
 defmodule TextServer.Ingestion.Commentary do
   require Logger
+
+  alias TextServer.Comments
   alias TextServer.Commentaries
-  alias TextServer.ElementTypes
   alias TextServer.Ingestion.WordRange
-  alias TextServer.TextElements
   alias TextServer.TextNodes
 
   @moduledoc """
@@ -29,18 +29,17 @@ defmodule TextServer.Ingestion.Commentary do
   TextNode. `captures` is the map of named captures from `Regex.named_captures(passage_regex(), selector)`,
   where `selector` is derived from the `anchor_target` of a canonical JSON lemma.
 
-  ### `ingest_multiline_glossa/4`
+  ### `ingest_glossa/4`
 
   Ingests a glossa for a lemma that spans more than a single TextNode. `captures` is
   the map of named captures from `Regex.named_captures(passage_regex(), selector)`,
   where `selector` is derived from the `anchor_target` of a canonical JSON lemma.
 
-  This function will swap `first_line_n` and `last_line_n` if they are reversed
-  in `selector`.
-
-  Unlike `ingest_glossa/4`, `ingest_multiline_glossa/4` creates two
-  TextElements, one for the start of the lemma containing the text `content`
-  of the glossa, and another for the end of the lemma with empty `content`.
+  This function will *not* swap `first_line_n` and `last_line_n` if they are reversed
+  in `selector`. We assume that they represent the order of the nodes in the
+  applicable version, which may or may not follow their numerical order (i.e., editorial
+  intervention or convention might have transposed them, and we need to preserve that
+  ordering here).
 
   ### `ingest_lemma/3`
 
@@ -79,8 +78,6 @@ defmodule TextServer.Ingestion.Commentary do
   to the AjMC canonical JSON file. Returns `:ok` on success.
   """
   def ingest_commentary(critical_text_urn, path) do
-    {:ok, comment_element_type} = ElementTypes.find_or_create_element_type(%{name: "comment"})
-
     basename = path |> Path.basename() |> Path.rootname()
     s = File.read!(path)
     json = Jason.decode!(s)
@@ -89,38 +86,12 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, commentary} = Commentaries.upsert_canonical_commentary(%{filename: basename, pid: pid})
 
     prepare_lemmas_from_canonical_json(json)
-    |> Enum.each(&ingest_lemma(commentary, critical_text_urn, comment_element_type, &1))
+    |> Enum.each(&ingest_lemma(commentary, critical_text_urn, &1))
 
     :ok
   end
 
-  defp ingest_glossa(commentary, urn, element_type, captures, lemma) do
-    %{
-      "first_line_n" => first_line_n,
-      "first_line_offset" => first_line_offset,
-      "last_line_offset" => last_line_offset
-    } = captures
-
-    content = Map.get(lemma, "content") |> String.replace("- ", "")
-    {_, popped_content_lemma} = Map.pop(lemma, "content")
-    text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_line_n}"})
-    attributes = Map.put(popped_content_lemma, :citation, [first_line_n])
-
-    {:ok, _text_element} =
-      %{
-        attributes: attributes,
-        canonical_commentary_id: commentary.id,
-        content: content,
-        end_offset: last_line_offset,
-        element_type_id: element_type.id,
-        end_text_node_id: text_node.id,
-        start_offset: first_line_offset,
-        start_text_node_id: text_node.id
-      }
-      |> TextElements.find_or_create_text_element()
-  end
-
-  defp ingest_multiline_glossa(commentary, urn, element_type, captures, lemma) do
+  defp ingest_glossa(commentary, urn, captures, lemma) do
     %{
       "first_line_n" => first_line_n,
       "first_line_offset" => first_line_offset,
@@ -128,54 +99,42 @@ defmodule TextServer.Ingestion.Commentary do
       "last_line_offset" => last_line_offset
     } = captures
 
-    content = Map.get(lemma, "content") |> String.replace("- ", "")
-    {_, popped_content_lemma} = Map.pop(lemma, "content")
-    # If the lemma spans multiple lines, create two comments
-    # (This is essentially how Word handles block-spanning comments in their docx)
-    first_n = min(String.to_integer(first_line_n), String.to_integer(last_line_n))
+    {content, no_content_lemma} = Map.pop(lemma, "content")
+    content = content |> String.replace("- ", "")
 
-    [first_offset, last_offset] =
-      if first_n == String.to_integer(first_line_n) do
-        [first_line_offset, last_line_offset]
-      else
-        [last_line_offset, first_line_offset]
-      end
+    if content == "" do
+      Logger.warning("No content for #{inspect(lemma)}.")
+    else
+      first_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_line_n}"})
+      last_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{last_line_n}"})
 
-    last_n = max(String.to_integer(first_line_n), String.to_integer(last_line_n))
+      lemma_transcript = Map.get(lemma, "lemma")
 
-    first_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_n}"})
-    attributes = Map.put(popped_content_lemma, :citation, [first_n, last_n])
+      citation =
+        if first_line_n == last_line_n do
+          [first_line_n]
+        else
+          [first_line_n, last_line_n]
+        end
 
-    {:ok, _text_element} =
-      %{
-        attributes: attributes,
-        canonical_commentary_id: commentary.id,
-        content: content,
-        end_offset: String.length(first_text_node.text),
-        element_type_id: element_type.id,
-        end_text_node_id: first_text_node.id,
-        start_offset: first_offset,
-        start_text_node_id: first_text_node.id
-      }
-      |> TextElements.find_or_create_text_element()
+      attributes = Map.put(no_content_lemma, :citation, citation)
 
-    last_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{last_n}"})
-
-    {:ok, _text_element} =
-      %{
-        attributes: attributes |> Map.put(:comment_end, true),
-        canonical_commentary_id: commentary.id,
-        content: "",
-        end_offset: last_offset,
-        element_type_id: element_type.id,
-        end_text_node_id: last_text_node.id,
-        start_offset: 0,
-        start_text_node_id: last_text_node.id
-      }
-      |> TextElements.find_or_create_text_element()
+      {:ok, _comment} =
+        %{
+          attributes: attributes,
+          canonical_commentary_id: commentary.id,
+          content: content,
+          lemma: lemma_transcript,
+          end_offset: last_line_offset,
+          end_text_node_id: last_text_node.id,
+          start_offset: first_line_offset,
+          start_text_node_id: first_text_node.id
+        }
+        |> Comments.upsert_comment()
+    end
   end
 
-  defp ingest_lemma(commentary, urn, element_type, %{"anchor_target" => anchor_target} = lemma)
+  defp ingest_lemma(commentary, urn, %{"anchor_target" => anchor_target} = lemma)
        when not is_nil(anchor_target) do
     j =
       try do
@@ -189,22 +148,15 @@ defmodule TextServer.Ingestion.Commentary do
     if is_map(j) do
       selector = Map.get(j, "selector")
 
-      with %{
-             "first_line_n" => first_line_n,
-             "last_line_n" => last_line_n
-           } = captures <- Regex.named_captures(passage_regex(), selector) do
-        if first_line_n != last_line_n do
-          ingest_multiline_glossa(commentary, urn, element_type, captures, lemma)
-        else
-          ingest_glossa(commentary, urn, element_type, captures, lemma)
-        end
+      with %{"first_line_n" => _} = captures <- Regex.named_captures(passage_regex(), selector) do
+        ingest_glossa(commentary, urn, captures, lemma)
       end
     else
       Logger.warning(anchor_target: j, commentary: commentary)
     end
   end
 
-  defp ingest_lemma(_commentary, _urn, _element_type, _lemma), do: nil
+  defp ingest_lemma(_commentary, _urn, _lemma), do: nil
 
   defp passage_regex,
     do:
@@ -217,7 +169,7 @@ defmodule TextServer.Ingestion.Commentary do
       children
       |> Map.get("lemmas", [])
 
-    lemmaless_comments =
+    _lemmaless_comments =
       lemmas
       |> Enum.filter(&(Map.get(&1, "label") == "scope-anchor"))
 
@@ -240,7 +192,7 @@ defmodule TextServer.Ingestion.Commentary do
 
     commentaries = regions |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
 
-    prepared_lemmas =
+    _prepared_lemmas =
       lemmas
       |> Enum.chunk_every(2, 1)
       |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))

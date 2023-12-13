@@ -8,6 +8,7 @@ defmodule TextServer.TextNodes.TextNode do
     # Plato, Aristotle, etc.
     field :location, {:array, :integer}
     field :normalized_text, :string
+    field :offset, :integer
     field :text, :string
     field :urn, TextServer.Ecto.Types.CTS_URN
     field :_search, TextServer.Ecto.Types.TsVector
@@ -15,6 +16,10 @@ defmodule TextServer.TextNodes.TextNode do
     field :graphemes_with_tags, :any, virtual: true
 
     belongs_to :version, TextServer.Versions.Version
+
+    has_many :comments, TextServer.Comments.Comment,
+      foreign_key: :start_text_node_id,
+      preload_order: [asc: :start_offset]
 
     has_many :text_elements, TextServer.TextElements.TextElement,
       foreign_key: :start_text_node_id,
@@ -26,10 +31,11 @@ defmodule TextServer.TextNodes.TextNode do
   @doc false
   def changeset(text_node, attrs) do
     text_node
-    |> cast(attrs, [:version_id, :location, :text, :urn])
-    |> validate_required([:location, :text, :urn])
+    |> cast(attrs, [:version_id, :location, :offset, :text, :urn])
+    |> validate_required([:location, :offset, :text, :urn])
     |> assoc_constraint(:version)
     |> unique_constraint([:version_id, :location, :urn])
+    |> unique_constraint([:version_id, :offset])
   end
 
   @search_types %{location: {:array, :any}, search_string: :string, urn: :string}
@@ -47,12 +53,21 @@ defmodule TextServer.TextNodes.TextNode do
     defstruct [:name, :metadata]
   end
 
-  def tag_graphemes(text_node) do
+  def tag_graphemes(text_node, comments) do
     elements =
-      text_node.text_elements |> Enum.filter(fn e -> e.element_type.name != "comment" end)
+      text_node.text_elements
 
     comments =
-      text_node.text_elements |> Enum.filter(fn e -> e.element_type.name == "comment" end)
+      comments
+      |> Enum.filter(fn comment ->
+        # comment starts with this text node OR
+        # comment ends on this text node OR
+        # text node is in the middle of a multi-line comment
+        comment.start_text_node_id == text_node.id or
+          comment.end_text_node_id == text_node.id or
+          (comment.start_text_node.offset <= text_node.offset and
+             text_node.offset <= comment.end_text_node.offset)
+      end)
 
     text = text_node.text
 
@@ -64,7 +79,7 @@ defmodule TextServer.TextNodes.TextNode do
       |> Enum.with_index(fn g, i -> {i, g, []} end)
 
     tagged_graphemes = apply_tags(elements, graphemes)
-    commented_graphemes = apply_comments(comments, tagged_graphemes)
+    commented_graphemes = apply_comments(text_node, comments, tagged_graphemes)
 
     grouped_graphemes =
       commented_graphemes
@@ -125,14 +140,32 @@ defmodule TextServer.TextNodes.TextNode do
     end)
   end
 
-  defp apply_comments(comments, graphemes) do
+  defp apply_comments(text_node, comments, graphemes) do
     graphemes
     |> Enum.map(fn g ->
       {i, g, tags} = g
 
       applicable_comments =
         comments
-        |> Enum.filter(fn c -> i in c.start_offset..(c.end_offset - 1) end)
+        |> Enum.filter(fn c ->
+          cond do
+            # comment applies only to this text node
+            c.start_text_node == c.end_text_node ->
+              i in c.start_offset..(c.end_offset - 1)
+
+            # comment starts on this text_node
+            c.start_text_node == text_node ->
+              i >= c.start_offset
+
+            # comment ends on this text node
+            c.end_text_node == text_node ->
+              i <= c.end_offset
+
+            # entire text node is in this comment
+            true ->
+              true
+          end
+        end)
         |> Enum.map(fn c -> %Tag{name: "comment", metadata: c} end)
 
       {i, g, tags ++ applicable_comments}

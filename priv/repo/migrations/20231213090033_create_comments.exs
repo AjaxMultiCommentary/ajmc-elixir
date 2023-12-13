@@ -5,7 +5,6 @@ defmodule TextServer.Repo.Migrations.CreateComments do
     create table(:comments) do
       add :content, :text
       add :lemma, :string
-      add :lemma_urn, :map, null: false
       add :attributes, :map, null: false
       add :start_offset, :integer, null: false
       add :end_offset, :integer, null: false
