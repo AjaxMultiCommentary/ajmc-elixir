@@ -56,13 +56,14 @@ defmodule TextServer.Ingestion.Versions do
     |> Enum.map(fn {passage, i} ->
       passage_urn = passage |> Map.get("passage_urn") |> CTS.URN.parse()
       passage_label = passage |> Map.get("label") |> Map.get("en") |> String.trim()
+      [start_location, end_location] = passage_urn.citations
 
       Versions.Passages.create_passage!(%{
         version_id: version.id,
         urn: passage_urn,
         label: passage_label,
-        end_location: [List.last(passage_urn.citations)],
-        start_location: [List.first(passage_urn.citations)],
+        end_location: [end_location],
+        start_location: [start_location],
         passage_number: i
       })
     end)
@@ -114,9 +115,11 @@ defmodule TextServer.Ingestion.Versions do
     lines = Enum.reverse(lines)
 
     lines
-    |> Enum.each(fn line ->
+    |> Enum.with_index()
+    |> Enum.each(fn {line, offset} ->
       {:ok, text_node} =
         TextNodes.find_or_create_text_node(%{
+          offset: offset,
           location: line.location,
           text: line.text,
           urn: "#{version.urn}:#{Enum.at(line.location, 0)}",

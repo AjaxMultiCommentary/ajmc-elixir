@@ -116,9 +116,9 @@ defmodule CTS.URN do
           version: nil | binary,
           exemplar: nil | binary,
           passage_component: nil | binary,
-          citations: nil | {binary, nil | binary},
-          subsections: nil | {binary, nil | binary},
-          indexes: nil | {integer(), nil | integer()}
+          citations: nil | list(binary),
+          subsections: nil | list(binary),
+          indexes: nil | list(integer())
         }
 
   @spec parse(binary | CTS.URN.t()) :: CTS.URN.t()
@@ -227,4 +227,8 @@ end
 
 defimpl String.Chars, for: CTS.URN do
   def to_string(s), do: CTS.URN.to_string(s)
+end
+
+defimpl Phoenix.Param, for: CTS.URN do
+  def to_param(data), do: CTS.URN.to_string(data)
 end

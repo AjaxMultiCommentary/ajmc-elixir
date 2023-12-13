@@ -40,7 +40,11 @@ defmodule TextServerWeb.VersionLiveTest do
     setup [:create_version]
 
     test "displays version", %{conn: conn, version: version} do
-      {:ok, _show_live, html} = live(conn, Routes.version_show_path(conn, :show, version))
+      {:ok, _show_live, html} =
+        live(
+          conn,
+          Routes.version_show_path(conn, :show, version)
+        )
 
       assert html =~ version.label
       assert html =~ version.description

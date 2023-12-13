@@ -2,6 +2,8 @@ defmodule TextServer.Versions.Version do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Phoenix.Param, key: :urn}
+
   schema "versions" do
     field :description, :string
     field :filemd5hash, :string

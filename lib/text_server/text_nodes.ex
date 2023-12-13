@@ -51,7 +51,7 @@ defmodule TextServer.TextNodes do
         t in TextNode,
         where: t.version_id == ^version_id,
         order_by: [asc: t.location],
-        preload: [text_elements: :element_type]
+        preload: [comments: :canonical_commentary, text_elements: :element_type]
       )
 
     Repo.paginate(query, params)
@@ -138,7 +138,8 @@ defmodule TextServer.TextNodes do
         order_by: [asc: t.location],
         preload: [
           :version,
-          text_elements: [:canonical_commentary, :element_type, :text_element_users]
+          comments: :canonical_commentary,
+          text_elements: [:element_type, :text_element_users]
         ]
       )
 
@@ -183,12 +184,8 @@ defmodule TextServer.TextNodes do
     Repo.all(query)
   end
 
-  def tag_text_nodes(text_nodes \\ []) do
-    Enum.map(text_nodes, &TextNode.tag_graphemes/1)
-  end
-
-  def tag_text_node(%TextNode{} = text_node) do
-    TextNode.tag_graphemes(text_node)
+  def tag_text_nodes(text_nodes, comments \\ []) do
+    Enum.map(text_nodes, &TextNode.tag_graphemes(&1, comments))
   end
 
   @doc """

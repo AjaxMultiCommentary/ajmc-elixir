@@ -8,7 +8,7 @@ defmodule TextServer.CommentsTest do
 
     import TextServer.CommentsFixtures
 
-    @invalid_attrs %{attributes: nil, content: nil, urn: nil}
+    @invalid_attrs %{attributes: nil, content: nil, lemma: nil}
 
     test "list_comments/0 returns all comments" do
       comment = comment_fixture()
@@ -21,12 +21,18 @@ defmodule TextServer.CommentsTest do
     end
 
     test "create_comment/1 with valid data creates a comment" do
-      valid_attrs = %{attributes: %{}, content: "some content", urn: "urn:cts:namespace:text_group.work.version:2.1"}
+      valid_attrs = %{
+        attributes: %{},
+        content: "some content",
+        lemma: "some lemma",
+        start_offset: 0,
+        end_offset: 8
+      }
 
       assert {:ok, %Comment{} = comment} = Comments.create_comment(valid_attrs)
       assert comment.attributes == %{}
       assert comment.content == "some content"
-      assert comment.urn == CTS.URN.parse("urn:cts:namespace:text_group.work.version:2.1")
+      assert comment.lemma == "some lemma"
     end
 
     test "create_comment/1 with invalid data returns error changeset" do
@@ -35,12 +41,17 @@ defmodule TextServer.CommentsTest do
 
     test "update_comment/2 with valid data updates the comment" do
       comment = comment_fixture()
-      update_attrs = %{attributes: %{}, content: "some updated content", urn: "urn:cts:namespace:text_group.work.version"}
+
+      update_attrs = %{
+        attributes: %{},
+        content: "some updated content",
+        lemma: "some updated lemma"
+      }
 
       assert {:ok, %Comment{} = comment} = Comments.update_comment(comment, update_attrs)
       assert comment.attributes == %{}
       assert comment.content == "some updated content"
-      assert comment.urn == CTS.URN.parse("urn:cts:namespace:text_group.work.version")
+      assert comment.lemma == "some updated lemma"
     end
 
     test "update_comment/2 with invalid data returns error changeset" do
