@@ -18,6 +18,17 @@ In production, a few additional variables are required:
 - `PHX_HOST`: The hostname of the application. ajmc.unil.ch for now. Note that, even though the Phoenix server will not be talking to the outside world directly (all traffic goes through a proxy), it still needs to know what hostname to expect in requests so that it can respond properly.
 - `PORT`: The local port for the server. This is where you'll send the proxied requests to, so if the proxy is serving the app at https://ajmc.unil.ch:443, it should proxy requests to something like http://127.0.0.1:4000.
 
+## Deployment
+
+This application is deployed using an Elixir [Release](https://hexdocs.pm/mix/1.15/Mix.Tasks.Release.html) that is built and deployed via a Docker container. The container's specification can be found in the [Dockerfile](./Dockerfile). Note the (very simple) [Dockerfile.postgres](./Dockerfile.postgres) as well: an example of using it can be found in [docker-compose.yaml](./docker-compose.yaml).
+
+(Note that this docker-compose file is not used in production, but is rather a development convenience for debugging deployment issues.)
+
+### Production server configuration
+
+All of the configuration for the production Phoenix/Cowboy endpoint can be found in [config/runtime.exs](./config/runtime.exs). Note that HTTPS is not enforced at the application level. Instead, the expectation is that the application only allows local access, which is brokered to the outside world by a reverse proxy such as nginx. Bear in mind that the proxy needs to allow websocket connections in order for [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) to work.
+
+
 ## Building
 
 The Dockerfile builds a release of the Elixir application in a fairly standard way, but we also need to seed the database with the latest textual data about the Ajax commentaries.
@@ -100,18 +111,6 @@ with that information (packaged in an admittedly confusing tuple of graphemes an
 `<.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />`
 
 It remains to be determined how we will work with comments that don't match the underlying critical text.
-
-## Deployment
-
-This application is deployed using an Elixir [Release](https://hexdocs.pm/mix/1.15/Mix.Tasks.Release.html) that is built and deployed via a Docker container. The container's specification can be found in the [Dockerfile](./Dockerfile). Note the (very simple) [Dockerfile.postgres](./Dockerfile.postgres) as well: an example of using it can be found in [docker-compose.yaml](./docker-compose.yaml).
-
-(Note that this docker-compose file is not used in production, but is rather a development convenience for debugging deployment issues.)
-
-### Production server configuration
-
-All of the configuration for the production Phoenix/Cowboy endpoint can be found in [config/runtime.exs](./config/runtime.exs). Note that HTTPS is not enforced at the application level. Instead, the expectation is that the application only allows local access, which is brokered to the outside world by a reverse proxy such as nginx. Bear in mind that the proxy needs to allow websocket connections in order for [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) to work.
-
-
 
 ## About the schema
 
