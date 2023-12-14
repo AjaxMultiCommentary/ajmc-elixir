@@ -2,28 +2,120 @@
 
 This repository is a hard fork of the Open Commentaries' [main server](https://github.com/Open-Commentaries/open-commentaries) as of [fd2b294d1ff89a8d73aaeec53b316d31ce038572](https://github.com/Open-Commentaries/open-commentaries/commit/fd2b294d1ff89a8d73aaeec53b316d31ce038572).
 
-## Development
-
-### Environment variables:
+## Environment variables
 
 In order to start the app locally, you will need to set a few
 environment variables:
 
+- `IIIF_ROOT_URL`: The URL for our IIIF Image API. Defaults to https://ajaxmulticommentary.github.io/ajmc_iiif/.
 - `ZOTERO_API_URL`: for now, set it to something like https://api.zotero.org/groups/YOUR_GROUP_HERE, since Zotero prefixes most API queries by the user or group. (See https://www.zotero.org/support/dev/web_api/v3/basics.)
 - `ZOTERO_API_TOKEN`: See https://www.zotero.org/settings/keys.
 
-- For now, enable S3 uploads by proxying the MinIO server with `fly proxy 9000`.
+In production, a few additional variables are required:
 
-## What are we doing?
+- `DATABASE_URL`: For example: postgres://USER:PASS@HOST/DATABASE
+- `SECRET_KEY_BASE`: For signing cookies etc.
+- `PHX_HOST`: The hostname of the application. ajmc.unil.ch for now. Note that, even though the Phoenix server will not be talking to the outside world directly (all traffic goes through a proxy), it still needs to know what hostname to expect in requests so that it can respond properly.
+- `PORT`: The local port for the server. This is where you'll send the proxied requests to, so if the proxy is serving the app at https://ajmc.unil.ch:443, it should proxy requests to something like http://127.0.0.1:4000.
 
-We have canonical texts that have been digitized, and we have people who have been writing commentaries in formats that are not compatible with these digital versions. How do we fit these two things together?
+## Building
 
-Digital preservation and presentation.
+The Dockerfile builds a release of the Elixir application in a fairly standard way, but we also need to seed the database with the latest textual data about the Ajax commentaries.
+
+To perform this seeding, [entrypoint.sh](./entrypoint.sh) runs `/app/bin/text_server eval "TextServer.Release.seed_database"`. This function starts the application processes (except for the HTTP server) and calls [`TextServer.Ingestion.Ajmc.run/0`](./lib/text_server/ingestion/ajmc.ex).
+
+`TextServer.Ingestion.Ajmc.run/0` _deletes all of the existing comments and commentaries_: the data have the potential to change in difficult-to-reconcile ways, so it's easier just to start fresh, since we store the source files locally (more on that in a second).
+
+`TextServer.Ingestion.Ajmc.run/0` then creates the `Version`s (= editions) of the critical text (Sophocles' _Ajax_), as detailed in [`TextServer.Ingestion.Versions`](./lib/text_server/ingestion/versions.ex).
+
+
+### Versions [`TextServer.Ingestion.Versions`](./lib/text_server/ingestion/versions.ex)
+
+These Versions are CTS-compliant editions of the text, meaning that they all descend from the same Work, which is identified by the URN urn:cts:greekLit:tlg0011.tlg003. Right now, we're only making one Version, based on Greg Crane's TEI XML encoding of Lloyd-Jones 1994's OCT. Eventually, we will ingest more editions into the same format.
+
+The data structure for representing a text is essentially an ordered list of `TextNode`s. We need to keep the order (found at the `offset` property internally) even though each `TextNode` also has a `location` because the locations do not necessarily match textual order: lines can be transposed, for example, so that the reading order of lines 5, 6, and 7 might actually be 6, 5, 7. To take a real example, the lines 1028–1039 are bracketed in some editions and arguably should be excluded from the text. That would mean a jump from 1027 to 1040 -- still properly ordered, but irreconcilable across editions without individual ordering.
+
+_Caveat lector: the following might change_
+
+Each `TextNode` can be broken down further into an ordered list of graphemes. (We use graphemes and not characters in order to simplify handling polytonic Greek combining characters.) Annotations typically refer to lemmata as the range of graphemes that correspond to the word tokens of a given lemma. That means that instead of the CTS standard `urn:cts:greekLit:tlg0011.tlg003.ajmc-fin:1034@Ἐρινὺς`, we would refer to the grapheme range at `urn:cts:greekLit:tlg0011.tlg003.ajmc-fin:1034@7-12`.
+
+This approach, however, should likely change, decomposing each edition to its `TextToken`s. This transition is a work in progress.
+
+### Commentaries
+
+Once the `Version`s have been ingested, we ingest each of the commentaries detailed in the [commentaries.toml](./priv/commentaries.toml). Their source files can be found with the glob pattern `priv/static/json/*_tess_retrained.json`. (_Nota bene_: Eventually we will need to move these files elsewhere, as we can only store public domain content in this repository.)
+
+Each `CanonicalCommentary` pulls its data from Zotero by mapping the `id` from the corresponding tess_retrained.json to its accompanying `zotero_id`.
+
+Each `CanonicalCommentary` has two kinds of comments: `Comment`s, which have a `word-anchor` and thus a lemma, and `LemmalessComments`, which have a `scope-anchor` (a range of lines).
+
+Each `Comment` is mapped to its corresponding tokens in `urn:cts:greekLit:tlg0011.tlg003.ajmc-lj`; each `LemmalessComment` is mapped to the corresponding lines.
+
+Note that sometimes these mappings will producde nonsensical results: Weckleinn, for instance, reorders the words in line 4, so his `Comment` on that line has a lemma ("ἔνθα Αἴαντος ἐσχάτην τάξιν ἔχει") that does not correspond to the text ("Αἴαντος, ἔνθα τάξιν ἐσχάτην ἔχει") — and this is a relatively minor discrepancy.
+
+This is why it's important that we also allow readers to change the "base" or critical text and to apply the comments in a flexible way.
+
+#### Rendering comments in the reader
+
+We render the lemma of comments as a heatmap over the critical text in the reading environment, allowing readers to see at a glance when lines have been heavily glossed. To do so, we borrow approaches from the OOXML specification and ProseMirror:
+
+We need to group the graphemes of each text node (line of _Ajax_) with the elements that should apply (we’re also preserving things like cruces and editorial insertions), including comments.
+
+Starting by finding the comments that apply to a given line:
+
+```        
+# comment starts with this text node OR
+# comment ends on this text node OR
+# text node is in the middle of a multi-line comment
+comment.start_text_node_id == text_node.id or
+  comment.end_text_node_id == text_node.id or
+  (comment.start_text_node.offset <= text_node.offset and
+      text_node.offset <= comment.end_text_node.offset)
+```
+
+we then check each grapheme to see if one of those comments applies:
+
+```
+cond do
+  # comment applies only to this text node
+  c.start_text_node == c.end_text_node ->
+    i in c.start_offset..(c.end_offset - 1)
+
+  # comment starts on this text_node
+  c.start_text_node == text_node ->
+    i >= c.start_offset
+
+  # comment ends on this text node
+  c.end_text_node == text_node ->
+    i <= c.end_offset
+
+  # entire text node is in this comment
+  true ->
+    true
+end
+```
+
+with that information (packaged in an admittedly confusing tuple of graphemes and tags), we can linearly render the text as a series of “grapheme blocks” with their unique tag sets:
+
+`<.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />`
+
+It remains to be determined how we will work with comments that don't match the underlying critical text.
+
+## Deployment
+
+This application is deployed using an Elixir [Release](https://hexdocs.pm/mix/1.15/Mix.Tasks.Release.html) that is built and deployed via a Docker container. The container's specification can be found in the [Dockerfile](./Dockerfile). Note the (very simple) [Dockerfile.postgres](./Dockerfile.postgres) as well: an example of using it can be found in [docker-compose.yaml](./docker-compose.yaml).
+
+(Note that this docker-compose file is not used in production, but is rather a development convenience for debugging deployment issues.)
+
+### Production server configuration
+
+All of the configuration for the production Phoenix/Cowboy endpoint can be found in [config/runtime.exs](./config/runtime.exs). Note that HTTPS is not enforced at the application level. Instead, the expectation is that the application only allows local access, which is brokered to the outside world by a reverse proxy such as nginx. Bear in mind that the proxy needs to allow websocket connections in order for [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) to work.
+
+
 
 ## About the schema
 
-We follow the [CTS URN spec](http://cite-architecture.github.io/ctsurn_spec/),
-which can at times be confusing.
+We follow the [CTS URN spec](http://cite-architecture.github.io/ctsurn_spec/), which can at times be confusing.
 
 Essentially, every `collection` (which is roughly analogous to a git repository)
 contains one or more `text_group`s. It can be helpful to think of each
@@ -82,76 +174,6 @@ dependency:
 4. Can we just use part of the dependency in the `vendor/` directory with proper attribution?
 5. If you really must install a dependency --- like `@tailwindcss/forms` --- run `npm i -D <dependency>`
 from within the `assets/` directory.
-
-## Commentaries
-
-Comments get as specific as possible (e.g., up to a specific lemma); but if that
-fails, specificity falls back up the citation chain (e.g., on the specific
-section in Pausanias).
-
-## Funding
-
-https://research.fas.harvard.edu/deans-competitive-fund-promising-scholarship
-
-
-## TODO: Organize comparanda by version type (edition, translation, commentary)
-
-## TODO: Sync to Dropbox
-
-## TODO: Tagging
-
-- Don't build into the interface
-- Build into XML parser
-- Hash tags and then Word/Open XML indexes
-- We need to be able to add definitions for tags
-  - make comments about tags themselves (build this into the interface)
-
-## TODO: Blog posts
-
-Allow writing blog posts on commentaries in progress
-
-## TODO: Two-up view
-
-Two panels with editions that can be synced. For example,
-we can have the Pausanias translation alongside the
-Pausanias commentary.
-
-## TODO: oc.newalexandria.info -> opencommentaries.org pipeline
-
-Migrate commentaries from oc.newalexandria to opencommentaries
-
-## TODO (and notes)
-
-- [ ] Scaife viewer-like URN navigation
-- [ ] Alexandria 1.0--style comments
-- Tags and/as index (#example-tag)
-- Logging for error reports
-- Anchor comments (ask for what these are) --- longer comments that fall under
-  a given tag. Can be divided into parts, sorted by text location order
-  when viewing a given tag's page.
-- Named-entity recognition from Neil Smith and Chris Blackwell
-- Mobile/responsive layout optimizations
-- Global find-and-replace
-- Version diffing (where in the pipeline?)
-- Need to support uploading multiple docxs
-- Show that so-and-so modified a text (important scholarly principle)
-- Different approaches for translations, editions, and commentaries
-  - Accommodate all three together, but don't enforce it
-  - Translation could be secondary to edition and commentary
-  - If the commentary is keyed to the original text (edition), translation is secondary
-  - If the commentary is keyed to the translation, the edition is secondary
-- Let the reader find the alignment between edition and translation
-- Let the commenter point to a reference text
-- Prioritize commentaries/comments --- just bring up comments
-- Aim for most people to create translations and commentaries from scratch on the platform
-- Use Perseus commentaries
-  - Pre-ingest things to show what people can do on the platform
-
-## TODO - Data from oc.newalexandria.info
-
-- Pull in comments from A Pausanias Commentary in Progress
-- Search functionality
-- Tagging!
 
 ## Learn more
 

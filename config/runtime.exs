@@ -14,11 +14,7 @@ end
 
 config :text_server,
   iiif_root_url:
-    System.get_env("IIIF_ROOT_URL") || "https://ajaxmulticommentary.github.io/ajmc_iiif/",
-  text_repo_destination: System.get_env("TEXT_REPO_DESTINATION"),
-  unsplash_access_key: System.get_env("UNSPLASH_ACCESS_KEY"),
-  unsplash_secret_key: System.get_env("UNSPLASH_SECRET_KEY"),
-  user_uploads_directory: System.get_env("USER_UPLOADS_DIRECTORY"),
+    System.get_env("IIIF_ROOT_URL", "https://ajaxmulticommentary.github.io/ajmc_iiif/"),
   env: config_env()
 
 config :ex_aws,
@@ -58,8 +54,8 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "ajmc.unil.ch"
-  port = String.to_integer(System.get_env("PORT") || "4000")
+  host = System.get_env("PHX_HOST", "ajmc.unil.ch")
+  port = String.to_integer(System.get_env("PORT", "4000"))
 
   config :text_server, TextServerWeb.Endpoint,
     url: [host: host, port: port],

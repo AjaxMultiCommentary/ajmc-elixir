@@ -66,7 +66,7 @@ defmodule TextServerWeb.VersionLive.FormComponent do
         fn %{path: path}, %{client_name: client_name} = _entry ->
           dir =
             Path.join([
-              Application.get_env(:text_server, :user_uploads_directory),
+              Application.get_env(:text_server, :user_uploads_directory, "uploads"),
               "version_files"
             ])
 
