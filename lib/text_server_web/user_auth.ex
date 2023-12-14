@@ -5,7 +5,6 @@ defmodule TextServerWeb.UserAuth do
   import Phoenix.Controller
 
   alias TextServer.Accounts
-  alias TextServer.Projects
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -208,23 +207,6 @@ defmodule TextServerWeb.UserAuth do
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
-      |> halt()
-    end
-  end
-
-  def require_project_admin(conn, _opts) do
-    user = conn.assigns[:current_user]
-    project_id = conn.params["project_id"]
-
-    project = Projects.get_project!(project_id)
-
-    if Projects.is_user_admin?(project, user) do
-      conn
-    else
-      conn
-      |> put_flash(:error, "You must be an admin of this project to access this page.")
-      |> maybe_store_return_to()
-      |> redirect(to: ~p"/projects/#{project_id}")
       |> halt()
     end
   end

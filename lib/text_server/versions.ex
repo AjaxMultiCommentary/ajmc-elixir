@@ -12,7 +12,6 @@ defmodule TextServer.Versions do
   alias TextServer.Repo
 
   alias TextServer.Languages
-  alias TextServer.Projects.Version, as: ProjectVersion
   alias TextServer.TextNodes
   alias TextServer.TextNodes.TextNode
   alias TextServer.Versions.Passage
@@ -89,19 +88,12 @@ defmodule TextServer.Versions do
   def create_version(attrs, project) do
     urn = make_version_urn(attrs, project)
 
-    Repo.transaction(fn ->
-      {:ok, version} =
-        %Version{}
-        |> Version.changeset(attrs |> Map.put("urn", urn))
-        |> Repo.insert()
+    {:ok, version} =
+      %Version{}
+      |> Version.changeset(attrs |> Map.put("urn", urn))
+      |> Repo.insert()
 
-      {:ok, _project_version} =
-        %ProjectVersion{}
-        |> ProjectVersion.changeset(%{version_id: version.id, project_id: project.id})
-        |> Repo.insert()
-
-      version
-    end)
+    version
   end
 
   def find_or_create_version(attrs \\ %{}) do

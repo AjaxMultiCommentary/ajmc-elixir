@@ -61,11 +61,6 @@ defmodule TextServerWeb.Router do
       live "/works/new", WorkLive.New, :new
       live "/works/:id/edit", WorkLive.Index, :edit
       live "/works/:id/show/edit", WorkLive.Show, :edit
-
-      scope "/:user_id" do
-        live "/projects", ProjectLive.UserProjectIndex, :index
-        live "/projects/:id/versions/new", VersionLive.New, :new
-      end
     end
   end
 
@@ -80,14 +75,13 @@ defmodule TextServerWeb.Router do
       live "/collections", CollectionLive.Index, :index
       live "/collections/:id", CollectionLive.Show, :show
 
+      live "/commentaries", VersionLive.Index, :index
+
       live "/exemplars", ExemplarLive.Index, :index
       live "/exemplars/:id", ExemplarLive.Show, :show
 
       live "/languages", LanguageLive.Index, :index
       live "/languages/:id", LanguageLive.Show, :show
-
-      live "/projects", ProjectLive.Index, :index
-      live "/projects/:id", ProjectLive.Show, :show
 
       live "/text_groups", TextGroupLive.Index, :index
       live "/text_groups/:id", TextGroupLive.Show, :show
@@ -143,9 +137,6 @@ defmodule TextServerWeb.Router do
       on_mount: [{TextServerWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", AccountLive.UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", AccountLive.UserSettingsLive, :confirm_email
-
-      live "/:user_id/projects/new", ProjectLive.New, :new
-      live "/projects/:id/exemplars/edit", ProjectLive.EditExemplars, :edit
     end
   end
 
