@@ -24,7 +24,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           <%= @comment.attributes
           |> Map.get("lemma") %>
         </h3>
-        <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= @comment.canonical_commentary.creator_last_name %></small>
+        <small class="mt-1 mx-w-2xl text-sm text-gray-500">
+          <%= @comment.canonical_commentary.creator_last_name %> <%= @comment.canonical_commentary.publication_date %>
+        </small>
       </div>
       <div class="collapse-content float-right">
         <p class="max-w-2xl text-sm text-gray-800"><%= @comment.content %></p>
