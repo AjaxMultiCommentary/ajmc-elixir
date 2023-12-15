@@ -75,7 +75,7 @@ defmodule TextServerWeb.Router do
       live "/collections", CollectionLive.Index, :index
       live "/collections/:id", CollectionLive.Show, :show
 
-      live "/commentaries", VersionLive.Index, :index
+      live "/bibliography", CommentariesLive.Index, :index
 
       live "/exemplars", ExemplarLive.Index, :index
       live "/exemplars/:id", ExemplarLive.Show, :show

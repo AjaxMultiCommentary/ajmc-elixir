@@ -18,7 +18,9 @@ defmodule TextServer.Commentaries do
 
   """
   def list_canonical_commentaries do
-    Repo.all(CanonicalCommentary)
+    CanonicalCommentary
+    |> order_by([c], c.creator_last_name)
+    |> Repo.all()
   end
 
   def filter_canonical_commentaries(opts \\ []) do
