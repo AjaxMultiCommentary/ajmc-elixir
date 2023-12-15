@@ -74,7 +74,7 @@ We need to group the graphemes of each text node (line of _Ajax_) with the eleme
 
 Starting by finding the comments that apply to a given line:
 
-```        
+```elixir    
 # comment starts with this text node OR
 # comment ends on this text node OR
 # text node is in the middle of a multi-line comment
@@ -86,7 +86,7 @@ comment.start_text_node_id == text_node.id or
 
 we then check each grapheme to see if one of those comments applies:
 
-```
+```elixir
 cond do
   # comment applies only to this text node
   c.start_text_node == c.end_text_node ->
@@ -108,7 +108,12 @@ end
 
 with that information (packaged in an admittedly confusing tuple of graphemes and tags), we can linearly render the text as a series of “grapheme blocks” with their unique tag sets:
 
-`<.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />`
+```elixir 
+<.text_element 
+  :for={{graphemes, tags} <- @text_node.graphemes_with_tags} 
+  tags={tags} text={Enum.join(graphemes)} 
+/>
+```
 
 It remains to be determined how we will work with comments that don't match the underlying critical text.
 
@@ -174,13 +179,11 @@ dependency:
 5. If you really must install a dependency --- like `@tailwindcss/forms` --- run `npm i -D <dependency>`
 from within the `assets/` directory.
 
-## Learn more
+## Acknowledgments
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Data and application code in this repository were produced in the context of the Ajax Multi-Commentary project, funded by the Swiss National Science Foundation under an Ambizione grant [PZ00P1_186033](https://data.snf.ch/grants/grant/186033).
+
+Contributors: Carla Amaya (UNIL), Sven Najem-Meyer (EPFL), Charles Pletcher (UNIL), Matteo Romanello (UNIL), Bruce Robertson (Mount Allison University).
 
 # License
 
