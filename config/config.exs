@@ -38,10 +38,6 @@ config :text_server, Oban,
   plugins: [Oban.Plugins.Pruner],
   queues: [default: 10]
 
-config :text_server, Zotero.API,
-  base_url: System.get_env("ZOTERO_API_URL"),
-  token: System.get_env("ZOTERO_API_TOKEN")
-
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 
