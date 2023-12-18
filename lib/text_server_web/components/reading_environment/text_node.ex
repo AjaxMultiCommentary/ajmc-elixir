@@ -32,12 +32,6 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     """
   end
 
-  @impl true
-  def handle_event("text-node-click", _, socket) do
-    send(self(), {:focused_text_node, socket.assigns.text_node})
-    {:noreply, socket}
-  end
-
   attr :classes, :string, default: ""
   attr :tags, :list, default: []
   attr :text, :string
@@ -51,6 +45,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         :classes,
         tags
         |> Enum.map(&tag_classes/1)
+        |> MapSet.new()
         |> Enum.join(" ")
       )
 
@@ -71,14 +66,16 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
               |> Enum.dedup()
           )
 
+        # We need to do this to keep the autoformatter from making the <span> span
+        # multiple lines, introducing unnecessary whitespace into the text
+        assigns =
+          assign(
+            assigns,
+            classes: [assigns.classes, "comments-#{min(Enum.count(assigns.commentary_ids), 10)}"]
+          )
+
         ~H"""
-        <span
-          class={[@classes, "comments-#{min(Enum.count(@commentary_ids), 10)}"]}
-          phx-click="highlight-comments"
-          phx-value-comments={@comments}
-        >
-          <%= @text %>
-        </span>
+        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments}><%= @text %></span>
         """
 
       Enum.member?(tags |> Enum.map(& &1.name), "image") ->
