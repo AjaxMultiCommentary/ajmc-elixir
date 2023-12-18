@@ -55,7 +55,7 @@ defmodule TextServerWeb.VersionLive.Show do
             <option>etc.</option>
           </select>
         </div>
-        <div class="col-span-3">
+        <div class="col-span-3 border max-h-full overflow-y-scroll">
           <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
             <.live_component
               id="commentaries-filter"
@@ -115,13 +115,13 @@ defmodule TextServerWeb.VersionLive.Show do
     text_nodes = passage.text_nodes
 
     commentaries =
-      Commentaries.list_canonical_commentaries()
+      Commentaries.list_viewable_commentaries(socket.assigns.current_user)
       |> Enum.map(fn c ->
         %{id: c.id, label: CanonicalCommentary.commentary_label(c), selected: false}
       end)
       |> build_options()
 
-    comments = filter_comments(text_nodes, commentaries)
+    comments = filter_comments(socket, text_nodes, commentaries)
     personae_loquentes = get_personae_loquentes(text_nodes)
 
     {:noreply,
@@ -185,7 +185,7 @@ defmodule TextServerWeb.VersionLive.Show do
 
   defp assign_multi_select_options(socket, commentaries) do
     text_nodes = socket.assigns.text_nodes
-    comments = filter_comments(text_nodes, commentaries)
+    comments = filter_comments(socket, text_nodes, commentaries)
     text_nodes = TextNodes.tag_text_nodes(socket.assigns.text_nodes, comments)
 
     socket
@@ -205,6 +205,7 @@ defmodule TextServerWeb.VersionLive.Show do
       data ->
         %SelectOption{id: data.id, label: data.label, selected: data.selected}
     end)
+    |> Enum.sort_by(&Map.get(&1, :label))
   end
 
   defp build_changeset(options) do
@@ -213,7 +214,7 @@ defmodule TextServerWeb.VersionLive.Show do
     |> Ecto.Changeset.put_embed(:options, options)
   end
 
-  defp filter_comments(text_nodes, options) do
+  defp filter_comments(socket, text_nodes, options) do
     selected_options =
       Enum.flat_map(options, fn option ->
         if option.selected in [true, "true"] do
@@ -224,6 +225,7 @@ defmodule TextServerWeb.VersionLive.Show do
       end)
 
     Comments.filter_comments(
+      socket.assigns.current_user,
       text_nodes |> Enum.map(& &1.id),
       selected_options
     )

@@ -13,14 +13,32 @@ defmodule TextServer.Commentaries do
 
   ## Examples
 
-      iex> list_canonical_commentaries()
+      iex> list_public_commentaries()
       [%CanonicalCommentary{}, ...]
 
   """
-  def list_canonical_commentaries do
+  def list_public_commentaries() do
+    CanonicalCommentary
+    |> where([c], c.publication_date < 1934)
+    |> preload(:creators)
+    |> Repo.all()
+  end
+
+  def list_commentaries() do
     CanonicalCommentary
     |> preload(:creators)
     |> Repo.all()
+  end
+
+  @doc """
+  Lists the commentaries that `current_user` can view.
+  """
+  def list_viewable_commentaries(current_user) when is_nil(current_user) do
+    list_public_commentaries()
+  end
+
+  def list_viewable_commentaries(_current_user) do
+    list_commentaries()
   end
 
   @doc """

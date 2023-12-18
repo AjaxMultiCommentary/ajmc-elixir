@@ -21,7 +21,18 @@ defmodule TextServer.Comments do
     Repo.all(Comment)
   end
 
-  def list_comments(start_text_node_ids) do
+  def list_comments(current_user, start_text_node_ids) when is_nil(current_user) do
+    query =
+      from(c in Comment,
+        join: parent in assoc(c, :canonical_commentary),
+        where: c.start_text_node_id in ^start_text_node_ids and parent.publication_date < 1935,
+        preload: [:start_text_node, :end_text_node, [canonical_commentary: :creators]]
+      )
+
+    Repo.all(query)
+  end
+
+  def list_comments(_current_user, start_text_node_ids) do
     Comment
     |> where([c], c.start_text_node_id in ^start_text_node_ids)
     |> preload(canonical_commentary: :creators)
@@ -40,12 +51,27 @@ defmodule TextServer.Comments do
       [%Comment{canonical_commentary_id: 1}, %Comment{canonical_commentary_id: 2}, ...]
   """
 
-  def filter_comments(start_text_node_ids, canonical_commentary_ids)
+  def filter_comments(current_user, start_text_node_ids, canonical_commentary_ids)
       when length(canonical_commentary_ids) == 0 do
-    list_comments(start_text_node_ids)
+    list_comments(current_user, start_text_node_ids)
   end
 
-  def filter_comments(start_text_node_ids, canonical_commentary_ids) do
+  def filter_comments(current_user, start_text_node_ids, canonical_commentary_ids)
+      when is_nil(current_user) do
+    query =
+      from(c in Comment,
+        join: parent in assoc(c, :canonical_commentary),
+        where:
+          c.start_text_node_id in ^start_text_node_ids and
+            c.canonical_commentary_id in ^canonical_commentary_ids and
+            parent.publication_date < 1935,
+        preload: [:start_text_node, :end_text_node, [canonical_commentary: :creators]]
+      )
+
+    Repo.all(query)
+  end
+
+  def filter_comments(_current_user, start_text_node_ids, canonical_commentary_ids) do
     Comment
     |> where(
       [c],

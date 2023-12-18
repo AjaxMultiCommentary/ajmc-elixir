@@ -18,7 +18,8 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     belongs_to :version, TextServer.Versions.Version
 
     many_to_many :creators, TextServer.Commentaries.Creator,
-      join_through: TextServer.Commentaries.CommentaryCreator
+      join_through: TextServer.Commentaries.CommentaryCreator,
+      on_replace: :delete
 
     timestamps()
   end

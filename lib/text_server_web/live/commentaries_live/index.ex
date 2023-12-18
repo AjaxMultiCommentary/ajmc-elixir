@@ -7,7 +7,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(commentaries: list_commentaries())}
+     |> assign(commentaries: Commentaries.list_public_commentaries())}
   end
 
   def render(assigns) do
@@ -31,9 +31,5 @@ defmodule TextServerWeb.CommentariesLive.Index do
       </CoreComponents.table>
     </div>
     """
-  end
-
-  defp list_commentaries do
-    Commentaries.list_canonical_commentaries()
   end
 end

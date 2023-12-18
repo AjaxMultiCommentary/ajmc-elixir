@@ -10,9 +10,9 @@ defmodule TextServer.CommentariesTest do
 
     @invalid_attrs %{filename: nil, pid: nil}
 
-    test "list_canonical_commentaries/0 returns all canonical_commentaries" do
+    test "list_public_commentaries/0 returns all canonical_commentaries" do
       canonical_commentary = canonical_commentary_fixture()
-      assert Commentaries.list_canonical_commentaries() == [canonical_commentary]
+      assert Commentaries.list_public_commentaries() == [canonical_commentary]
     end
 
     test "get_canonical_commentary!/1 returns the canonical_commentary with given id" do
