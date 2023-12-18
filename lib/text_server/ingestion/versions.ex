@@ -107,7 +107,24 @@ defmodule TextServer.Ingestion.Versions do
             }
           end)
 
-        new_line = %{elements: line.elements, location: [line.n], text: text, words: words}
+        speaker =
+          lloyd_jones_body.body.speakers
+          |> Enum.find(fn speaker -> Enum.member?(speaker.lines, line.n) end)
+
+        new_line = %{
+          elements: [
+            %{
+              attributes: %{name: speaker.name},
+              start_offset: 0,
+              end_offset: String.length(text),
+              name: "speaker"
+            }
+            | line.elements
+          ],
+          location: [line.n],
+          text: text,
+          words: words
+        }
 
         %{word_count: word_count + length(words), lines: [new_line | acc.lines]}
       end)

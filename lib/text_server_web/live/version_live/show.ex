@@ -31,6 +31,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :location, :list, default: []
   attr :passage, Versions.Passage
   attr :passages, :list, default: []
+  attr :personae_loquentes, :map, default: %{}
   attr :text_nodes, :list, default: []
   attr :version, Versions.Version, required: true
   attr :versions, :list, required: true
@@ -75,6 +76,7 @@ defmodule TextServerWeb.VersionLive.Show do
             footnotes={@footnotes}
             location={@location}
             passage={@passage}
+            personae_loquentes={@personae_loquentes}
             text_nodes={@text_nodes}
             version_urn={@version.urn}
           />
@@ -106,6 +108,7 @@ defmodule TextServerWeb.VersionLive.Show do
       |> build_options()
 
     comments = filter_comments(text_nodes, commentaries)
+    personae_loquentes = get_personae_loquentes(text_nodes)
 
     {:noreply,
      socket
@@ -120,6 +123,7 @@ defmodule TextServerWeb.VersionLive.Show do
        passage: passage,
        passages: Passages.list_passages_for_version(version),
        page_title: version.label,
+       personae_loquentes: personae_loquentes,
        text_nodes: text_nodes |> TextNodes.tag_text_nodes(comments),
        version: version
      )}
@@ -210,5 +214,26 @@ defmodule TextServerWeb.VersionLive.Show do
       selected_options
     )
     |> Enum.sort_by(&{&1.start_text_node.offset, &1.start_offset})
+  end
+
+  defp get_personae_loquentes(text_nodes) do
+    text_nodes
+    |> Enum.chunk_by(fn tn ->
+      tn.text_elements
+      |> Enum.find(fn te -> te.element_type.name == "speaker" end)
+      |> Map.get(:attributes)
+      |> Map.get("name")
+    end)
+    |> Enum.reduce(%{}, fn chunk, acc ->
+      [node | _rest] = chunk
+
+      speaker_name =
+        node.text_elements
+        |> Enum.find(fn te -> te.element_type.name == "speaker" end)
+        |> Map.get(:attributes)
+        |> Map.get("name")
+
+      Map.put(acc, node.offset, speaker_name)
+    end)
   end
 end

@@ -34,6 +34,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
 
   attr :comments, :list, default: []
   attr :focused_text_node, :any, default: nil
+  attr :personae_loquentes, :map, default: %{}
   attr :text_nodes, :list, required: true
   attr :version_urn, :string, required: true
 
@@ -47,6 +48,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
           id={text_node.id}
           comments={@comments}
           is_focused={is_focused(@focused_text_node, text_node)}
+          persona_loquens={Map.get(@personae_loquentes, text_node.offset)}
           text_node={text_node}
         />
       </section>

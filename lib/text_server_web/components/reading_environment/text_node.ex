@@ -3,6 +3,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   attr :comments, :list, default: []
   attr :is_focused, :boolean, default: false
+  attr :persona_loquens, :string
   attr :text_node, :map, required: true
 
   @impl true
@@ -15,15 +16,18 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
-    <div class="flex">
-      <p
-        class="max-w-prose text-node"
-        data-location={Enum.join(@text_node.location, ".")}
-        phx-click="text-node-click"
-        phx-target={@myself}
-      >
-        <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
-      </p>
+    <div>
+      <h3 :if={@persona_loquens} class="font-bold mt-4"><%= @persona_loquens %></h3>
+      <div class="flex">
+        <p
+          class="max-w-prose text-node"
+          data-location={Enum.join(@text_node.location, ".")}
+          phx-click="text-node-click"
+          phx-target={@myself}
+        >
+          <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
+        </p>
+      </div>
     </div>
     """
   end
