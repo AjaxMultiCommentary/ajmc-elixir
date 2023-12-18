@@ -40,15 +40,21 @@ defmodule TextServerWeb.VersionLive.Show do
   def render(assigns) do
     ~H"""
     <article class="mx-auto">
-      <div class="flex justify-between">
-        <div>
+      <div class="grid grid-cols-10 gap-x-8 gap-y-2 h-screen max-h-[64rem]">
+        <div class="col-span-2">
           <h1 class="text-2xl font-bold"><%= raw(@version.label) %></h1>
 
           <p><%= @version.description %></p>
-
-          <p><%= @version.urn %></p>
         </div>
-        <div>
+        <div class="col-span-5">
+          <select class="w-full border">
+            <option>Critical text</option>
+            <option>Lloyd-Jones 1994</option>
+            <option>Jebb</option>
+            <option>etc.</option>
+          </select>
+        </div>
+        <div class="col-span-3">
           <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
             <.live_component
               id="commentaries-filter"
@@ -59,15 +65,13 @@ defmodule TextServerWeb.VersionLive.Show do
             />
           </.form>
         </div>
-      </div>
 
-      <hr class="my-4" />
+        <hr class="my-4 col-span-10" />
 
-      <div class="grid grid-cols-8 gap-8">
         <div class="col-span-2">
           <Navigation.nav_menu passages={@passages} current_passage={@passage} />
         </div>
-        <div class="col-span-3 overflow-y-auto max-h-screen mb-8">
+        <div class="col-span-5 overflow-y-scroll">
           <.live_component
             id={:reader}
             module={TextServerWeb.ReadingEnvironment.Reader}
@@ -81,7 +85,7 @@ defmodule TextServerWeb.VersionLive.Show do
             version_urn={@version.urn}
           />
         </div>
-        <div class="col-span-3 overflow-y-scroll max-h-screen">
+        <div class="col-span-3 overflow-y-scroll">
           <%= for comment <- @comments do %>
             <.live_component
               id={comment.id}
@@ -90,6 +94,9 @@ defmodule TextServerWeb.VersionLive.Show do
               is_highlighted={Enum.member?(@highlighted_comments, Map.get(comment, :id))}
             />
           <% end %>
+        </div>
+        <div class="col-span-10 flex shadow-xl p-4 bg-base-200">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </div>
       </div>
     </article>

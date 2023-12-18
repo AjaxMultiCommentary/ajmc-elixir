@@ -1,71 +1,22 @@
 defmodule TextServerWeb.Components.MultiSelect do
   use TextServerWeb, :live_component
 
-  alias Phoenix.LiveView.JS
-
   def render(assigns) do
     ~H"""
-    <div class="justify-center">
-      <div
-        class="border border-gray-200 dark:border-gray-700 w-96 h-12 pb-2 m-2 w-96 flex relative"
-        id={"selected-options-container-#{@id}"}
-      >
-        <%= for option <- @selected_options do %>
-          <div
-            id={"option_#{option.label}"}
-            class="bg-slate-700 shadow-lg rounded-lg mt-2 ml-1 text-white inline-block pl-2 pr-2 text-center"
-          >
-            <%= option.label %>
-          </div>
-        <% end %>
-        <div class="absolute right-0">
-          <svg
-            id={"#{@id}-down-icon"}
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 absolute right-0 top-3"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            phx-click={JS.toggle() |> JS.toggle(to: "##{@id}-up-icon") |> JS.toggle(to: "#options-container-#{@id}")}
-          >
-            <path
-              fill-rule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <svg
-            id={"#{@id}-up-icon"}
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5  absolute right-0 top-3 hidden"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            phx-click={JS.toggle() |> JS.toggle(to: "##{@id}-down-icon") |> JS.toggle(to: "#options-container-#{@id}")}
-          >
-            <path
-              fill-rule="evenodd"
-              d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-              clip-rule="evenodd"
-            />
-          </svg>
+    <div class="flex flex-wrap" id={"options-container-#{@id}"}>
+      <%= inputs_for @form, :options, fn value -> %>
+        <div class="px-2">
+          <%= checkbox(value, :selected,
+            phx_change: "checked",
+            phx_target: @myself,
+            value: value.data.selected
+          ) %>
+          <label class="text-gray-800">
+            <%= label(value, :label, value.data.label) %>
+            <%= hidden_input(value, :label, value: value.data.label) %>
+          </label>
         </div>
-      </div>
-      <div class="hidden w-96 p-4 ml-2 absolute z-10 bg-stone-50 shadow-2xl rounded-lg" id={"options-container-#{@id}"}>
-        <%= inputs_for @form, :options, fn value -> %>
-          <div class="form-check">
-            <label class="form-check-label inline-block text-gray-800">
-              <%= checkbox(value, :selected,
-                phx_change: "checked",
-                phx_target: @myself,
-                value: value.data.selected,
-                class:
-                  "form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
-              ) %>
-              <%= label(value, :label, value.data.label, class: "ml-2") %>
-              <%= hidden_input(value, :label, value: value.data.label) %>
-            </label>
-          </div>
-        <% end %>
-      </div>
+      <% end %>
     </div>
     """
   end

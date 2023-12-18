@@ -158,7 +158,8 @@
  */
 .openseadragon-iiif-viewer {
 	height: 300px;
-	width: 500px;
+	width: 300px;
+	max-width: 100%;
 }
 
 /* Styles for markdown copy (on project homepages)
