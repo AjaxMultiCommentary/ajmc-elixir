@@ -24,7 +24,7 @@ defmodule TextServer.Comments do
   def list_comments(start_text_node_ids) do
     Comment
     |> where([c], c.start_text_node_id in ^start_text_node_ids)
-    |> preload(:canonical_commentary)
+    |> preload(canonical_commentary: :creators)
     |> preload(:start_text_node)
     |> preload(:end_text_node)
     |> Repo.all()
@@ -52,7 +52,7 @@ defmodule TextServer.Comments do
       c.start_text_node_id in ^start_text_node_ids and
         c.canonical_commentary_id in ^canonical_commentary_ids
     )
-    |> preload(:canonical_commentary)
+    |> preload(canonical_commentary: :creators)
     |> preload(:start_text_node)
     |> preload(:end_text_node)
     |> Repo.all()

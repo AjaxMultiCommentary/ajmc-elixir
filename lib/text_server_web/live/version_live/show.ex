@@ -1,4 +1,5 @@
 defmodule TextServerWeb.VersionLive.Show do
+  alias TextServer.Commentaries.CanonicalCommentary
   use TextServerWeb, :live_view
 
   alias TextServerWeb.ReadingEnvironment.Navigation
@@ -96,7 +97,11 @@ defmodule TextServerWeb.VersionLive.Show do
           <% end %>
         </div>
         <div class="col-span-10 flex shadow-xl p-4 bg-base-200">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+          dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+          ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+          eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+          in culpa qui officia deserunt mollit anim id est laborum.
         </div>
       </div>
     </article>
@@ -111,7 +116,9 @@ defmodule TextServerWeb.VersionLive.Show do
 
     commentaries =
       Commentaries.list_canonical_commentaries()
-      |> Enum.map(fn c -> %{id: c.id, label: c.creator_last_name, selected: false} end)
+      |> Enum.map(fn c ->
+        %{id: c.id, label: CanonicalCommentary.commentary_label(c), selected: false}
+      end)
       |> build_options()
 
     comments = filter_comments(text_nodes, commentaries)

@@ -1,4 +1,5 @@
 defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
+  alias TextServer.Commentaries.CanonicalCommentary
   use TextServerWeb, :live_component
 
   alias TextServerWeb.CoreComponents
@@ -25,7 +26,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           |> Map.get("lemma") %>
         </h3>
         <small class="mt-1 mx-w-2xl text-sm text-gray-500">
-          <%= @comment.canonical_commentary.creator_last_name %> <%= @comment.canonical_commentary.publication_date %>
+          <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
         </small>
       </div>
       <div class="collapse-content float-right">

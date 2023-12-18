@@ -97,9 +97,18 @@ defmodule TextServer.Ingestion.Commentary do
     basename = path |> Path.basename() |> Path.rootname()
     zotero_id = commentary_meta |> Map.get("zotero_id")
     zotero_data = Zotero.API.item(zotero_id) |> Map.get("data")
-    creator = zotero_data |> Map.get("creators") |> List.first()
-    creator_first_name = creator |> Map.get("firstName")
-    creator_last_name = creator |> Map.get("lastName")
+
+    creators =
+      zotero_data
+      |> Map.get("creators")
+      |> Enum.map(fn c ->
+        %{
+          creator_type: Map.get(c, "creatorType"),
+          first_name: Map.get(c, "firstName"),
+          last_name: Map.get(c, "lastName")
+        }
+      end)
+
     languages = zotero_data |> Map.get("language") |> String.split(", ")
     publication_date = zotero_data |> Map.get("date")
     source_url = zotero_data |> Map.get("url")
@@ -110,8 +119,7 @@ defmodule TextServer.Ingestion.Commentary do
 
     {:ok, commentary} =
       Commentaries.upsert_canonical_commentary(%{
-        creator_first_name: creator_first_name,
-        creator_last_name: creator_last_name,
+        creators: creators,
         filename: basename,
         languages: languages,
         pid: pid,

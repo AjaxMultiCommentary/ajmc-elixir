@@ -19,14 +19,8 @@ defmodule TextServer.Commentaries do
   """
   def list_canonical_commentaries do
     CanonicalCommentary
-    |> order_by([c], c.creator_last_name)
+    |> preload(:creators)
     |> Repo.all()
-  end
-
-  def filter_canonical_commentaries(opts \\ []) do
-    IO.inspect(opts)
-
-    list_canonical_commentaries()
   end
 
   @doc """
@@ -90,6 +84,7 @@ defmodule TextServer.Commentaries do
   """
   def update_canonical_commentary(%CanonicalCommentary{} = canonical_commentary, attrs) do
     canonical_commentary
+    |> Repo.preload(:creators)
     |> CanonicalCommentary.changeset(attrs)
     |> Repo.update()
   end
