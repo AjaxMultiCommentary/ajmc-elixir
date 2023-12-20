@@ -188,17 +188,25 @@ defmodule TextServer.Ingestion.Commentary do
         }
         |> Comments.upsert_comment()
       else
-        unless is_nil(last_text_node) or is_nil(first_text_node) do
-          %{
-            attributes: attributes,
-            canonical_commentary_id: commentary.id,
-            content: content,
-            end_text_node_id: last_text_node.id,
-            start_text_node_id: first_text_node.id,
-            urn: "#{urn}:#{first_line_n}-#{last_line_n}"
-          }
-          |> LemmalessComments.upsert_lemmaless_comment()
-        end
+        end_text_node_id =
+          if last_text_node do
+            Map.get(last_text_node, :id)
+          end
+
+        first_text_node_id =
+          if first_text_node do
+            Map.get(first_text_node, :id)
+          end
+
+        %{
+          attributes: attributes,
+          canonical_commentary_id: commentary.id,
+          content: content,
+          end_text_node_id: end_text_node_id,
+          start_text_node_id: first_text_node_id,
+          urn: "#{urn}:#{Enum.join(citation, "-")}"
+        }
+        |> LemmalessComments.upsert_lemmaless_comment()
       end
     end
   end

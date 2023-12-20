@@ -54,12 +54,12 @@ defmodule TextServer.Comments do
       [%Comment{canonical_commentary_id: 1}, %Comment{canonical_commentary_id: 2}, ...]
   """
 
-  def filter_comments(current_user, start_text_node_ids, canonical_commentary_ids)
+  def filter_comments(current_user, canonical_commentary_ids, start_text_node_ids)
       when length(canonical_commentary_ids) == 0 do
     list_comments(current_user, start_text_node_ids)
   end
 
-  def filter_comments(current_user, start_text_node_ids, canonical_commentary_ids)
+  def filter_comments(current_user, canonical_commentary_ids, start_text_node_ids)
       when is_nil(current_user) do
     query =
       from(c in Comment,
@@ -75,7 +75,7 @@ defmodule TextServer.Comments do
     Repo.all(query)
   end
 
-  def filter_comments(_current_user, start_text_node_ids, canonical_commentary_ids) do
+  def filter_comments(_current_user, canonical_commentary_ids, start_text_node_ids) do
     Comment
     |> where(
       [c],

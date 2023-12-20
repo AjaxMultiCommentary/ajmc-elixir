@@ -1,6 +1,8 @@
 defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
-  alias TextServer.Commentaries.CanonicalCommentary
   use TextServerWeb, :live_component
+
+  alias TextServer.Comments.Comment
+  alias TextServer.Commentaries.CanonicalCommentary
 
   alias TextServerWeb.CoreComponents
 
@@ -22,8 +24,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           <span class="text-sm font-light text-gray-600">
             <%= citation(@comment.attributes) %>
           </span>
-          <%= @comment.attributes
-          |> Map.get("lemma") %>
+          <%= if match?(%Comment{}, @comment) do %>
+            <%= @comment.attributes |> Map.get("lemma") %>
+          <% end %>
         </h3>
         <small class="mt-1 mx-w-2xl text-sm text-gray-500">
           <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>

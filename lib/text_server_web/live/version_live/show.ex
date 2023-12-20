@@ -1,11 +1,14 @@
 defmodule TextServerWeb.VersionLive.Show do
-  alias TextServer.Commentaries.CanonicalCommentary
   use TextServerWeb, :live_view
 
   alias TextServerWeb.ReadingEnvironment.Navigation
 
   alias TextServer.Comments
+  alias TextServer.Comments.Comment
   alias TextServer.Commentaries
+  alias TextServer.Commentaries.CanonicalCommentary
+  alias TextServer.LemmalessComments
+  alias TextServer.LemmalessComments.LemmalessComment
   alias TextServer.MultiSelect
   alias TextServer.MultiSelect.SelectOption
   alias TextServer.TextNodes
@@ -29,6 +32,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
   attr :highlighted_comments, :list
+  attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
   attr :passage, Versions.Passage
   attr :passages, :list, default: []
@@ -76,7 +80,6 @@ defmodule TextServerWeb.VersionLive.Show do
           <.live_component
             id={:reader}
             module={TextServerWeb.ReadingEnvironment.Reader}
-            comments={@comments}
             focused_text_node={@focused_text_node}
             footnotes={@footnotes}
             location={@location}
@@ -87,7 +90,7 @@ defmodule TextServerWeb.VersionLive.Show do
           />
         </div>
         <div class="col-span-3 overflow-y-scroll">
-          <%= for comment <- @comments do %>
+          <%= for comment <- @all_comments do %>
             <.live_component
               id={comment.id}
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
@@ -121,26 +124,23 @@ defmodule TextServerWeb.VersionLive.Show do
       end)
       |> build_options()
 
-    comments = filter_comments(socket, text_nodes, commentaries)
     personae_loquentes = get_personae_loquentes(text_nodes)
 
-    {:noreply,
-     socket
-     |> assign(
-       commentaries: commentaries,
-       comments: comments,
-       commentary_filter_changeset:
-         commentaries
-         |> build_changeset(),
-       form: to_form(params),
-       highlighted_comments: [],
-       passage: passage,
-       passages: Passages.list_passages_for_version(version),
-       page_title: version.label,
-       personae_loquentes: personae_loquentes,
-       text_nodes: text_nodes |> TextNodes.tag_text_nodes(comments),
-       version: version
-     )}
+    socket =
+      socket
+      |> assign(
+        form: to_form(params),
+        highlighted_comments: [],
+        passage: passage,
+        passages: Passages.list_passages_for_version(version),
+        page_title: version.label,
+        personae_loquentes: personae_loquentes,
+        text_nodes: text_nodes,
+        version: version
+      )
+      |> assign_multi_select_options(commentaries)
+
+    {:noreply, socket}
   end
 
   def handle_params(params, session, socket) do
@@ -184,15 +184,36 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   defp assign_multi_select_options(socket, commentaries) do
+    selected_options =
+      Enum.flat_map(commentaries, fn option ->
+        if option.selected in [true, "true"] do
+          [option.id]
+        else
+          []
+        end
+      end)
+
     text_nodes = socket.assigns.text_nodes
-    comments = filter_comments(socket, text_nodes, commentaries)
+    comments = filter_comments(socket, text_nodes, selected_options)
+    lemmaless_comments = filter_lemmaless_comments(socket, text_nodes, selected_options)
     text_nodes = TextNodes.tag_text_nodes(socket.assigns.text_nodes, comments)
+
+    all_comments =
+      (comments ++ lemmaless_comments)
+      |> Enum.sort_by(fn
+        %Comment{} = comment ->
+          comment.start_text_node.location
+
+        %LemmalessComment{} = comment ->
+          comment.urn.citations |> List.first() |> String.to_integer()
+      end)
 
     socket
     |> assign(
-      commentary_filter_changeset: build_changeset(commentaries),
-      comments: comments,
+      all_comments: all_comments,
       commentaries: commentaries,
+      commentary_filter_changeset: build_changeset(commentaries),
+      lemmaless_comments: lemmaless_comments,
       text_nodes: text_nodes
     )
   end
@@ -214,22 +235,26 @@ defmodule TextServerWeb.VersionLive.Show do
     |> Ecto.Changeset.put_embed(:options, options)
   end
 
-  defp filter_comments(socket, text_nodes, options) do
-    selected_options =
-      Enum.flat_map(options, fn option ->
-        if option.selected in [true, "true"] do
-          [option.id]
-        else
-          []
-        end
-      end)
-
+  defp filter_comments(socket, text_nodes, selected_options) do
     Comments.filter_comments(
       socket.assigns.current_user,
-      text_nodes |> Enum.map(& &1.id),
-      selected_options
+      selected_options,
+      text_nodes |> Enum.map(& &1.id)
     )
-    |> Enum.sort_by(&{&1.start_text_node.offset, &1.start_offset})
+    |> Enum.sort_by(&{&1.start_text_node.location, &1.start_offset})
+  end
+
+  defp filter_lemmaless_comments(socket, text_nodes, selected_options) do
+    first_line_n = text_nodes |> List.first() |> Map.get(:location) |> List.first()
+    last_line_n = text_nodes |> List.last() |> Map.get(:location) |> List.first()
+
+    LemmalessComments.filter_lemmaless_comments(
+      socket.assigns.current_user,
+      selected_options,
+      first_line_n,
+      last_line_n
+    )
+    |> Enum.sort_by(&(&1.urn.citations |> List.first()))
   end
 
   defp get_personae_loquentes(text_nodes) do

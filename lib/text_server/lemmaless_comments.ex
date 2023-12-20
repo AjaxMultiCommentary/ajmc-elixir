@@ -21,6 +21,65 @@ defmodule TextServer.LemmalessComments do
     Repo.all(LemmalessComment)
   end
 
+  def list_lemmaless_comments(current_user) when is_nil(current_user) do
+    public_commentaries_query()
+    |> Repo.all()
+  end
+
+  def list_lemmaless_comments(_current_user) do
+    list_lemmaless_comments()
+  end
+
+  def list_lemmaless_comments_for_lines(current_user, first_line_n, last_line_n)
+      when is_nil(current_user) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+    query = public_commentaries_query()
+
+    from(
+      q in query,
+      where: fragment("(? -> ? ->> 0)::int", q.urn, "citations") in ^range
+    )
+    |> Repo.all()
+  end
+
+  def list_lemmaless_comments_for_lines(_current_user, first_line_n, last_line_n) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+
+    LemmalessComment
+    |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
+    |> preload(canonical_commentary: :creators)
+    |> Repo.all()
+  end
+
+  def filter_lemmaless_comments(current_user, comentary_ids, first_line_n, last_line_n)
+      when length(comentary_ids) == 0 do
+    list_lemmaless_comments_for_lines(current_user, first_line_n, last_line_n)
+  end
+
+  def filter_lemmaless_comments(current_user, commentary_ids, first_line_n, last_line_n)
+      when is_nil(current_user) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+    query = public_commentaries_query()
+
+    from(
+      c in query,
+      where:
+        fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range and
+          c.canonical_commentary_id in ^commentary_ids
+    )
+    |> Repo.all()
+  end
+
+  def filter_lemmaless_comments(_current_user, commentary_ids, first_line_n, last_line_n) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+
+    LemmalessComment
+    |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
+    |> where([c], c.canonical_commentary_id in ^commentary_ids)
+    |> preload(canonical_commentary: :creators)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single lemmaless_comment.
 
@@ -61,10 +120,7 @@ defmodule TextServer.LemmalessComments do
   def upsert_lemmaless_comment(attrs) do
     query =
       from(c in LemmalessComment,
-        where:
-          c.canonical_commentary_id == ^attrs.canonical_commentary_id and
-            c.end_text_node_id == ^attrs.end_text_node_id and
-            c.start_text_node_id == ^attrs.start_text_node_id
+        where: c.canonical_commentary_id == ^attrs.canonical_commentary_id and c.urn == ^attrs.urn
       )
 
     case Repo.one(query) do
@@ -118,5 +174,15 @@ defmodule TextServer.LemmalessComments do
   """
   def change_lemmaless_comment(%LemmalessComment{} = lemmaless_comment, attrs \\ %{}) do
     LemmalessComment.changeset(lemmaless_comment, attrs)
+  end
+
+  defp public_commentaries_query do
+    from(c in LemmalessComment,
+      join: parent in assoc(c, :canonical_commentary),
+      where:
+        parent.public_domain_year < ^NaiveDateTime.utc_now().year() and
+          not is_nil(parent.public_domain_year),
+      preload: [canonical_commentary: :creators]
+    )
   end
 end
