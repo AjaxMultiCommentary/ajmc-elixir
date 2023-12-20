@@ -25,7 +25,10 @@ defmodule TextServer.Comments do
     query =
       from(c in Comment,
         join: parent in assoc(c, :canonical_commentary),
-        where: c.start_text_node_id in ^start_text_node_ids and parent.publication_date < 1935,
+        where:
+          c.start_text_node_id in ^start_text_node_ids and
+            parent.public_domain_year < ^NaiveDateTime.utc_now().year() and
+            not is_nil(parent.public_domain_year),
         preload: [:start_text_node, :end_text_node, [canonical_commentary: :creators]]
       )
 
@@ -64,7 +67,8 @@ defmodule TextServer.Comments do
         where:
           c.start_text_node_id in ^start_text_node_ids and
             c.canonical_commentary_id in ^canonical_commentary_ids and
-            parent.publication_date < 1935,
+            parent.public_domain_year < ^NaiveDateTime.utc_now().year() and
+            not is_nil(parent.public_domain_year),
         preload: [:start_text_node, :end_text_node, [canonical_commentary: :creators]]
       )
 

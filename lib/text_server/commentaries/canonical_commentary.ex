@@ -10,8 +10,10 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     field :languages, {:array, :string}
     field :pid, :string
     field :publication_date, :integer
+    field :public_domain_year, :integer
     field :source_url, :string
     field :title, :string
+    field :wikidata_qid, :string
     field :zotero_id, :string
     field :zotero_link, :string
 
@@ -32,8 +34,10 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
       :languages,
       :pid,
       :publication_date,
+      :public_domain_year,
       :source_url,
       :title,
+      :wikidata_qid,
       :zotero_id,
       :zotero_link,
       :version_id

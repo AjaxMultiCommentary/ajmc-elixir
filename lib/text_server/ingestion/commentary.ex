@@ -96,7 +96,8 @@ defmodule TextServer.Ingestion.Commentary do
   defp create_commentary(path, pid, commentary_meta) do
     basename = path |> Path.basename() |> Path.rootname()
     zotero_id = commentary_meta |> Map.get("zotero_id")
-    zotero_data = Zotero.API.item(zotero_id) |> Map.get("data")
+    zotero_data = Zotero.API.item(zotero_id)
+    zotero_extra = zotero_data |> Map.get("extra", %{})
 
     creators =
       zotero_data
@@ -111,6 +112,15 @@ defmodule TextServer.Ingestion.Commentary do
 
     languages = zotero_data |> Map.get("language") |> String.split(", ")
     publication_date = zotero_data |> Map.get("date")
+
+    public_domain_year =
+      if zotero_extra |> Map.get("Public Domain Year") == "n/a" do
+        nil
+      else
+        zotero_extra |> Map.get("Public Domain Year")
+      end
+
+    wikidata_qid = zotero_extra |> Map.get("QID")
     source_url = zotero_data |> Map.get("url")
     title = zotero_data |> Map.get("title")
 
@@ -124,8 +134,10 @@ defmodule TextServer.Ingestion.Commentary do
         languages: languages,
         pid: pid,
         publication_date: publication_date,
+        public_domain_year: public_domain_year,
         source_url: source_url,
         title: title,
+        wikidata_qid: wikidata_qid,
         zotero_id: zotero_id,
         zotero_link: zotero_link
       })

@@ -19,7 +19,10 @@ defmodule TextServer.Commentaries do
   """
   def list_public_commentaries() do
     CanonicalCommentary
-    |> where([c], c.publication_date < 1934)
+    |> where(
+      [c],
+      not is_nil(c.public_domain_year) and c.public_domain_year < ^NaiveDateTime.utc_now().year()
+    )
     |> preload(:creators)
     |> Repo.all()
   end
