@@ -56,6 +56,24 @@ defmodule TextServer.LemmalessComments do
   end
 
   @doc """
+  Upserts a lemmaless_comment.
+  """
+  def upsert_lemmaless_comment(attrs) do
+    query =
+      from(c in LemmalessComment,
+        where:
+          c.canonical_commentary_id == ^attrs.canonical_commentary_id and
+            c.end_text_node_id == ^attrs.end_text_node_id and
+            c.start_text_node_id == ^attrs.start_text_node_id
+      )
+
+    case Repo.one(query) do
+      nil -> create_lemmaless_comment(attrs)
+      comment -> update_lemmaless_comment(comment, attrs)
+    end
+  end
+
+  @doc """
   Updates a lemmaless_comment.
 
   ## Examples

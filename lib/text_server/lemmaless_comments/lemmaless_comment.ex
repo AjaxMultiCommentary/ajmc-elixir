@@ -5,7 +5,7 @@ defmodule TextServer.LemmalessComments.LemmalessComment do
   schema "lemmaless_comments" do
     field :attributes, :map
     field :content, :string
-    field :urn, :map
+    field :urn, TextServer.Ecto.Types.CTS_URN
     field :canonical_commentary_id, :id
     field :start_text_node_id, :id
     field :end_text_node_id, :id

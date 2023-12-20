@@ -1,6 +1,7 @@
 defmodule TextServer.Ingestion.Commentary do
   require Logger
 
+  alias TextServer.LemmalessComments
   alias TextServer.Comments
   alias TextServer.Commentaries
   alias TextServer.Ingestion.WordRange
@@ -87,8 +88,9 @@ defmodule TextServer.Ingestion.Commentary do
 
     commentary = create_commentary(path, pid, commentary_meta)
 
-    prepare_lemmas_from_canonical_json(json)
-    |> Enum.each(&ingest_lemma(commentary, critical_text_urn, &1))
+    _lemma_comments =
+      prepare_lemmas_from_canonical_json(json)
+      |> Enum.each(&ingest_lemma(commentary, critical_text_urn, &1))
 
     :ok
   end
@@ -173,7 +175,7 @@ defmodule TextServer.Ingestion.Commentary do
 
       attributes = Map.put(no_content_lemma, :citation, citation)
 
-      {:ok, _comment} =
+      if Map.get(lemma, "label") == "word-anchor" do
         %{
           attributes: attributes,
           canonical_commentary_id: commentary.id,
@@ -185,10 +187,27 @@ defmodule TextServer.Ingestion.Commentary do
           start_text_node_id: first_text_node.id
         }
         |> Comments.upsert_comment()
+      else
+        unless is_nil(last_text_node) or is_nil(first_text_node) do
+          %{
+            attributes: attributes,
+            canonical_commentary_id: commentary.id,
+            content: content,
+            end_text_node_id: last_text_node.id,
+            start_text_node_id: first_text_node.id,
+            urn: "#{urn}:#{first_line_n}-#{last_line_n}"
+          }
+          |> LemmalessComments.upsert_lemmaless_comment()
+        end
+      end
     end
   end
 
-  defp ingest_lemma(commentary, urn, %{"anchor_target" => anchor_target} = lemma)
+  defp ingest_lemma(
+         commentary,
+         urn,
+         %{"anchor_target" => anchor_target} = lemma
+       )
        when not is_nil(anchor_target) do
     j =
       try do
@@ -210,6 +229,43 @@ defmodule TextServer.Ingestion.Commentary do
     end
   end
 
+  defp ingest_lemma(
+         commentary,
+         urn,
+         %{"label" => "scope-anchor"} = comment
+       ) do
+    maybe_line_ns =
+      try do
+        Map.get(comment, "lemma")
+        |> String.replace(~r/\./, "")
+        |> String.replace("A", "4")
+        |> String.replace("B", "8")
+        |> String.replace("S", "5")
+        |> String.trim()
+        |> String.split("-")
+        |> Enum.map(&String.to_integer/1)
+      rescue
+        _ ->
+          Logger.warning(
+            reason: "Unable to parse line numbers for scope-anchor",
+            comment: comment
+          )
+
+          nil
+      end
+
+    if maybe_line_ns do
+      captures = %{
+        "first_line_n" => List.first(maybe_line_ns),
+        "first_line_offset" => nil,
+        "last_line_n" => List.last(maybe_line_ns),
+        "last_line_offset" => nil
+      }
+
+      ingest_glossa(commentary, urn, captures, comment)
+    end
+  end
+
   defp ingest_lemma(_commentary, _urn, _lemma), do: nil
 
   defp passage_regex,
@@ -223,13 +279,9 @@ defmodule TextServer.Ingestion.Commentary do
       children
       |> Map.get("lemmas", [])
 
-    _lemmaless_comments =
-      lemmas
-      |> Enum.filter(&(Map.get(&1, "label") == "scope-anchor"))
-
     lemmas =
       lemmas
-      |> Enum.filter(&(Map.get(&1, "label") == "word-anchor"))
+      |> Enum.filter(&Enum.member?(~w(scope-anchor word-anchor), Map.get(&1, "label")))
 
     pages = children |> Map.get("pages")
 
@@ -246,10 +298,9 @@ defmodule TextServer.Ingestion.Commentary do
 
     commentaries = regions |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
 
-    _prepared_lemmas =
-      lemmas
-      |> Enum.chunk_every(2, 1)
-      |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
+    lemmas
+    |> Enum.chunk_every(2, 1)
+    |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
   end
 
   defp prepare_lemma(commentaries, pages, words, [lemma]) do

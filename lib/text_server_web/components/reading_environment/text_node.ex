@@ -18,15 +18,11 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     ~H"""
     <div>
       <h3 :if={@persona_loquens} class="font-bold mt-4 first:mt-0"><%= @persona_loquens %></h3>
-      <div class="flex">
-        <p
-          class="max-w-prose text-node"
-          data-location={Enum.join(@text_node.location, ".")}
-          phx-click="text-node-click"
-          phx-target={@myself}
-        >
+      <div class="flex justify-between">
+        <p class="max-w-prose text-node" phx-click="text-node-click" phx-target={@myself}>
           <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
         </p>
+        <span class="text-slate-300 hover:text-slate-500 mr-8"><%= Enum.join(@text_node.location, ".") %></span>
       </div>
     </div>
     """
@@ -121,7 +117,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   defp tag_classes(tag) do
     case tag.name do
-      "add" -> "bg-sky-400"
+      "add" -> "@@ajmc-addition"
       "comment" -> "@@ajmc-comment-box-shadow cursor-pointer"
       "del" -> "line-through"
       "emph" -> "italic"
