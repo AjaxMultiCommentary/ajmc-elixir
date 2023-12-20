@@ -2,6 +2,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
   attr :is_focused, :boolean, default: false
+  attr :lemmaless_comments, :list, default: []
   attr :persona_loquens, :string
   attr :text_node, :map, required: true
 
@@ -12,6 +13,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   @impl true
   def render(assigns) do
+    IO.inspect(assigns.lemmaless_comments)
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
@@ -21,9 +23,27 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         <p class="max-w-prose text-node" phx-click="text-node-click" phx-target={@myself}>
           <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
         </p>
-        <span class="text-slate-300 hover:text-slate-500 mr-8"><%= Enum.join(@text_node.location, ".") %></span>
+        <.line_number lemmaless_comments={@lemmaless_comments} location={@text_node.location} />
       </div>
     </div>
+    """
+  end
+
+  attr :lemmaless_comments, :list, default: []
+  attr :location, :string
+
+  def line_number(assigns) do
+    ~H"""
+    <span
+      class={[
+        "text-slate-500 hover:text-slate-800 mr-8 cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
+        "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
+      ]}
+      phx-click="highlight-lemmaless-comments"
+      phx-value-comments={@lemmaless_comments |> Enum.map(& &1.id) |> Jason.encode!()}
+    >
+      <%= Enum.join(@location, ".") %>
+    </span>
     """
   end
 

@@ -32,6 +32,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
   attr :highlighted_comments, :list
+  attr :highlighted_lemmaless_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
   attr :passage, Versions.Passage
@@ -82,6 +83,7 @@ defmodule TextServerWeb.VersionLive.Show do
             module={TextServerWeb.ReadingEnvironment.Reader}
             focused_text_node={@focused_text_node}
             footnotes={@footnotes}
+            lemmaless_comments={@lemmaless_comments}
             location={@location}
             passage={@passage}
             personae_loquentes={@personae_loquentes}
@@ -95,7 +97,7 @@ defmodule TextServerWeb.VersionLive.Show do
               id={comment.id}
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
-              is_highlighted={Enum.member?(@highlighted_comments, Map.get(comment, :id))}
+              is_highlighted={is_highlighted(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
             />
           <% end %>
         </div>
@@ -158,6 +160,14 @@ defmodule TextServerWeb.VersionLive.Show do
       |> Jason.decode!()
 
     {:noreply, socket |> assign(highlighted_comments: ids)}
+  end
+
+  def handle_event("highlight-lemmaless-comments", %{"comments" => comment_ids}, socket) do
+    ids =
+      comment_ids
+      |> Jason.decode!()
+
+    {:noreply, socket |> assign(highlighted_lemmaless_comments: ids)}
   end
 
   def handle_event("validate", %{"multi_select" => multi_component}, socket) do
@@ -276,5 +286,13 @@ defmodule TextServerWeb.VersionLive.Show do
 
       Map.put(acc, node.offset, speaker_name)
     end)
+  end
+
+  defp is_highlighted(%Comment{} = comment, comment_ids, _) do
+    Enum.member?(comment_ids, comment.id)
+  end
+
+  defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
+    Enum.member?(lemmaless_comment_ids, comment.id)
   end
 end

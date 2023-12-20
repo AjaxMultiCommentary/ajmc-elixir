@@ -33,6 +33,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
   alias TextServerWeb.Components
 
   attr :focused_text_node, :any, default: nil
+  attr :lemmaless_comments, :list, default: []
   attr :personae_loquentes, :map, default: %{}
   attr :text_nodes, :list, required: true
   attr :version_urn, :string, required: true
@@ -44,6 +45,19 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
         <.live_component
           :for={text_node <- @text_nodes}
           module={TextServerWeb.ReadingEnvironment.TextNode}
+          lemmaless_comments={
+            @lemmaless_comments
+            |> Enum.filter(fn c ->
+              [first_citation, last_citation] = c.urn.citations
+              location = List.first(text_node.location)
+
+              if is_nil(last_citation) do
+                location == String.to_integer(first_citation)
+              else
+                location in String.to_integer(first_citation)..String.to_integer(last_citation)
+              end
+            end)
+          }
           id={text_node.id}
           is_focused={is_focused(@focused_text_node, text_node)}
           persona_loquens={Map.get(@personae_loquentes, text_node.offset)}
