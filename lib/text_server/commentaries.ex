@@ -60,6 +60,10 @@ defmodule TextServer.Commentaries do
   """
   def get_canonical_commentary!(id), do: Repo.get!(CanonicalCommentary, id)
 
+  def get_canonical_commentary_by(attrs \\ %{}) do
+    Repo.get_by(CanonicalCommentary, attrs)
+  end
+
   @doc """
   Creates a canonical_commentary.
 

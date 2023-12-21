@@ -65,4 +65,8 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
 
     "#{creators} #{commentary.publication_date}"
   end
+
+  def is_public_domain?(%CanonicalCommentary{} = commentary) do
+    commentary.public_domain_year < NaiveDateTime.utc_now().year()
+  end
 end

@@ -97,6 +97,12 @@ defmodule TextServerWeb.Router do
     end
   end
 
+  scope "/iiif", TextServerWeb do
+    pipe_through :browser
+
+    get "/:commentary_pid/*image", IiifController, :show
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:components, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

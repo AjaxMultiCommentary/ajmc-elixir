@@ -13,7 +13,6 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   @impl true
   def render(assigns) do
-    IO.inspect(assigns.lemmaless_comments)
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
