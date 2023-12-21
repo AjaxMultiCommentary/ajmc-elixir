@@ -254,6 +254,10 @@ defmodule TextServerWeb.VersionLive.Show do
     |> Enum.sort_by(&{&1.start_text_node.location, &1.start_offset})
   end
 
+  defp filter_lemmaless_comments(_socket, text_nodes, _) when length(text_nodes) == 0 do
+    []
+  end
+
   defp filter_lemmaless_comments(socket, text_nodes, selected_options) do
     first_line_n = text_nodes |> List.first() |> Map.get(:location) |> List.first()
     last_line_n = text_nodes |> List.last() |> Map.get(:location) |> List.first()

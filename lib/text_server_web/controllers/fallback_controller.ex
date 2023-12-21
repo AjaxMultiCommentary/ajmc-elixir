@@ -21,4 +21,11 @@ defmodule TextServerWeb.FallbackController do
     |> put_view(html: TextServerWeb.ErrorHTML, json: TextServerWeb.ErrorJSON)
     |> render(:"404")
   end
+
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(:forbidden)
+    |> put_view(TextServerWeb.ErrorView)
+    |> render(:"403")
+  end
 end

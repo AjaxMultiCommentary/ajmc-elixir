@@ -6,7 +6,9 @@ defmodule TextServer.CommentsTest do
   describe "comments" do
     alias TextServer.Comments.Comment
 
+    import TextServer.CommentariesFixtures
     import TextServer.CommentsFixtures
+    import TextServer.TextNodesFixtures
 
     @invalid_attrs %{attributes: nil, content: nil, lemma: nil}
 
@@ -23,10 +25,13 @@ defmodule TextServer.CommentsTest do
     test "create_comment/1 with valid data creates a comment" do
       valid_attrs = %{
         attributes: %{},
+        canonical_commentary_id: canonical_commentary_fixture().id,
         content: "some content",
         lemma: "some lemma",
         start_offset: 0,
-        end_offset: 8
+        start_text_node_id: text_node_fixture().id,
+        end_offset: 8,
+        end_text_node_id: text_node_fixture().id
       }
 
       assert {:ok, %Comment{} = comment} = Comments.create_comment(valid_attrs)

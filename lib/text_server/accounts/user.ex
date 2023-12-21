@@ -2,11 +2,12 @@ defmodule TextServer.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @allowed_email_addresses [
-    "matteo.romanello@unil.ch",
-    "sven.najem-meyer@epfl.ch",
-    "charles.pletcher@unil.ch"
-  ]
+  def allowed_email_addresses,
+    do: [
+      "matteo.romanello@unil.ch",
+      "sven.najem-meyer@epfl.ch",
+      "charles.pletcher@unil.ch"
+    ]
 
   schema "users" do
     field :email, :string
@@ -46,7 +47,7 @@ defmodule TextServer.Accounts.User do
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
-    |> validate_inclusion(:email, @allowed_email_addresses)
+    |> validate_inclusion(:email, allowed_email_addresses())
     |> unsafe_validate_unique(:email, TextServer.Repo)
     |> unique_constraint(:email)
   end

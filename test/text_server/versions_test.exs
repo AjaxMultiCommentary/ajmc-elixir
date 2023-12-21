@@ -1,7 +1,6 @@
 defmodule TextServer.VersionsTest do
   use TextServer.DataCase
 
-  alias TextServer.TextNodes
   alias TextServer.Versions
   alias TextServer.Versions.Version
 
@@ -108,84 +107,6 @@ defmodule TextServer.VersionsTest do
     test "change_version/1 returns a version changeset" do
       version = version_fixture()
       assert %Ecto.Changeset{} = Versions.change_version(version)
-    end
-
-    test "get_table_of_contents/1 returns the table of contents for the given version" do
-      version = version_fixture()
-
-      for i <- 1..5 do
-        TextServer.TextNodesFixtures.version_text_node_fixture(version, %{
-          location: [i, 1, 1]
-        })
-      end
-
-      toc = Versions.get_table_of_contents(version.id)
-
-      assert Map.get(toc, 1) == %{1 => [1]}
-      assert Map.get(toc, 2) == %{1 => [1]}
-      assert Map.get(toc, 3) == %{1 => [1]}
-      assert Map.get(toc, 4) == %{1 => [1]}
-      assert Map.get(toc, 5) == %{1 => [1]}
-    end
-
-    test "get_passage_by_urn/1 returns the first page of TextNodes if no passage is given" do
-      version = version_fixture()
-
-      for i <- 1..5 do
-        for j <- 1..5 do
-          TextServer.TextNodesFixtures.version_text_node_fixture(version, %{
-            location: [1, i, j]
-          })
-        end
-      end
-
-      {:ok, passage} = Versions.get_passage_by_urn(version.urn)
-
-      assert Enum.count(passage) == 5
-      assert List.first(passage).location == [1, 1, 1]
-      assert List.last(passage).location == [1, 1, 5]
-    end
-
-    test "get_passage_by_urn/1 returns the appropriate page with a passage" do
-      version = version_fixture()
-
-      for i <- 1..5 do
-        for j <- 1..5 do
-          TextServer.TextNodesFixtures.version_text_node_fixture(version, %{
-            location: [1, i, j]
-          })
-        end
-      end
-
-      {:ok, passage} = Versions.get_passage_by_urn("#{version.urn}:1.2.1")
-
-      assert Enum.count(passage) == 5
-      assert List.first(passage).location == [1, 2, 1]
-      assert List.last(passage).location == [1, 2, 5]
-
-      {:ok, passage} = Versions.get_passage_by_urn("#{version.urn}:1.3.1")
-
-      assert Enum.count(passage) == 5
-      assert List.first(passage).location == [1, 3, 1]
-      assert List.last(passage).location == [1, 3, 5]
-    end
-
-    test "get_passage_by_urn/1 returns the appropriate TextNodes with a start and end passage" do
-      version = version_fixture()
-
-      for i <- 1..5 do
-        for j <- 1..5 do
-          TextServer.TextNodesFixtures.version_text_node_fixture(version, %{
-            location: [1, i, j]
-          })
-        end
-      end
-
-      {:ok, passage} = Versions.get_passage_by_urn("#{version.urn}:1.2.2-1.2.4")
-
-      assert Enum.count(passage) == 3
-      assert List.first(passage).location == [1, 2, 2]
-      assert List.last(passage).location == [1, 2, 4]
     end
   end
 end

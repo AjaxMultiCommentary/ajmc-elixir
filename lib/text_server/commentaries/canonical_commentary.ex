@@ -1,6 +1,11 @@
 defmodule TextServer.Commentaries.CanonicalCommentary do
+  @behaviour Bodyguard.Policy
+
+  alias TextServer.Accounts
   alias TextServer.Commentaries.CanonicalCommentary
+
   use Ecto.Schema
+
   import Ecto.Changeset
 
   @derive {Jason.Encoder, only: [:filename, :pid]}
@@ -54,6 +59,20 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     |> assoc_constraint(:version)
     |> cast_assoc(:creators, required: true)
   end
+
+  @doc """
+  Authorization behaviour right now is very simple:
+  if a user is logged in, we assume they can view
+  all commentaries; if not, we check if the commentary
+  is public domain.
+  """
+  def authorize(_, %Accounts.User{}, _), do: true
+
+  def authorize(_, nil, %CanonicalCommentary{} = commentary) do
+    is_public_domain?(commentary)
+  end
+
+  def authorize(_, _, _), do: false
 
   def commentary_label(%CanonicalCommentary{} = commentary) do
     creators =

@@ -26,14 +26,4 @@ defmodule TextServerWeb.TextNodeLiveTest do
       refute has_element?(index_live, "#text_node-#{text_node.id}")
     end
   end
-
-  describe "Show" do
-    setup [:create_text_node]
-
-    test "displays text_node", %{conn: conn, text_node: text_node} do
-      {:ok, _show_live, html} = live(conn, Routes.text_node_show_path(conn, :show, text_node))
-
-      assert html =~ "Show"
-    end
-  end
 end

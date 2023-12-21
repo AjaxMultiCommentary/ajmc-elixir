@@ -7,7 +7,7 @@ defmodule TextServer.MixProject do
       version: "0.0.3",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: Mix.compilers() ++ [:rambo],
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -34,6 +34,7 @@ defmodule TextServer.MixProject do
   defp deps do
     [
       {:bcrypt_elixir, "~> 3.0"},
+      {:bodyguard, "~> 2.4.2"},
       {:data_schema, "~> 0.5.0"},
       {:earmark, "~> 1.4.34"},
       {:ecto_psql_extras, "~> 0.6"},
@@ -61,7 +62,6 @@ defmodule TextServer.MixProject do
       {:phoenix, "~> 1.7"},
       {:plug_cowboy, "~> 2.5"},
       {:postgrex, "~> 0.16.3"},
-      {:rambo, "~> 0.3.4"},
       {:req, "~> 0.4.0"},
       {:recase, "~> 0.5"},
       {:saxy, "~> 1.5"},

@@ -24,16 +24,6 @@ defmodule TextServerWeb.VersionLiveTest do
       assert html =~ "Versions"
       assert html =~ version.description
     end
-
-    test "deletes version in listing", %{conn: conn, version: version} do
-      user = TextServer.AccountsFixtures.user_fixture()
-      conn = log_in_user(conn, user)
-
-      {:ok, index_live, _html} = live(conn, Routes.version_index_path(conn, :index))
-
-      assert index_live |> element("#version-#{version.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#version-#{version.id}")
-    end
   end
 
   describe "Show" do

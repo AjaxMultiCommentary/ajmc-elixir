@@ -15,6 +15,8 @@ defmodule TextServer.TextNodesFixtures do
       |> Enum.into(%{
         version_id: version.id,
         location: location,
+        offset:
+          (TextServer.TextNodes.list_text_nodes_by_version_id(version.id) |> Enum.count()) + 1,
         text: "some text",
         urn: "#{version.urn}:#{Enum.join(location, ".")}"
       })
@@ -35,6 +37,8 @@ defmodule TextServer.TextNodesFixtures do
       |> Enum.into(%{
         version_id: version.id,
         location: location,
+        offset:
+          (TextServer.TextNodes.list_text_nodes_by_version_id(version.id) |> Enum.count()) + 1,
         text: "some text",
         urn: "#{version.urn}:#{Enum.join(location, ".")}"
       })
