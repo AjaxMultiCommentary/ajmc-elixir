@@ -33,6 +33,15 @@ topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (info) => topbar.show());
 window.addEventListener("phx:page-loading-stop", (info) => topbar.hide());
 
+
+window.addEventListener("phx:highlight-comment", (e) => {
+	const el = document.getElementById(e.detail.id);
+
+	if (el) {
+		el.scrollIntoView({ behavior: "smooth" });
+	}
+});
+
 // connect if there are any LiveViews on the page
 liveSocket.connect();
 

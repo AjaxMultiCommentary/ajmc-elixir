@@ -83,6 +83,7 @@ defmodule TextServerWeb.VersionLive.Show do
             module={TextServerWeb.ReadingEnvironment.Reader}
             focused_text_node={@focused_text_node}
             footnotes={@footnotes}
+            highlighted_comments={@highlighted_comments}
             lemmaless_comments={@lemmaless_comments}
             location={@location}
             passage={@passage}
@@ -159,6 +160,7 @@ defmodule TextServerWeb.VersionLive.Show do
       comment_ids
       |> Jason.decode!()
 
+    send(self(), {:comments_highlighted, ids})
     {:noreply, socket |> assign(highlighted_comments: ids)}
   end
 
@@ -184,12 +186,12 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   @impl true
-  def handle_info({:focused_text_node, text_node}, socket) do
-    {:noreply, socket |> assign(focused_text_node: text_node)}
+  def handle_info({:comments_highlighted, [id | _]}, socket) do
+    {:noreply, push_event(socket, "highlight-comment", %{id: "comment-#{id}"})}
   end
 
   def handle_info({:updated_options, options}, socket) do
-    # update the list of comments, the selected selected_commentaries and the changeset in the form
+    # update the list of comments, the selected commentaries and the changeset in the form
     {:noreply, assign_multi_select_options(socket, options)}
   end
 

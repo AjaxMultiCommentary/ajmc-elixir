@@ -32,7 +32,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
 
   alias TextServerWeb.Components
 
-  attr :focused_text_node, :any, default: nil
+  attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :personae_loquentes, :map, default: %{}
   attr :text_nodes, :list, required: true
@@ -45,6 +45,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
         <.live_component
           :for={text_node <- @text_nodes}
           module={TextServerWeb.ReadingEnvironment.TextNode}
+          highlighted_comments={@highlighted_comments}
           lemmaless_comments={
             @lemmaless_comments
             |> Enum.filter(fn c ->
@@ -59,7 +60,6 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
             end)
           }
           id={text_node.id}
-          is_focused={is_focused(@focused_text_node, text_node)}
           persona_loquens={Map.get(@personae_loquentes, text_node.offset)}
           text_node={text_node}
         />
@@ -67,13 +67,5 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
       <Components.footnotes footnotes={@footnotes} />
     </article>
     """
-  end
-
-  defp is_focused(focused_text_node, _text_node) when is_nil(focused_text_node) do
-    false
-  end
-
-  defp is_focused(focused_text_node, text_node) do
-    focused_text_node == text_node
   end
 end

@@ -14,11 +14,14 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   def render(assigns) do
     ~H"""
-    <div class={[
-      "border-2 collapse collapse-arrow rounded-sm mb-2",
-      if(@is_highlighted, do: "border-stone-800", else: ""),
-      if(@is_open, do: "collapse-open", else: "collapse-close")
-    ]}>
+    <div
+      class={[
+        "border-2 collapse collapse-arrow rounded-sm mb-2",
+        if(@is_highlighted, do: "border-stone-800", else: ""),
+        if(@is_open, do: "collapse-open", else: "collapse-close")
+      ]}
+      id={"comment-#{@comment.id}"}
+    >
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium text-gray-900 cursor-pointer">
           <span class="text-sm font-light text-gray-600">

@@ -1,15 +1,10 @@
 defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
-  attr :is_focused, :boolean, default: false
+  attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :persona_loquens, :string
   attr :text_node, :map, required: true
-
-  @impl true
-  def mount(socket) do
-    {:ok, socket |> assign(is_focused: false)}
-  end
 
   @impl true
   def render(assigns) do
@@ -19,8 +14,13 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     <div>
       <h3 :if={@persona_loquens} class="font-bold mt-4 first:mt-0"><%= @persona_loquens %></h3>
       <div class="flex justify-between">
-        <p class="max-w-prose text-node" phx-click="text-node-click" phx-target={@myself}>
-          <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
+        <p class="max-w-prose text-node" phx-target={@myself}>
+          <.text_element
+            :for={{graphemes, tags} <- @text_node.graphemes_with_tags}
+            highlighted_comments={@highlighted_comments}
+            tags={tags}
+            text={Enum.join(graphemes)}
+          />
         </p>
         <.line_number lemmaless_comments={@lemmaless_comments} location={@text_node.location} />
       </div>
@@ -47,6 +47,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   end
 
   attr :classes, :string, default: ""
+  attr :highlighted_comments, :list, default: []
   attr :tags, :list, default: []
   attr :text, :string
 
@@ -71,8 +72,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             comments:
               tags
               |> Enum.filter(&(&1.name == "comment"))
-              |> Enum.map(& &1.metadata.id)
-              |> Jason.encode!(),
+              |> Enum.map(& &1.metadata.id),
             commentary_ids:
               tags
               |> Enum.filter(&(&1.name == "comment"))
@@ -85,11 +85,17 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         assigns =
           assign(
             assigns,
-            classes: [assigns.classes, "comments-#{min(Enum.count(assigns.commentary_ids), 10)}"]
+            classes: [
+              assigns.classes,
+              "comments-#{min(Enum.count(assigns.commentary_ids), 10)}",
+              highlighted?(assigns.comments, assigns.highlighted_comments)
+            ]
           )
 
         ~H"""
-        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments}><%= @text %></span>
+        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments |> Jason.encode!()}>
+          <%= @text %>
+        </span>
         """
 
       Enum.member?(tags |> Enum.map(& &1.name), "image") ->
@@ -130,6 +136,16 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
       true ->
         ~H"<span class={@classes}><%= @text %></span>"
+    end
+  end
+
+  defp highlighted?(comment_ids, highlighted_comment_ids) do
+    # IO.inspect(comment_ids, highlighted_comment_ids)
+
+    if Enum.any?(comment_ids, fn id ->
+         Enum.member?(highlighted_comment_ids, id)
+       end) do
+      "border border-md"
     end
   end
 
