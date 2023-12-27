@@ -27,13 +27,15 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           <span class="text-sm font-light text-gray-600">
             <%= citation(@comment.attributes) %>
           </span>
-          <%= if match?(%Comment{}, @comment) do %>
-            <%= @comment.attributes |> Map.get("lemma") %>
-          <% end %>
+          <small class="mt-1 mx-w-2xl text-sm text-gray-500">
+            <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
+          </small>
         </h3>
-        <small class="mt-1 mx-w-2xl text-sm text-gray-500">
-          <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
-        </small>
+        <%= if match?(%Comment{}, @comment) do %>
+          <small class="text-sm text-slate-700">
+            <%= @comment.attributes |> Map.get("lemma") %>
+          </small>
+        <% end %>
       </div>
       <div class="collapse-content float-right">
         <p class="max-w-2xl text-sm text-gray-800"><%= @comment.content %></p>
@@ -74,9 +76,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     citation = attributes |> Map.get("citation")
 
     if Enum.count(citation) > 1 do
-      "Lines #{Enum.join(citation, "–")}."
+      "#{gettext("vv.")} #{Enum.join(citation, "–")}."
     else
-      "Line #{List.first(citation)}."
+      "#{gettext("v.")} #{List.first(citation)}."
     end
   end
 end

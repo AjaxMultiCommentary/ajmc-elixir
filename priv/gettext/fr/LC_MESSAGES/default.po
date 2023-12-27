@@ -54,7 +54,7 @@ msgstr ""
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "Prologue"
-msgstr ""
+msgstr "Prologo"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "*Parodos*"
@@ -94,4 +94,14 @@ msgstr "Troisième *stasimon*"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "*Exodos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:81
+#, elixir-autogen, elixir-format
+msgid "v."
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:79
+#, elixir-autogen, elixir-format
+msgid "vv."
 msgstr ""
