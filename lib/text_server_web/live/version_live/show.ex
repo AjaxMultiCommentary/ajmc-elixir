@@ -16,11 +16,12 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServer.Versions.Passages
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(%{"urn" => urn} = _params, _session, socket) do
     {:ok,
      socket
      |> assign_new(:current_user, fn -> nil end)
      |> assign(
+       urn: urn,
        focused_text_node: nil,
        version_command_palette_open: false
      )}
@@ -155,6 +156,14 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   @impl true
+  def handle_event("change-locale", %{"language_select" => locale}, socket) do
+    Gettext.put_locale(TextServerWeb.Gettext, locale)
+
+    urn = socket.assigns.urn
+
+    {:noreply, push_navigate(socket, to: "/#{locale}/versions/#{urn}")}
+  end
+
   def handle_event("highlight-comments", %{"comments" => comment_ids}, socket) do
     ids =
       comment_ids

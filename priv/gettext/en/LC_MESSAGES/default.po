@@ -51,3 +51,47 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Creator(s)"
 msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Prologue"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Parodos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "First episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "First *stasimon*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Second episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Second *stasimon*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Third episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Epiparodos* and *kommos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Fourth episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Third *stasimon*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Exodos*"
+msgstr ""

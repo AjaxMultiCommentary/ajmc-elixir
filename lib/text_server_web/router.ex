@@ -34,66 +34,20 @@ defmodule TextServerWeb.Router do
     resources "/lemmaless_comments", LemmalessCommentController, except: [:new, :edit]
   end
 
-  scope "/", TextServerWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :with_authenticated_user,
-      on_mount: [{TextServerWeb.UserAuth, :ensure_authenticated}] do
-      live "/collections/new", CollectionLive.Index, :new
-      live "/collections/:id/edit", CollectionLive.Index, :edit
-      live "/collections/:id/show/edit", CollectionLive.Show, :edit
-
-      live "/languages/new", LanguageLive.Index, :new
-      live "/languages/:id/edit", LanguageLive.Index, :edit
-      live "/languages/:id/show/edit", LanguageLive.Show, :edit
-
-      live "/text_groups/new", TextGroupLive.Index, :new
-      live "/text_groups/:id/edit", TextGroupLive.Index, :edit
-      live "/text_groups/:id/show/edit", TextGroupLive.Show, :edit
-
-      live "/text_nodes/new", TextNodeLive.Index, :new
-      live "/text_nodes/:id/edit", TextNodeLive.Index, :edit
-      live "/text_nodes/:id/show/edit", TextNodeLive.Show, :edit
-
-      live "/versions/:id/edit", VersionLive.Index, :edit
-      live "/versions/:id/show/edit", VersionLive.Show, :edit
-
-      live "/works/new", WorkLive.New, :new
-      live "/works/:id/edit", WorkLive.Index, :edit
-      live "/works/:id/show/edit", WorkLive.Show, :edit
-    end
-  end
-
-  scope "/", TextServerWeb do
+  scope "/:locale", TextServerWeb do
     pipe_through :browser
 
     get "/", PageController, :home
 
     # these logged-out routes must come last, otherwise they
     # match on /{resource}/new
-    live_session :default, on_mount: [{TextServerWeb.UserAuth, :mount_current_user}] do
-      live "/collections", CollectionLive.Index, :index
-      live "/collections/:id", CollectionLive.Show, :show
-
+    live_session :default,
+      on_mount: [
+        {TextServerWeb.Locale, :set_locale},
+        {TextServerWeb.UserAuth, :mount_current_user}
+      ] do
       live "/bibliography", CommentariesLive.Index, :index
-
-      live "/exemplars", ExemplarLive.Index, :index
-      live "/exemplars/:id", ExemplarLive.Show, :show
-
-      live "/languages", LanguageLive.Index, :index
-      live "/languages/:id", LanguageLive.Show, :show
-
-      live "/text_groups", TextGroupLive.Index, :index
-      live "/text_groups/:id", TextGroupLive.Show, :show
-
-      live "/text_nodes", TextNodeLive.Index, :index
-      live "/text_nodes/:id", TextNodeLive.Show, :show
-
-      live "/versions", VersionLive.Index, :index
       live "/versions/:urn", VersionLive.Show, :show
-
-      live "/works", WorkLive.Index, :index
-      live "/works/:id", WorkLive.Show, :show
     end
   end
 
@@ -156,5 +110,12 @@ defmodule TextServerWeb.Router do
       live "/users/confirm/:token", AccountLive.UserConfirmationLive, :edit
       live "/users/confirm", AccountLive.UserConfirmationInstructionsLive, :new
     end
+  end
+
+  scope "/", TextServerWeb do
+    pipe_through :browser
+
+    get "/", PageController, :redirect_to_locale
+    get "/versions/:urn", PageController, :redirect_to_locale
   end
 end

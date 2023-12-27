@@ -13,7 +13,7 @@
   </head>
   <body class="prose-stone">
     <div>
-      <nav class="bg-alexandria-scrolls">
+      <nav class>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="flex h-16 justify-between">
             <div class="flex">
@@ -21,13 +21,21 @@
                 <.link href={~p"/"} class="text-slate-700 hover:text-gray-300 py-2 text-sm font-medium">
                   Ajax Multi-Commentary
                 </.link>
-                <.link
-                  href={~p"/bibliography"}
-                  class="hidden text-slate-700 hover:text-gray-300 px-3 py-2 text-sm font-medium"
-                >
+                <.link href={~p"/bibliography"} class="text-slate-700 hover:text-gray-300 px-3 py-2 text-sm font-medium">
                   Available commentaries
                 </.link>
               </div>
+            </div>
+            <div class="h-16 flex items-center">
+              <form id="language-select-form">
+                <.input
+                  name="language_select"
+                  value={Gettext.get_locale(TextServerWeb.Gettext)}
+                  type="select"
+                  options={Gettext.known_locales(TextServerWeb.Gettext) |> Enum.map(&{String.upcase(&1), &1})}
+                  phx-change="change-locale"
+                />
+              </form>
             </div>
           </div>
         </div>
