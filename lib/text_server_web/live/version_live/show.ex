@@ -178,6 +178,7 @@ defmodule TextServerWeb.VersionLive.Show do
       comment_ids
       |> Jason.decode!()
 
+    send(self(), {:comments_highlighted, ids})
     {:noreply, socket |> assign(highlighted_lemmaless_comments: ids)}
   end
 

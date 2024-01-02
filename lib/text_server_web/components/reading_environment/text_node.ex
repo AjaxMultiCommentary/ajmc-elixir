@@ -35,7 +35,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     ~H"""
     <span
       class={[
-        "text-slate-500 hover:text-slate-800 mr-8 cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
+        "text-slate-500 hover:text-slate-800 cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
         "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
       ]}
       phx-click="highlight-lemmaless-comments"
@@ -140,8 +140,6 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   end
 
   defp highlighted?(comment_ids, highlighted_comment_ids) do
-    # IO.inspect(comment_ids, highlighted_comment_ids)
-
     if Enum.any?(comment_ids, fn id ->
          Enum.member?(highlighted_comment_ids, id)
        end) do
