@@ -29,11 +29,11 @@
             <div class="h-16 flex items-center">
               <form id="language-select-form">
                 <.input
+                  id="language_select"
                   name="language_select"
                   value={Gettext.get_locale(TextServerWeb.Gettext)}
                   type="select"
                   options={Gettext.known_locales(TextServerWeb.Gettext) |> Enum.map(&{String.upcase(&1), &1})}
-                  phx-change="change-locale"
                 />
               </form>
             </div>

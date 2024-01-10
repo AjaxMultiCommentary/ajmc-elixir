@@ -12,6 +12,7 @@ defmodule TextServerWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug TextServerWeb.Plugs.Locale
   end
 
   pipeline :api do
@@ -34,7 +35,7 @@ defmodule TextServerWeb.Router do
     resources "/lemmaless_comments", LemmalessCommentController, except: [:new, :edit]
   end
 
-  scope "/:locale", TextServerWeb do
+  scope "/", TextServerWeb do
     pipe_through :browser
 
     get "/", PageController, :home
@@ -43,8 +44,8 @@ defmodule TextServerWeb.Router do
     # match on /{resource}/new
     live_session :default,
       on_mount: [
-        {TextServerWeb.Locale, :set_locale},
-        {TextServerWeb.UserAuth, :mount_current_user}
+        {TextServerWeb.UserAuth, :mount_current_user},
+        {TextServerWeb.Hooks.RestoreLocale, :default}
       ] do
       live "/bibliography", CommentariesLive.Index, :index
       live "/versions/:urn", VersionLive.Show, :show
@@ -110,12 +111,5 @@ defmodule TextServerWeb.Router do
       live "/users/confirm/:token", AccountLive.UserConfirmationLive, :edit
       live "/users/confirm", AccountLive.UserConfirmationInstructionsLive, :new
     end
-  end
-
-  scope "/", TextServerWeb do
-    pipe_through :browser
-
-    get "/", PageController, :redirect_to_locale
-    get "/versions/:urn", PageController, :redirect_to_locale
   end
 end

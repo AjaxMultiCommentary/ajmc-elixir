@@ -12,7 +12,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
 
   def render(assigns) do
     ~H"""
-    <div class="px-4 sm:px-6 lg:px-8">
+    <section>
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
           <h1 class="text-base font-semibold leading-6 text-gray-900"><%= gettext("Bibliography") %></h1>
@@ -31,7 +31,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
           <%= commentary.languages |> Enum.join(", ") %>
         </:col>
       </CoreComponents.table>
-    </div>
+    </section>
     """
   end
 

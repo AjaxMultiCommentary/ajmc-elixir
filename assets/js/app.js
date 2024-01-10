@@ -28,6 +28,18 @@ let liveSocket = new LiveSocket("/live", Socket, {
 	uploaders,
 });
 
+let localeSelect = document.getElementById("language_select");
+
+if (localeSelect) {
+	localeSelect.addEventListener("change", e => {
+		let searchParams = new URLSearchParams(window.location.search);
+
+		searchParams.set("locale", e.target.value);
+
+		window.location.search = searchParams;
+	});
+}
+
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (info) => topbar.show());

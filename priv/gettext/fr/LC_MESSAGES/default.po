@@ -19,38 +19,38 @@ msgstr ""
 #: lib/text_server_web/live/commentaries_live/index.ex:18
 #, elixir-autogen, elixir-format
 msgid "Bibliography"
-msgstr ""
+msgstr "Bibliographie"
 
 #: lib/text_server_web/live/commentaries_live/index.ex:30
 #, elixir-autogen, elixir-format
 msgid "Languages"
-msgstr ""
+msgstr "Langues"
 
 #: lib/text_server_web/live/commentaries_live/index.ex:27
 #, elixir-autogen, elixir-format
 msgid "Public Domain?"
-msgstr ""
+msgstr "Domaine public ?"
 
 #: lib/text_server_web/live/commentaries_live/index.ex:26
 #, elixir-autogen, elixir-format
 msgid "Publication Date"
-msgstr ""
+msgstr "Date de publication"
 
 #: lib/text_server_web/live/commentaries_live/index.ex:25
 #, elixir-autogen, elixir-format
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 #: lib/text_server_web/components/core_components.ex:76
 #: lib/text_server_web/components/core_components.ex:128
 #, elixir-autogen, elixir-format
 msgid "close"
-msgstr ""
+msgstr "fermer"
 
 #: lib/text_server_web/live/commentaries_live/index.ex:22
 #, elixir-autogen, elixir-format
 msgid "Creator(s)"
-msgstr ""
+msgstr "Auteurs"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "Prologue"
