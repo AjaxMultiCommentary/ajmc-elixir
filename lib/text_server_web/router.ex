@@ -48,6 +48,7 @@ defmodule TextServerWeb.Router do
         {TextServerWeb.Hooks.RestoreLocale, :default}
       ] do
       live "/bibliography", CommentariesLive.Index, :index
+      live "/bibliography/:pid", CommentariesLive.Show, :show
       live "/versions/:urn", VersionLive.Show, :show
     end
   end

@@ -78,7 +78,7 @@ defmodule TextServerWeb.VersionLive.Show do
         <div class="col-span-2">
           <Navigation.nav_menu passages={@passages} current_passage={@passage} />
         </div>
-        <div class="col-span-5 overflow-y-scroll">
+        <div class="col-span-5 overflow-y-scroll -mt-4">
           <.live_component
             id={:reader}
             module={TextServerWeb.ReadingEnvironment.Reader}

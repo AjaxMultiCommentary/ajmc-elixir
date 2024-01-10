@@ -12,7 +12,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
     <div>
-      <h3 :if={@persona_loquens} class="font-bold mt-4 first:mt-0"><%= @persona_loquens %></h3>
+      <h3 :if={@persona_loquens} class="font-bold pt-4"><%= @persona_loquens %></h3>
       <div class="flex justify-between">
         <p class="max-w-prose text-node" phx-target={@myself}>
           <.text_element

@@ -28,7 +28,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
             <%= citation(@comment.attributes) %>
           </span>
           <small class="mt-1 mx-w-2xl text-sm text-gray-500">
-            <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
+            <.link navigate={~p"/bibliography/#{@comment.canonical_commentary.pid}"} class="hover:underline">
+              <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
+            </.link>
           </small>
         </h3>
         <%= if match?(%Comment{}, @comment) do %>

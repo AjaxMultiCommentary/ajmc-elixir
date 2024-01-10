@@ -85,6 +85,28 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     "#{creators} #{commentary.publication_date}"
   end
 
+  def creators_to_string(creators) when length(creators) == 0 do
+    "Anonymous"
+  end
+
+  def creators_to_string(creators) when length(creators) == 1 do
+    creator = creators |> List.first()
+
+    "#{creator.last_name}, #{creator.first_name}"
+  end
+
+  def creators_to_string(creators) when length(creators) > 1 do
+    [creator | rest] = creators
+
+    s = "#{creator.last_name}, #{creator.first_name}"
+
+    last = List.last(rest)
+
+    rest = (rest -- [last]) |> Enum.map(fn c -> "#{c.first_name} #{c.last_name}" end)
+
+    "#{s}, #{Enum.join(rest, ",")}, and #{last.first_name} #{last.last_name}"
+  end
+
   def is_public_domain?(%CanonicalCommentary{} = commentary) do
     commentary.public_domain_year < NaiveDateTime.utc_now().year()
   end

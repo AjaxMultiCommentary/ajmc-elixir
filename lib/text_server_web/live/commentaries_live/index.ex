@@ -3,6 +3,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
   use TextServerWeb, :live_view
 
   alias TextServer.Commentaries
+  alias TextServer.Commentaries.CanonicalCommentary
 
   def mount(_params, _session, socket) do
     {:ok,
@@ -20,9 +21,11 @@ defmodule TextServerWeb.CommentariesLive.Index do
       </div>
       <CoreComponents.table id="bibliography" rows={@commentaries} row_id={fn row -> "commentary_#{row.id}" end}>
         <:col :let={commentary} label={gettext("Creator(s)")}>
-          <%= creators_to_string(commentary.creators) %>
+          <%= CanonicalCommentary.creators_to_string(commentary.creators) %>
         </:col>
-        <:col :let={commentary} label={gettext("Title")}><%= commentary.title %></:col>
+        <:col :let={commentary} label={gettext("Title")}>
+          <.link navigate={~p"/bibliography/#{commentary.pid}"}><%= commentary.title %></.link>
+        </:col>
         <:col :let={commentary} label={gettext("Publication Date")}><%= commentary.publication_date %></:col>
         <:col :let={commentary} label={gettext("Public Domain?")}>
           <%= commentary.public_domain_year < NaiveDateTime.utc_now().year %>
@@ -38,23 +41,5 @@ defmodule TextServerWeb.CommentariesLive.Index do
       </CoreComponents.table>
     </section>
     """
-  end
-
-  defp creators_to_string(creators) when length(creators) == 1 do
-    creator = creators |> List.first()
-
-    "#{creator.last_name}, #{creator.first_name}"
-  end
-
-  defp creators_to_string(creators) when length(creators) > 1 do
-    [creator | rest] = creators
-
-    s = "#{creator.last_name}, #{creator.first_name}"
-
-    last = List.last(rest)
-
-    rest = (rest -- [last]) |> Enum.map(fn c -> "#{c.first_name} #{c.last_name}" end)
-
-    "#{s}, #{Enum.join(rest, ",")}, and #{last.first_name} #{last.last_name}"
   end
 end
