@@ -6,7 +6,7 @@ defmodule TextServer.TextNodes.TextNode do
     # FIXME: (charles) Eventually, location will need to
     # be an array of strings, not integers. Consider citations for
     # Plato, Aristotle, etc.
-    field :location, {:array, :integer}
+    field :location, {:array, :string}
     field :normalized_text, :string
     field :offset, :integer
     field :text, :string
@@ -16,10 +16,6 @@ defmodule TextServer.TextNodes.TextNode do
     field :graphemes_with_tags, :any, virtual: true
 
     belongs_to :version, TextServer.Versions.Version
-
-    has_many :comments, TextServer.Comments.Comment,
-      foreign_key: :start_text_node_id,
-      preload_order: [asc: :start_offset]
 
     has_many :text_elements, TextServer.TextElements.TextElement,
       foreign_key: :start_text_node_id,
@@ -53,6 +49,38 @@ defmodule TextServer.TextNodes.TextNode do
     defstruct [:name, :metadata]
   end
 
+  def get_word_at_offset(text_node, offset, start_or_end \\ :start)
+
+  def get_word_at_offset(text_node, offset, start_or_end) when is_nil(offset) do
+    get_word_at_offset(text_node, 0, start_or_end)
+  end
+
+  def get_word_at_offset(text_node, offset, start_or_end) when is_binary(offset) do
+    get_word_at_offset(text_node, String.to_integer(offset), start_or_end)
+  end
+
+  def get_word_at_offset(text_node, offset, :start) do
+    {_before, s} = String.split_at(text_node.text, offset)
+
+    s
+    |> String.trim()
+    |> String.graphemes()
+    |> Enum.take_while(fn g -> Regex.match?(~r/[[:word:]]/u, g) end)
+    |> Enum.join()
+  end
+
+  def get_word_at_offset(text_node, offset, :end) do
+    {s, _after} = String.split_at(text_node.text, offset)
+
+    s
+    |> String.trim()
+    |> String.graphemes()
+    |> Enum.reverse()
+    |> Enum.take_while(fn g -> Regex.match?(~r/[[:word:]]/u, g) end)
+    |> Enum.reverse()
+    |> Enum.join()
+  end
+
   def tag_graphemes(text_node, comments) do
     elements =
       text_node.text_elements
@@ -60,13 +88,17 @@ defmodule TextServer.TextNodes.TextNode do
     comments =
       comments
       |> Enum.filter(fn comment ->
+        comment_start_location = comment.urn.citations |> Enum.at(0)
+        comment_end_location = comment.urn.citations |> Enum.at(1)
+        text_node_location = text_node.location |> Enum.at(0)
+
         # comment starts with this text node OR
         # comment ends on this text node OR
         # text node is in the middle of a multi-line comment
-        comment.start_text_node_id == text_node.id or
-          comment.end_text_node_id == text_node.id or
-          (comment.start_text_node.offset <= text_node.offset and
-             text_node.offset <= comment.end_text_node.offset)
+        comment_start_location == text_node_location or
+          comment_end_location == text_node_location or
+          (comment_start_location <= text_node_location and
+             text_node_location <= comment_end_location)
       end)
 
     text = text_node.text
@@ -148,17 +180,19 @@ defmodule TextServer.TextNodes.TextNode do
       applicable_comments =
         comments
         |> Enum.filter(fn c ->
+          text_node_location = Enum.at(text_node.location, 0)
+
           cond do
             # comment applies only to this text node
-            c.start_text_node == c.end_text_node ->
+            Enum.at(c.urn.citations, 0) == Enum.at(c.urn.citations, 1) ->
               i in c.start_offset..(c.end_offset - 1)
 
             # comment starts on this text_node
-            c.start_text_node == text_node ->
+            Enum.at(c.urn.citations, 0) == text_node_location ->
               i >= c.start_offset
 
             # comment ends on this text node
-            c.end_text_node == text_node ->
+            Enum.at(c.urn.citations, 1) == text_node_location ->
               i <= c.end_offset
 
             # entire text node is in this comment

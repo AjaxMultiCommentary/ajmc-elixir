@@ -21,26 +21,28 @@ defmodule TextServer.Comments do
     Repo.all(Comment)
   end
 
-  def list_comments(current_user, start_text_node_ids) when is_nil(current_user) do
+  def list_comments(current_user, first_line_n, last_line_n) when is_nil(current_user) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+
     query =
       from(c in Comment,
         join: parent in assoc(c, :canonical_commentary),
         where:
-          c.start_text_node_id in ^start_text_node_ids and
+          fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range and
             parent.public_domain_year < ^NaiveDateTime.utc_now().year() and
             not is_nil(parent.public_domain_year),
-        preload: [:start_text_node, :end_text_node, [canonical_commentary: :creators]]
+        preload: [canonical_commentary: :creators]
       )
 
     Repo.all(query)
   end
 
-  def list_comments(_current_user, start_text_node_ids) do
+  def list_comments(_current_user, first_line_n, last_line_n) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+
     Comment
-    |> where([c], c.start_text_node_id in ^start_text_node_ids)
+    |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
     |> preload(canonical_commentary: :creators)
-    |> preload(:start_text_node)
-    |> preload(:end_text_node)
     |> Repo.all()
   end
 
@@ -53,19 +55,20 @@ defmodule TextServer.Comments do
       iex> filter_comments([1, 2, 3])
       [%Comment{canonical_commentary_id: 1}, %Comment{canonical_commentary_id: 2}, ...]
   """
-
-  def filter_comments(current_user, canonical_commentary_ids, start_text_node_ids)
+  def filter_comments(current_user, canonical_commentary_ids, first_n, last_n)
       when length(canonical_commentary_ids) == 0 do
-    list_comments(current_user, start_text_node_ids)
+    list_comments(current_user, first_n, last_n)
   end
 
-  def filter_comments(current_user, canonical_commentary_ids, start_text_node_ids)
+  def filter_comments(current_user, canonical_commentary_ids, first_line_n, last_line_n)
       when is_nil(current_user) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+
     query =
       from(c in Comment,
         join: parent in assoc(c, :canonical_commentary),
         where:
-          c.start_text_node_id in ^start_text_node_ids and
+          fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range and
             c.canonical_commentary_id in ^canonical_commentary_ids and
             parent.public_domain_year < ^NaiveDateTime.utc_now().year() and
             not is_nil(parent.public_domain_year),
@@ -75,11 +78,13 @@ defmodule TextServer.Comments do
     Repo.all(query)
   end
 
-  def filter_comments(_current_user, canonical_commentary_ids, start_text_node_ids) do
+  def filter_comments(_current_user, canonical_commentary_ids, first_line_n, last_line_n) do
+    range = Range.new(first_line_n, last_line_n) |> Range.to_list()
+
     Comment
     |> where(
       [c],
-      c.start_text_node_id in ^start_text_node_ids and
+      fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range and
         c.canonical_commentary_id in ^canonical_commentary_ids
     )
     |> preload(canonical_commentary: :creators)
@@ -131,9 +136,7 @@ defmodule TextServer.Comments do
         where:
           c.canonical_commentary_id == ^attrs.canonical_commentary_id and
             c.end_offset == ^attrs.end_offset and
-            c.end_text_node_id == ^attrs.end_text_node_id and
-            c.start_offset == ^attrs.start_offset and
-            c.start_text_node_id == ^attrs.start_text_node_id
+            c.start_offset == ^attrs.start_offset
       )
 
     case Repo.one(query) do

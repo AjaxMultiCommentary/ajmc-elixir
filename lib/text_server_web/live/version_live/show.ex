@@ -222,12 +222,9 @@ defmodule TextServerWeb.VersionLive.Show do
 
     all_comments =
       (comments ++ lemmaless_comments)
-      |> Enum.sort_by(fn
-        %Comment{} = comment ->
-          comment.start_text_node.location
-
-        %LemmalessComment{} = comment ->
-          comment.urn.citations |> List.first() |> String.to_integer()
+      |> Enum.sort_by(fn comment ->
+        {comment.urn.citations |> List.first() |> String.to_integer(),
+         Map.get(comment, :start_offset, 0)}
       end)
 
     socket
@@ -258,12 +255,15 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   defp filter_comments(socket, text_nodes, selected_options) do
+    first_line_n = List.first(text_nodes).location |> Enum.at(0) |> String.to_integer()
+    last_line_n = List.last(text_nodes).location |> Enum.at(0) |> String.to_integer()
+
     Comments.filter_comments(
       socket.assigns.current_user,
       selected_options,
-      text_nodes |> Enum.map(& &1.id)
+      first_line_n,
+      last_line_n
     )
-    |> Enum.sort_by(&{&1.start_text_node.location, &1.start_offset})
   end
 
   defp filter_lemmaless_comments(_socket, text_nodes, _) when length(text_nodes) == 0 do
@@ -271,8 +271,11 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   defp filter_lemmaless_comments(socket, text_nodes, selected_options) do
-    first_line_n = text_nodes |> List.first() |> Map.get(:location) |> List.first()
-    last_line_n = text_nodes |> List.last() |> Map.get(:location) |> List.first()
+    first_line_n =
+      text_nodes |> List.first() |> Map.get(:location) |> List.first() |> String.to_integer()
+
+    last_line_n =
+      text_nodes |> List.last() |> Map.get(:location) |> List.first() |> String.to_integer()
 
     LemmalessComments.filter_lemmaless_comments(
       socket.assigns.current_user,
@@ -280,7 +283,6 @@ defmodule TextServerWeb.VersionLive.Show do
       first_line_n,
       last_line_n
     )
-    |> Enum.sort_by(&(&1.urn.citations |> List.first()))
   end
 
   defp get_personae_loquentes(text_nodes) do

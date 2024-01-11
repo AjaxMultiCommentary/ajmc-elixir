@@ -25,8 +25,6 @@ defmodule TextServer.Ingestion.Versions do
         Versions.create_xml_document!(version, %{document: xml})
       end
 
-      TextServer.Versions.Passage |> TextServer.Repo.delete_all()
-
       create_text_nodes(version)
       create_navigation(version)
 
@@ -82,10 +80,10 @@ defmodule TextServer.Ingestion.Versions do
     version =
       TextServer.Repo.get(Versions.Version, version.id) |> TextServer.Repo.preload(:xml_document)
 
-    {:ok, lloyd_jones_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
+    {:ok, version_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
 
     %{word_count: _word_count, lines: lines} =
-      lloyd_jones_body.body.lines
+      version_body.body.lines
       |> Enum.reduce(%{word_count: 0, lines: []}, fn line, acc ->
         text = line.text |> String.trim()
         word_count = acc.word_count
@@ -108,7 +106,7 @@ defmodule TextServer.Ingestion.Versions do
           end)
 
         speaker =
-          lloyd_jones_body.body.speakers
+          version_body.body.speakers
           |> Enum.find(fn speaker -> Enum.member?(speaker.lines, line.n) end)
 
         new_line = %{
@@ -209,7 +207,7 @@ defmodule TextServer.Ingestion.Versions do
          version_type: :edition
        }}
     ]
-    |> Enum.map(&Application.app_dir(:text_server, &1))
+    |> Enum.map(&{Application.app_dir(:text_server, elem(&1, 0)), elem(&1, 1)})
   end
 
   defp synopsis_json do

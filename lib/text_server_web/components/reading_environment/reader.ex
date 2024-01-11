@@ -53,9 +53,9 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
               location = List.first(text_node.location)
 
               if is_nil(last_citation) do
-                location == String.to_integer(first_citation)
+                location == first_citation
               else
-                location in String.to_integer(first_citation)..String.to_integer(last_citation)
+                String.to_integer(location) in String.to_integer(first_citation)..String.to_integer(last_citation)
               end
             end)
           }

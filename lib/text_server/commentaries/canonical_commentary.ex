@@ -18,6 +18,7 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     field :public_domain_year, :integer
     field :source_url, :string
     field :title, :string
+    field :urn, TextServer.Ecto.Types.CTS_URN
     field :wikidata_qid, :string
     field :zotero_id, :string
     field :zotero_link, :string
@@ -42,6 +43,7 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
       :public_domain_year,
       :source_url,
       :title,
+      :urn,
       :wikidata_qid,
       :zotero_id,
       :zotero_link,
@@ -52,10 +54,12 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
       :languages,
       :pid,
       :publication_date,
-      :title
+      :title,
+      :urn
     ])
     |> unique_constraint(:filename)
     |> unique_constraint(:pid)
+    |> unique_constraint(:urn)
     |> assoc_constraint(:version)
     |> cast_assoc(:creators, required: true)
   end

@@ -51,7 +51,7 @@ defmodule TextServer.TextNodes do
         t in TextNode,
         where: t.version_id == ^version_id,
         order_by: [asc: t.location],
-        preload: [comments: :canonical_commentary, text_elements: :element_type]
+        preload: [text_elements: :element_type]
       )
 
     Repo.paginate(query, params)
@@ -118,6 +118,10 @@ defmodule TextServer.TextNodes do
 
   Used by Exemplars.get_version_page/2 and Exemplars.get_version_page_by_location/2.
 
+  FIXME: Currently this is an n+2 query because of the need to get the
+  offsets. I'm not sure that there's a good way to fix that without
+  causing more problems with how the passages are recorded.
+
   ## Examples
 
       iex> list_text_nodes_by_version_between_locations(%Version{id: 1}, [1, 1, 1], [1, 1, 2])
@@ -128,17 +132,19 @@ defmodule TextServer.TextNodes do
         start_location,
         end_location
       ) do
+    first_text_node = get_text_node_by(%{location: start_location, version_id: version.id})
+    last_text_node = get_text_node_by(%{location: end_location, version_id: version.id})
+
     query =
       from(
         t in TextNode,
         where:
           t.version_id == ^version.id and
-            t.location >= ^start_location and
-            t.location <= ^end_location,
-        order_by: [asc: t.location],
+            t.offset >= ^first_text_node.offset and
+            t.offset <= ^last_text_node.offset,
+        order_by: [asc: t.offset],
         preload: [
           :version,
-          comments: :canonical_commentary,
           text_elements: [:element_type, :text_element_users]
         ]
       )
@@ -230,9 +236,19 @@ defmodule TextServer.TextNodes do
   end
 
   def find_or_create_text_node(attrs) do
+    location =
+      attrs[:location]
+      |> Enum.map(fn l ->
+        if is_binary(l) do
+          l
+        else
+          Integer.to_string(l)
+        end
+      end)
+
     query =
       from(t in TextNode,
-        where: t.version_id == ^attrs[:version_id] and t.location == ^attrs[:location]
+        where: t.version_id == ^attrs[:version_id] and t.location == ^location
       )
 
     case Repo.one(query) do
