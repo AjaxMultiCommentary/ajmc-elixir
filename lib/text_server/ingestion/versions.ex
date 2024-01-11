@@ -14,10 +14,10 @@ defmodule TextServer.Ingestion.Versions do
     {:ok, work} = create_work(text_group)
     {:ok, language} = create_language()
 
-    for xml_file <- xml_files() do
+    for {xml_file, version_data} <- xml_files() do
       xml = File.read!(xml_file)
 
-      {:ok, version} = create_version(work, language, xml)
+      {:ok, version} = create_version(work, language, xml, version_data)
 
       version = TextServer.Repo.preload(version, :xml_document)
 
@@ -161,17 +161,14 @@ defmodule TextServer.Ingestion.Versions do
     end)
   end
 
-  defp create_version(%Works.Work{} = work, %Languages.Language{} = language, xml) do
-    Versions.find_or_create_version(%{
-      description: "edited by Hugh Lloyd-Jones",
-      filename: "lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml",
-      filemd5hash: :crypto.hash(:md5, xml) |> Base.encode16(case: :lower),
-      label: "Sophocles' <i>Ajax</i>",
-      language_id: language.id,
-      urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj",
-      version_type: :edition,
-      work_id: work.id
-    })
+  defp create_version(%Works.Work{} = work, %Languages.Language{} = language, xml, version_data) do
+    Versions.find_or_create_version(
+      Map.merge(version_data, %{
+        filemd5hash: :crypto.hash(:md5, xml) |> Base.encode16(case: :lower),
+        language_id: language.id,
+        work_id: work.id
+      })
+    )
   end
 
   defp create_work(%TextGroups.TextGroup{} = text_group) do
@@ -186,7 +183,31 @@ defmodule TextServer.Ingestion.Versions do
 
   defp xml_files do
     [
-      "priv/static/xml/lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml"
+      {"priv/static/xml/tlg0011.tlg003.ajmc-lj.xml",
+       %{
+         description: "edited by Hugh Lloyd-Jones",
+         filename: "tlg0011.tlg003.ajmc-lj.xml",
+         label: "Sophocles' <i>Ajax</i>",
+         urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj",
+         version_type: :edition
+       }},
+      {"priv/static/xml/tlg0011.tlg003.1st1K-grc1.xml",
+       %{
+         description:
+           "commentario perpetuo illustravit Christ. Augustus Lobeck. Editio Tertia. Edited by Francis Storr",
+         filename: "tlg0011.tlg003.1st1K-grc1.xml",
+         label: "Sophoclis Aiax",
+         urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lobeck",
+         version_type: :edition
+       }},
+      {"priv/static/xml/tlg0011.tlg003.opp-grc1.xml",
+       %{
+         description: "edited by A. C. Pearson",
+         filename: "tlg0011.tlg003.opp-grc1.xml",
+         label: "Sophoclis Fabulae: recognovit brevique adnotatione critica instruxit.",
+         urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-pearson",
+         version_type: :edition
+       }}
     ]
     |> Enum.map(&Application.app_dir(:text_server, &1))
   end
