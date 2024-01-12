@@ -133,15 +133,17 @@ defmodule TextServer.TextNodes do
         end_location
       ) do
     first_text_node = get_text_node_by(%{location: start_location, version_id: version.id})
-    last_text_node = get_text_node_by(%{location: end_location, version_id: version.id})
+    # last_text_node = get_text_node_by(%{location: end_location, version_id: version.id})
 
+    # FIXME: Using the end_location like this is a bit of a hack to get around the
+    # fact that not every line exists or is numbered in every edition.
     query =
       from(
         t in TextNode,
         where:
           t.version_id == ^version.id and
             t.offset >= ^first_text_node.offset and
-            t.offset <= ^last_text_node.offset,
+            t.offset <= ^(end_location |> List.first()),
         order_by: [asc: t.offset],
         preload: [
           :version,

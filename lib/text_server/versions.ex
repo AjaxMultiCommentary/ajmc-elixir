@@ -147,9 +147,9 @@ defmodule TextServer.Versions do
       [%Version{}, ...]
 
   """
-  def list_versions(params \\ [page: 1, page_size: 20]) do
+  def list_versions(params \\ []) do
     Version
-    |> Repo.paginate(params)
+    |> Repo.all(params)
   end
 
   @spec list_versions_except(list(integer()), keyword | map) :: Scrivener.Page.t()

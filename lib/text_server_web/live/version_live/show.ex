@@ -14,6 +14,7 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServer.TextNodes
   alias TextServer.Versions
   alias TextServer.Versions.Passages
+  alias TextServer.Versions.Version
 
   @impl true
   def mount(%{"urn" => urn} = _params, _session, socket) do
@@ -41,7 +42,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :personae_loquentes, :map, default: %{}
   attr :text_nodes, :list, default: []
   attr :version, Versions.Version, required: true
-  attr :versions, :list, required: true
+  attr :versions_for_select, :list, required: true
 
   @impl true
   def render(assigns) do
@@ -54,12 +55,9 @@ defmodule TextServerWeb.VersionLive.Show do
           <p><%= @version.description %></p>
         </div>
         <div class="col-span-5">
-          <select class="w-full border">
-            <option>Critical text</option>
-            <option>Lloyd-Jones 1994</option>
-            <option>Jebb</option>
-            <option>etc.</option>
-          </select>
+          <.form :let={f} for={to_form(Versions.change_version(%Version{}))} id="version-select" phx-change="change-version">
+            <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
+          </.form>
         </div>
         <div class="col-span-3 border max-h-full overflow-y-scroll">
           <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
@@ -140,7 +138,12 @@ defmodule TextServerWeb.VersionLive.Show do
         page_title: version.label,
         personae_loquentes: personae_loquentes,
         text_nodes: text_nodes,
-        version: version
+        version: version,
+        versions_for_select:
+          list_versions()
+          |> Enum.map(fn v ->
+            {"#{v.label} #{v.description}", CTS.URN.to_string(v.urn)}
+          end)
       )
       |> assign_multi_select_options(commentaries)
 
@@ -156,12 +159,9 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   @impl true
-  def handle_event("change-locale", %{"language_select" => locale}, socket) do
-    Gettext.put_locale(TextServerWeb.Gettext, locale)
-
-    urn = socket.assigns.urn
-
-    {:noreply, push_navigate(socket, to: "/#{locale}/versions/#{urn}")}
+  def handle_event("change-version", %{"version" => %{"id" => urn}}, socket) do
+    {:noreply,
+     push_navigate(socket, to: ~p"/versions/#{urn}?page=#{socket.assigns.passage.passage_number}")}
   end
 
   def handle_event("highlight-comments", %{"comments" => comment_ids}, socket) do
@@ -312,5 +312,9 @@ defmodule TextServerWeb.VersionLive.Show do
 
   defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
     Enum.member?(lemmaless_comment_ids, comment.id)
+  end
+
+  defp list_versions do
+    Versions.list_versions()
   end
 end

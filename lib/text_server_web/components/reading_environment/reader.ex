@@ -55,7 +55,11 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
               if is_nil(last_citation) do
                 location == first_citation
               else
-                String.to_integer(location) in String.to_integer(first_citation)..String.to_integer(last_citation)
+                # The call to String.replace/3 strips away alphabet characters from locations like 587b
+                # so that we can just use the citations as a (numerical) range
+                (location |> String.replace(~r/[[:alpha:]]/u, "") |> String.to_integer()) in String.to_integer(
+                  first_citation
+                )..String.to_integer(last_citation)
               end
             end)
           }
