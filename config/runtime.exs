@@ -13,8 +13,7 @@ if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
 end
 
 config :text_server,
-  iiif_root_url:
-    System.get_env("IIIF_ROOT_URL", "https://ajaxmulticommentary.github.io/ajmc_iiif/"),
+  iiif_root_url: System.get_env("IIIF_ROOT_URL", "/iiif/"),
   env: config_env()
 
 config :ex_aws,

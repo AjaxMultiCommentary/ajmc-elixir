@@ -118,19 +118,9 @@ defmodule TextServer.TextElements do
           |> Map.put_new(:end_offset, el[:start_offset])
         )
 
-      maybe_upload_to_s3(el[:type], text_element)
-
       {:ok, {element_type, text_element}}
     end)
   end
-
-  defp maybe_upload_to_s3(:image, text_element) do
-    %{id: text_element.id}
-    |> TextServer.Workers.S3Worker.new()
-    |> Oban.insert()
-  end
-
-  defp maybe_upload_to_s3(_type_atom, _el), do: {:ok, nil}
 
   @doc """
   Updates a text_element.

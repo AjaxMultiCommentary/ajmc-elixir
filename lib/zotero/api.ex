@@ -89,7 +89,17 @@ defmodule Zotero.API do
       base_req()
       |> Req.get!(url: "/items/#{item_key}")
 
-    resp.body
+    body = resp.body
+    data = body |> Map.get("data")
+
+    extra =
+      data
+      |> Map.get("extra")
+      |> String.split("\n")
+      |> Enum.map(&String.split(&1, ": "))
+      |> Map.new(fn [k, v] -> {k, v} end)
+
+    Map.put(data, "extra", extra)
   end
 
   defp base_req do

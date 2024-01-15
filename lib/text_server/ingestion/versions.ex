@@ -14,18 +14,16 @@ defmodule TextServer.Ingestion.Versions do
     {:ok, work} = create_work(text_group)
     {:ok, language} = create_language()
 
-    for xml_file <- xml_files() do
+    for {xml_file, version_data} <- xml_files() do
       xml = File.read!(xml_file)
 
-      {:ok, version} = create_version(work, language, xml)
+      {:ok, version} = create_version(work, language, xml, version_data)
 
       version = TextServer.Repo.preload(version, :xml_document)
 
       if is_nil(version.xml_document) do
         Versions.create_xml_document!(version, %{document: xml})
       end
-
-      TextServer.Versions.Passage |> TextServer.Repo.delete_all()
 
       create_text_nodes(version)
       create_navigation(version)
@@ -82,10 +80,10 @@ defmodule TextServer.Ingestion.Versions do
     version =
       TextServer.Repo.get(Versions.Version, version.id) |> TextServer.Repo.preload(:xml_document)
 
-    {:ok, lloyd_jones_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
+    {:ok, version_body} = DataSchema.to_struct(version.xml_document, DataSchemas.Version)
 
     %{word_count: _word_count, lines: lines} =
-      lloyd_jones_body.body.lines
+      version_body.body.lines
       |> Enum.reduce(%{word_count: 0, lines: []}, fn line, acc ->
         text = line.text |> String.trim()
         word_count = acc.word_count
@@ -107,7 +105,24 @@ defmodule TextServer.Ingestion.Versions do
             }
           end)
 
-        new_line = %{elements: line.elements, location: [line.n], text: text, words: words}
+        speaker =
+          version_body.body.speakers
+          |> Enum.find(fn speaker -> Enum.member?(speaker.lines, line.n) end)
+
+        new_line = %{
+          elements: [
+            %{
+              attributes: %{name: speaker.name},
+              start_offset: 0,
+              end_offset: String.length(text),
+              name: "speaker"
+            }
+            | line.elements
+          ],
+          location: [line.n],
+          text: text,
+          words: words
+        }
 
         %{word_count: word_count + length(words), lines: [new_line | acc.lines]}
       end)
@@ -144,17 +159,14 @@ defmodule TextServer.Ingestion.Versions do
     end)
   end
 
-  defp create_version(%Works.Work{} = work, %Languages.Language{} = language, xml) do
-    Versions.find_or_create_version(%{
-      description: "edited by Hugh Lloyd-Jones",
-      filename: "lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml",
-      filemd5hash: :crypto.hash(:md5, xml) |> Base.encode16(case: :lower),
-      label: "Sophocles' <i>Ajax</i>",
-      language_id: language.id,
-      urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj",
-      version_type: :edition,
-      work_id: work.id
-    })
+  defp create_version(%Works.Work{} = work, %Languages.Language{} = language, xml, version_data) do
+    Versions.find_or_create_version(
+      Map.merge(version_data, %{
+        filemd5hash: :crypto.hash(:md5, xml) |> Base.encode16(case: :lower),
+        language_id: language.id,
+        work_id: work.id
+      })
+    )
   end
 
   defp create_work(%TextGroups.TextGroup{} = text_group) do
@@ -169,9 +181,33 @@ defmodule TextServer.Ingestion.Versions do
 
   defp xml_files do
     [
-      "priv/static/xml/lloyd-jones1994/tlg0011.tlg003.ajmc-lj.xml"
+      {"priv/static/xml/tlg0011.tlg003.ajmc-lj.xml",
+       %{
+         description: "edited by Hugh Lloyd-Jones",
+         filename: "tlg0011.tlg003.ajmc-lj.xml",
+         label: "Sophocles' <i>Ajax</i>",
+         urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj",
+         version_type: :edition
+       }},
+      {"priv/static/xml/tlg0011.tlg003.1st1K-grc1.xml",
+       %{
+         description:
+           "commentario perpetuo illustravit Christ. Augustus Lobeck. Editio Tertia. Edited by Francis Storr",
+         filename: "tlg0011.tlg003.1st1K-grc1.xml",
+         label: "Sophoclis Aiax",
+         urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lobeck",
+         version_type: :edition
+       }},
+      {"priv/static/xml/tlg0011.tlg003.opp-grc1.xml",
+       %{
+         description: "edited by A. C. Pearson",
+         filename: "tlg0011.tlg003.opp-grc1.xml",
+         label: "Sophoclis Fabulae: recognovit brevique adnotatione critica instruxit.",
+         urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-pearson",
+         version_type: :edition
+       }}
     ]
-    |> Enum.map(&Application.app_dir(:text_server, &1))
+    |> Enum.map(&{Application.app_dir(:text_server, elem(&1, 0)), elem(&1, 1)})
   end
 
   defp synopsis_json do

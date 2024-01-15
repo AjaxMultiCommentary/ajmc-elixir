@@ -1,10 +1,10 @@
 defmodule TextServer.Ingestion.Commentary do
   require Logger
 
+  alias TextServer.LemmalessComments
   alias TextServer.Comments
   alias TextServer.Commentaries
   alias TextServer.Ingestion.WordRange
-  alias TextServer.TextNodes
 
   @moduledoc """
   The main pipeline for ingesting an AjMC Canonical Commentary.
@@ -23,13 +23,13 @@ defmodule TextServer.Ingestion.Commentary do
 
   This regex is probably a bit verbose, but it means to be clear rather than clever.
 
-  ### `ingest_glossa/4`
+  ### `ingest_glossa/3`
 
   Ingests a glossa for a lemma that does not span more than a single
   TextNode. `captures` is the map of named captures from `Regex.named_captures(passage_regex(), selector)`,
   where `selector` is derived from the `anchor_target` of a canonical JSON lemma.
 
-  ### `ingest_glossa/4`
+  ### `ingest_glossa/3`
 
   Ingests a glossa for a lemma that spans more than a single TextNode. `captures` is
   the map of named captures from `Regex.named_captures(passage_regex(), selector)`,
@@ -43,7 +43,7 @@ defmodule TextServer.Ingestion.Commentary do
 
   ### `ingest_lemma/3`
 
-  Provides the internal interface for the `ingest_[multiline_]glossa/4` functions.
+  Provides the internal interface for the `ingest_[multiline_]glossa/3` functions.
   Essentially determines if a lemma spans multiple lines and calls the appropriate
   glossa ingestion function accordingly.
 
@@ -72,12 +72,10 @@ defmodule TextServer.Ingestion.Commentary do
   """
 
   @doc """
-  The public entrypoint for this module. Takes a URN for the version
-  (critical text) to which the comments should apply, e.g.,
-  `"urn:cts:greekLit:tlg0011.tlg003.ajmc-lj"` and a path
-  to the AjMC canonical JSON file. Returns `:ok` on success.
+  The public entrypoint for this module. Takes a path
+  to the AjMC canonical JSON fil and the metadata from commentaries.toml. Returns `:ok` on success.
   """
-  def ingest_commentary(critical_text_urn, path, commentaries_meta) do
+  def ingest_commentary(path, commentaries_meta) do
     s = File.read!(path)
     json = Jason.decode!(s)
     pid = json |> Map.get("id")
@@ -87,8 +85,9 @@ defmodule TextServer.Ingestion.Commentary do
 
     commentary = create_commentary(path, pid, commentary_meta)
 
-    prepare_lemmas_from_canonical_json(json)
-    |> Enum.each(&ingest_lemma(commentary, critical_text_urn, &1))
+    _lemma_comments =
+      prepare_lemmas_from_canonical_json(json)
+      |> Enum.each(&ingest_lemma(commentary, &1))
 
     :ok
   end
@@ -96,12 +95,31 @@ defmodule TextServer.Ingestion.Commentary do
   defp create_commentary(path, pid, commentary_meta) do
     basename = path |> Path.basename() |> Path.rootname()
     zotero_id = commentary_meta |> Map.get("zotero_id")
-    zotero_data = Zotero.API.item(zotero_id) |> Map.get("data")
-    creator = zotero_data |> Map.get("creators") |> List.first()
-    creator_first_name = creator |> Map.get("firstName")
-    creator_last_name = creator |> Map.get("lastName")
+    zotero_data = Zotero.API.item(zotero_id)
+    zotero_extra = zotero_data |> Map.get("extra", %{})
+
+    creators =
+      zotero_data
+      |> Map.get("creators")
+      |> Enum.map(fn c ->
+        %{
+          creator_type: Map.get(c, "creatorType"),
+          first_name: Map.get(c, "firstName"),
+          last_name: Map.get(c, "lastName")
+        }
+      end)
+
     languages = zotero_data |> Map.get("language") |> String.split(", ")
     publication_date = zotero_data |> Map.get("date")
+
+    public_domain_year =
+      if zotero_extra |> Map.get("Public Domain Year") == "n/a" do
+        nil
+      else
+        zotero_extra |> Map.get("Public Domain Year")
+      end
+
+    wikidata_qid = zotero_extra |> Map.get("QID")
     source_url = zotero_data |> Map.get("url")
     title = zotero_data |> Map.get("title")
 
@@ -110,14 +128,16 @@ defmodule TextServer.Ingestion.Commentary do
 
     {:ok, commentary} =
       Commentaries.upsert_canonical_commentary(%{
-        creator_first_name: creator_first_name,
-        creator_last_name: creator_last_name,
+        creators: creators,
         filename: basename,
         languages: languages,
         pid: pid,
         publication_date: publication_date,
+        public_domain_year: public_domain_year,
         source_url: source_url,
         title: title,
+        urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-#{pid}",
+        wikidata_qid: wikidata_qid,
         zotero_id: zotero_id,
         zotero_link: zotero_link
       })
@@ -125,7 +145,7 @@ defmodule TextServer.Ingestion.Commentary do
     commentary
   end
 
-  defp ingest_glossa(commentary, urn, captures, lemma) do
+  defp ingest_glossa(commentary, captures, lemma) do
     %{
       "first_line_n" => first_line_n,
       "first_line_offset" => first_line_offset,
@@ -139,36 +159,61 @@ defmodule TextServer.Ingestion.Commentary do
     if content == "" do
       Logger.warning("No content for #{inspect(lemma)}.")
     else
-      first_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{first_line_n}"})
-      last_text_node = TextNodes.get_text_node_by(%{urn: "#{urn}:#{last_line_n}"})
-
       lemma_transcript = Map.get(lemma, "lemma")
 
       citation =
-        if first_line_n == last_line_n do
-          [first_line_n]
+        [first_line_n, last_line_n]
+        |> Enum.sort_by(fn
+          n when is_binary(n) ->
+            n |> String.replace(~r/[[:alpha:]]/u, "") |> String.to_integer()
+
+          n when is_integer(n) ->
+            n
+        end)
+        |> Enum.dedup()
+
+      {start_offset, end_offset} =
+        if length(citation) == 2 and citation != [first_line_n, last_line_n] do
+          {last_line_offset, first_line_offset}
         else
-          [first_line_n, last_line_n]
+          {first_line_offset, last_line_offset}
         end
 
       attributes = Map.put(no_content_lemma, :citation, citation)
 
-      {:ok, _comment} =
+      if Map.get(lemma, "label") == "word-anchor" do
         %{
           attributes: attributes,
           canonical_commentary_id: commentary.id,
           content: content,
           lemma: lemma_transcript,
-          end_offset: last_line_offset,
-          end_text_node_id: last_text_node.id,
-          start_offset: first_line_offset,
-          start_text_node_id: first_text_node.id
+          end_offset: end_offset,
+          start_offset: start_offset,
+          urn: %{
+            commentary.urn
+            | citations: citation,
+              passage_component:
+                "#{Enum.at(citation, 0)}@#{start_offset}-#{Enum.at(citation, 1)}@#{end_offset}",
+              subsections: [start_offset, end_offset]
+          }
         }
         |> Comments.upsert_comment()
+      else
+        %{
+          attributes: attributes,
+          canonical_commentary_id: commentary.id,
+          content: content,
+          urn: "#{commentary.urn}:#{Enum.join(citation, "-")}"
+        }
+        |> LemmalessComments.upsert_lemmaless_comment()
+      end
     end
   end
 
-  defp ingest_lemma(commentary, urn, %{"anchor_target" => anchor_target} = lemma)
+  defp ingest_lemma(
+         commentary,
+         %{"anchor_target" => anchor_target} = lemma
+       )
        when not is_nil(anchor_target) do
     j =
       try do
@@ -183,14 +228,50 @@ defmodule TextServer.Ingestion.Commentary do
       selector = Map.get(j, "selector")
 
       with %{"first_line_n" => _} = captures <- Regex.named_captures(passage_regex(), selector) do
-        ingest_glossa(commentary, urn, captures, lemma)
+        ingest_glossa(commentary, captures, lemma)
       end
     else
       Logger.warning(anchor_target: j, commentary: commentary)
     end
   end
 
-  defp ingest_lemma(_commentary, _urn, _lemma), do: nil
+  defp ingest_lemma(
+         commentary,
+         %{"label" => "scope-anchor"} = comment
+       ) do
+    maybe_line_ns =
+      try do
+        Map.get(comment, "lemma")
+        |> String.replace(~r/\./, "")
+        |> String.replace("A", "4")
+        |> String.replace("B", "8")
+        |> String.replace("S", "5")
+        |> String.trim()
+        |> String.split("-")
+        |> Enum.map(&String.to_integer/1)
+      rescue
+        _ ->
+          Logger.warning(
+            reason: "Unable to parse line numbers for scope-anchor",
+            comment: comment
+          )
+
+          nil
+      end
+
+    if maybe_line_ns do
+      captures = %{
+        "first_line_n" => List.first(maybe_line_ns),
+        "first_line_offset" => nil,
+        "last_line_n" => List.last(maybe_line_ns),
+        "last_line_offset" => nil
+      }
+
+      ingest_glossa(commentary, captures, comment)
+    end
+  end
+
+  defp ingest_lemma(_commentary, _lemma), do: nil
 
   defp passage_regex,
     do:
@@ -203,13 +284,9 @@ defmodule TextServer.Ingestion.Commentary do
       children
       |> Map.get("lemmas", [])
 
-    _lemmaless_comments =
-      lemmas
-      |> Enum.filter(&(Map.get(&1, "label") == "scope-anchor"))
-
     lemmas =
       lemmas
-      |> Enum.filter(&(Map.get(&1, "label") == "word-anchor"))
+      |> Enum.filter(&Enum.member?(~w(scope-anchor word-anchor), Map.get(&1, "label")))
 
     pages = children |> Map.get("pages")
 
@@ -226,10 +303,9 @@ defmodule TextServer.Ingestion.Commentary do
 
     commentaries = regions |> Enum.filter(&(Map.get(&1, "region_type") == "commentary"))
 
-    _prepared_lemmas =
-      lemmas
-      |> Enum.chunk_every(2, 1)
-      |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
+    lemmas
+    |> Enum.chunk_every(2, 1)
+    |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
   end
 
   defp prepare_lemma(commentaries, pages, words, [lemma]) do

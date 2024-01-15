@@ -1,40 +1,53 @@
 defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
-  attr :comments, :list, default: []
-  attr :is_focused, :boolean, default: false
+  attr :highlighted_comments, :list, default: []
+  attr :lemmaless_comments, :list, default: []
+  attr :persona_loquens, :string
   attr :text_node, :map, required: true
-
-  @impl true
-  def mount(socket) do
-    {:ok, socket |> assign(is_focused: false)}
-  end
 
   @impl true
   def render(assigns) do
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
-    <div class="flex">
-      <p
-        class="max-w-prose text-node"
-        data-location={Enum.join(@text_node.location, ".")}
-        phx-click="text-node-click"
-        phx-target={@myself}
-      >
-        <.text_element :for={{graphemes, tags} <- @text_node.graphemes_with_tags} tags={tags} text={Enum.join(graphemes)} />
-      </p>
+    <div>
+      <h3 :if={@persona_loquens} class="font-bold pt-4"><%= @persona_loquens %></h3>
+      <div class="flex justify-between">
+        <p class="max-w-prose text-node" phx-target={@myself}>
+          <.text_element
+            :for={{graphemes, tags} <- @text_node.graphemes_with_tags}
+            highlighted_comments={@highlighted_comments}
+            tags={tags}
+            text={Enum.join(graphemes)}
+          />
+        </p>
+        <.line_number lemmaless_comments={@lemmaless_comments} location={@text_node.location} />
+      </div>
     </div>
     """
   end
 
-  @impl true
-  def handle_event("text-node-click", _, socket) do
-    send(self(), {:focused_text_node, socket.assigns.text_node})
-    {:noreply, socket}
+  attr :lemmaless_comments, :list, default: []
+  attr :location, :string
+
+  def line_number(assigns) do
+    ~H"""
+    <span
+      class={[
+        "text-slate-500 hover:text-slate-800 cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
+        "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
+      ]}
+      phx-click="highlight-lemmaless-comments"
+      phx-value-comments={@lemmaless_comments |> Enum.map(& &1.id) |> Jason.encode!()}
+    >
+      <%= Enum.join(@location, ".") %>
+    </span>
+    """
   end
 
   attr :classes, :string, default: ""
+  attr :highlighted_comments, :list, default: []
   attr :tags, :list, default: []
   attr :text, :string
 
@@ -47,6 +60,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         :classes,
         tags
         |> Enum.map(&tag_classes/1)
+        |> MapSet.new()
         |> Enum.join(" ")
       )
 
@@ -58,8 +72,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             comments:
               tags
               |> Enum.filter(&(&1.name == "comment"))
-              |> Enum.map(& &1.metadata.id)
-              |> Jason.encode!(),
+              |> Enum.map(& &1.metadata.id),
             commentary_ids:
               tags
               |> Enum.filter(&(&1.name == "comment"))
@@ -67,12 +80,20 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
               |> Enum.dedup()
           )
 
+        # We need to do this to keep the autoformatter from making the <span> span
+        # multiple lines, introducing unnecessary whitespace into the text
+        assigns =
+          assign(
+            assigns,
+            classes: [
+              assigns.classes,
+              "comments-#{min(Enum.count(assigns.commentary_ids), 10)}",
+              highlighted?(assigns.comments, assigns.highlighted_comments)
+            ]
+          )
+
         ~H"""
-        <span
-          class={[@classes, "comments-#{min(Enum.count(@commentary_ids), 10)}"]}
-          phx-click="highlight-comments"
-          phx-value-comments={@comments}
-        >
+        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments |> Jason.encode!()}>
           <%= @text %>
         </span>
         """
@@ -118,9 +139,17 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     end
   end
 
+  defp highlighted?(comment_ids, highlighted_comment_ids) do
+    if Enum.any?(comment_ids, fn id ->
+         Enum.member?(highlighted_comment_ids, id)
+       end) do
+      "border border-md"
+    end
+  end
+
   defp tag_classes(tag) do
     case tag.name do
-      "add" -> "bg-sky-400"
+      "add" -> "@@ajmc-addition"
       "comment" -> "@@ajmc-comment-box-shadow cursor-pointer"
       "del" -> "line-through"
       "emph" -> "italic"

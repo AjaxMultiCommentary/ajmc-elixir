@@ -40,7 +40,6 @@ defmodule TextServer.Repo.Migrations.CreateRepositories do
         extra_collection.text_groups
         # move all text_groups to the first collection
         |> Enum.each(fn text_group ->
-          IO.inspect(text_group)
           {:ok, _tg} = TextGroups.update_text_group(text_group, %{collection_id: collection.id})
         end)
 

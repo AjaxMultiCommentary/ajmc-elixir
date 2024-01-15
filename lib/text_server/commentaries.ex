@@ -13,20 +13,35 @@ defmodule TextServer.Commentaries do
 
   ## Examples
 
-      iex> list_canonical_commentaries()
+      iex> list_public_commentaries()
       [%CanonicalCommentary{}, ...]
 
   """
-  def list_canonical_commentaries do
+  def list_public_commentaries() do
     CanonicalCommentary
-    |> order_by([c], c.creator_last_name)
+    |> where(
+      [c],
+      not is_nil(c.public_domain_year) and c.public_domain_year < ^NaiveDateTime.utc_now().year()
+    )
+    |> preload(:creators)
     |> Repo.all()
   end
 
-  def filter_canonical_commentaries(opts \\ []) do
-    IO.inspect(opts)
+  def list_commentaries() do
+    CanonicalCommentary
+    |> preload(:creators)
+    |> Repo.all()
+  end
 
-    list_canonical_commentaries()
+  @doc """
+  Lists the commentaries that `current_user` can view.
+  """
+  def list_viewable_commentaries(current_user) when is_nil(current_user) do
+    list_public_commentaries()
+  end
+
+  def list_viewable_commentaries(_current_user) do
+    list_commentaries()
   end
 
   @doc """
@@ -44,6 +59,10 @@ defmodule TextServer.Commentaries do
 
   """
   def get_canonical_commentary!(id), do: Repo.get!(CanonicalCommentary, id)
+
+  def get_canonical_commentary_by(attrs \\ %{}) do
+    Repo.get_by(CanonicalCommentary, attrs)
+  end
 
   @doc """
   Creates a canonical_commentary.
@@ -90,6 +109,7 @@ defmodule TextServer.Commentaries do
   """
   def update_canonical_commentary(%CanonicalCommentary{} = canonical_commentary, attrs) do
     canonical_commentary
+    |> Repo.preload(:creators)
     |> CanonicalCommentary.changeset(attrs)
     |> Repo.update()
   end

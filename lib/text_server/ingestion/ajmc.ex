@@ -2,9 +2,12 @@ defmodule TextServer.Ingestion.Ajmc do
   def run do
     TextServer.Repo.delete_all(TextServer.TextElements.TextElement)
     TextServer.Repo.delete_all(TextServer.Comments.Comment)
+    TextServer.Repo.delete_all(TextServer.LemmalessComments.LemmalessComment)
+    TextServer.Repo.delete_all(TextServer.TextNodes.TextNode)
     TextServer.Repo.delete_all(TextServer.Versions.Version)
+    TextServer.Repo.delete_all(TextServer.Versions.Passage)
 
-    [version | _rest] = TextServer.Ingestion.Versions.create_versions()
+    TextServer.Ingestion.Versions.create_versions()
 
     commentaries_meta =
       File.read!(commentaries_meta_path())
@@ -13,11 +16,7 @@ defmodule TextServer.Ingestion.Ajmc do
       |> Enum.filter(fn c -> Map.get(c, "zotero_id") != "" end)
 
     for p <- commentary_paths() do
-      TextServer.Ingestion.Commentary.ingest_commentary(
-        CTS.URN.to_string(version.urn),
-        p,
-        commentaries_meta
-      )
+      TextServer.Ingestion.Commentary.ingest_commentary(p, commentaries_meta)
     end
   end
 

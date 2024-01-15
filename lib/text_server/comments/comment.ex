@@ -8,10 +8,9 @@ defmodule TextServer.Comments.Comment do
     field :lemma, :string
     field :start_offset, :integer
     field :end_offset, :integer
+    field :urn, TextServer.Ecto.Types.CTS_URN
 
     belongs_to :canonical_commentary, TextServer.Commentaries.CanonicalCommentary
-    belongs_to :start_text_node, TextServer.TextNodes.TextNode
-    belongs_to :end_text_node, TextServer.TextNodes.TextNode
 
     timestamps()
   end
@@ -24,23 +23,19 @@ defmodule TextServer.Comments.Comment do
       :canonical_commentary_id,
       :content,
       :end_offset,
-      :end_text_node_id,
       :lemma,
       :start_offset,
-      :start_text_node_id
+      :urn
     ])
     |> validate_required([
       :attributes,
       :canonical_commentary_id,
       :content,
       :end_offset,
-      :end_text_node_id,
       :lemma,
       :start_offset,
-      :start_text_node_id
+      :urn
     ])
     |> assoc_constraint(:canonical_commentary)
-    |> assoc_constraint(:start_text_node)
-    |> assoc_constraint(:end_text_node)
   end
 end

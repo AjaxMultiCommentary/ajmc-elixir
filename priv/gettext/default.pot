@@ -1,0 +1,107 @@
+## This file is a PO Template file.
+##
+## "msgid"s here are often extracted from source code.
+## Add new messages manually only if they're dynamic
+## messages that can't be statically extracted.
+##
+## Run "mix gettext.extract" to bring this file up to
+## date. Leave "msgstr"s empty as changing them here has no
+## effect: edit them in PO (.po) files instead.
+#
+msgid ""
+msgstr ""
+
+#: lib/text_server_web/components/core_components.ex:467
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:18
+#, elixir-autogen, elixir-format
+msgid "Bibliography"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:30
+#, elixir-autogen, elixir-format
+msgid "Languages"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:27
+#, elixir-autogen, elixir-format
+msgid "Public Domain?"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:26
+#, elixir-autogen, elixir-format
+msgid "Publication Date"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:25
+#, elixir-autogen, elixir-format
+msgid "Title"
+msgstr ""
+
+#: lib/text_server_web/components/core_components.ex:76
+#: lib/text_server_web/components/core_components.ex:128
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:22
+#, elixir-autogen, elixir-format
+msgid "Creator(s)"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Prologue"
+msgstr "Prologo"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Parodos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "First episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "First *stasimon*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Second episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Second *stasimon*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Third episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Epiparodos* and *kommos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Fourth episode"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Third *stasimon*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Exodos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:81
+#, elixir-autogen, elixir-format
+msgid "v."
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:79
+#, elixir-autogen, elixir-format
+msgid "vv."
+msgstr ""

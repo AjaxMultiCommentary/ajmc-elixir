@@ -25,6 +25,7 @@ defmodule TextServer.TextNodesTest do
       valid_attrs = %{
         location: [],
         text: "some text",
+        offset: 100,
         urn: "urn:cts:namespace:text_group.work.version:1.1"
       }
 
@@ -118,7 +119,7 @@ defmodule TextServer.TextNodesTest do
 
       page = TextNodes.list_text_nodes_by_version_id(text_node.version_id)
       node = List.first(page.entries)
-      tagged = TextNode.tag_graphemes(node)
+      tagged = TextNode.tag_graphemes(node, [])
 
       assert tagged.location == text_node.location
       assert length(tagged.graphemes_with_tags) == 3

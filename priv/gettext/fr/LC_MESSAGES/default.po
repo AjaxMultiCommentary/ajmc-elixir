@@ -1,0 +1,107 @@
+## "msgid"s in this file come from POT (.pot) files.
+###
+### Do not add, change, or remove "msgid"s manually here as
+### they're tied to the ones in the corresponding POT file
+### (with the same domain).
+###
+### Use "mix gettext.extract --merge" or "mix gettext.merge"
+### to merge POT files into PO files.
+msgid ""
+msgstr ""
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n>1);\n"
+
+#: lib/text_server_web/components/core_components.ex:467
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:18
+#, elixir-autogen, elixir-format
+msgid "Bibliography"
+msgstr "Bibliographie"
+
+#: lib/text_server_web/live/commentaries_live/index.ex:30
+#, elixir-autogen, elixir-format
+msgid "Languages"
+msgstr "Langues"
+
+#: lib/text_server_web/live/commentaries_live/index.ex:27
+#, elixir-autogen, elixir-format
+msgid "Public Domain?"
+msgstr "Domaine public ?"
+
+#: lib/text_server_web/live/commentaries_live/index.ex:26
+#, elixir-autogen, elixir-format
+msgid "Publication Date"
+msgstr "Date de publication"
+
+#: lib/text_server_web/live/commentaries_live/index.ex:25
+#, elixir-autogen, elixir-format
+msgid "Title"
+msgstr "Titre"
+
+#: lib/text_server_web/components/core_components.ex:76
+#: lib/text_server_web/components/core_components.ex:128
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr "fermer"
+
+#: lib/text_server_web/live/commentaries_live/index.ex:22
+#, elixir-autogen, elixir-format
+msgid "Creator(s)"
+msgstr "Auteurs"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Prologue"
+msgstr "Prologo"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Parodos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "First episode"
+msgstr "Premier épisode"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "First *stasimon*"
+msgstr "Premier *stasimon*"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Second episode"
+msgstr "Deuxième épisode"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Second *stasimon*"
+msgstr "Deuxième *stasimon*"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Third episode"
+msgstr "Troisième épisode"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Epiparodos* and *kommos*"
+msgstr "*Epiparodos* et *kommos*"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Fourth episode"
+msgstr "Quatrième épisode"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "Third *stasimon*"
+msgstr "Troisième *stasimon*"
+
+#: lib/text_server_web/components/reading_environment/navigation.ex:19
+msgid "*Exodos*"
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:81
+#, elixir-autogen, elixir-format
+msgid "v."
+msgstr ""
+
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:79
+#, elixir-autogen, elixir-format
+msgid "vv."
+msgstr ""

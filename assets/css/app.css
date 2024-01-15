@@ -158,7 +158,8 @@
  */
 .openseadragon-iiif-viewer {
 	height: 300px;
-	width: 500px;
+	width: 300px;
+	max-width: 100%;
 }
 
 /* Styles for markdown copy (on project homepages)
@@ -230,6 +231,14 @@
 	margin-bottom: 0.9rem;
 }
 
+.\@\@ajmc-addition::before {
+	content: "[";
+}
+
+.\@\@ajmc-addition::after {
+	content: "]";
+}
+
 .\@\@ajmc-comment-box-shadow.comments-1 {
 	background-color: rgb(99, 162, 187, 0.2);
 }
@@ -264,17 +273,6 @@
 
 .\@\@ajmc-comment-box-shadow.comments-10 {
 	background-color: rgb(67, 121, 142, 1);
-}
-
-.text-node::before {
-	content: attr(data-location);
-	color: lightgray;
-	display: inline-block;
-	width: 2em;
-}
-
-.text-node:hover::before {
-	color: lightslategray;
 }
 
 /** Begin tei.css --- based on work by Luke Hollis and the IIP Project */

@@ -1,6 +1,9 @@
 defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   use TextServerWeb, :live_component
 
+  alias TextServer.Comments.Comment
+  alias TextServer.Commentaries.CanonicalCommentary
+
   alias TextServerWeb.CoreComponents
 
   attr :comment, :map, required: true
@@ -11,22 +14,30 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   def render(assigns) do
     ~H"""
-    <div class={[
-      "border-2 collapse collapse-arrow rounded-sm mb-2",
-      if(@is_highlighted, do: "border-stone-800", else: ""),
-      if(@is_open, do: "collapse-open", else: "collapse-close")
-    ]}>
+    <div
+      class={[
+        "border-2 collapse collapse-arrow rounded-sm mb-2",
+        if(@is_highlighted, do: "border-stone-800", else: ""),
+        if(@is_open, do: "collapse-open", else: "collapse-close")
+      ]}
+      id={"comment-#{@comment.id}"}
+    >
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium text-gray-900 cursor-pointer">
           <span class="text-sm font-light text-gray-600">
             <%= citation(@comment.attributes) %>
           </span>
-          <%= @comment.attributes
-          |> Map.get("lemma") %>
+          <small class="mt-1 mx-w-2xl text-sm text-gray-500">
+            <.link navigate={~p"/bibliography/#{@comment.canonical_commentary.pid}"} class="hover:underline">
+              <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
+            </.link>
+          </small>
         </h3>
-        <small class="mt-1 mx-w-2xl text-sm text-gray-500">
-          <%= @comment.canonical_commentary.creator_last_name %> <%= @comment.canonical_commentary.publication_date %>
-        </small>
+        <%= if match?(%Comment{}, @comment) do %>
+          <small class="text-sm text-slate-700">
+            <%= @comment.attributes |> Map.get("lemma") %>
+          </small>
+        <% end %>
       </div>
       <div class="collapse-content float-right">
         <p class="max-w-2xl text-sm text-gray-800"><%= @comment.content %></p>
@@ -67,9 +78,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     citation = attributes |> Map.get("citation")
 
     if Enum.count(citation) > 1 do
-      "Lines #{Enum.join(citation, "–")}."
+      "#{gettext("vv.")} #{Enum.join(citation, "–")}."
     else
-      "Line #{List.first(citation)}."
+      "#{gettext("v.")} #{List.first(citation)}."
     end
   end
 end

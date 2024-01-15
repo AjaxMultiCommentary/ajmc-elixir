@@ -6,8 +6,8 @@ defmodule TextServer.Versions.Passage do
     field :passage_number, :integer
     field :label, :string
     field :urn, TextServer.Ecto.Types.CTS_URN
-    field :end_location, {:array, :integer}
-    field :start_location, {:array, :integer}
+    field :end_location, {:array, :string}
+    field :start_location, {:array, :string}
 
     belongs_to :version, TextServer.Versions.Version
 
@@ -33,6 +33,5 @@ defmodule TextServer.Versions.Passage do
     ])
     |> assoc_constraint(:version)
     |> unique_constraint([:version_id, :passage_number])
-    |> unique_constraint(:urn)
   end
 end

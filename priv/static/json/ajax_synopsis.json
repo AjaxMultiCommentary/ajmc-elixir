@@ -7,7 +7,7 @@
                 "fr": "Prologue",
                 "it": "Prologo"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:1-133",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:1-133",
             "passage_ref": "vv. 1-133"
         },
         {
@@ -17,7 +17,7 @@
                 "fr": "*Parodos*",
                 "it": "*Parodos*"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:144-200",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:144-200",
             "passage_ref": "vv. 201-595"
         },
         {
@@ -27,7 +27,7 @@
                 "fr": "Premier épisode",
                 "it": "Primo episodio"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:201-595",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:201-595",
             "passage_ref": "vv. 201-595"
         },
         {
@@ -37,7 +37,7 @@
                 "fr": "Premier *stasimon*",
                 "it": "Primo stasimo"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:596-645",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:596-645",
             "passage_ref": "vv. 596-645"
         },
         {
@@ -47,7 +47,7 @@
                 "fr": "Deuxième épisode",
                 "it": "Secondo episodio"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:646-692",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:646-692",
             "passage_ref": "vv. 646-692"
         },
         {
@@ -57,7 +57,7 @@
                 "fr": "Deuxième *stasimon*",
                 "it": "Secondo stasimo"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:693-718",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:693-718",
             "passage_ref": "vv. 693-718"
         },
         {
@@ -67,7 +67,7 @@
                 "fr": "Troisième épisode",
                 "it": "Terzo episodio"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:719-865",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:719-865",
             "passage_ref": "vv. 719-865"
         },
         {
@@ -75,9 +75,9 @@
                 "de": "",
                 "en": "*Epiparodos* and *kommos*",
                 "fr": "*Épiparodos* et *kommos*",
-                "it": "*Epiparodos* et *kommos*"
+                "it": "*Epiparodos* e *kommos*"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:866-973",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:866-973",
             "passage_ref": "vv. 866-973"
         },
         {
@@ -87,7 +87,7 @@
                 "fr": "Quatrième épisode",
                 "it": "Quarto episodio"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:974-1184",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:974-1184",
             "passage_ref": "vv. 974-1184"
         },
         {
@@ -97,7 +97,7 @@
                 "fr": "Troisième *stasimon*",
                 "it": "Terzo stasimo"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:1185-1222",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:1185-1222",
             "passage_ref": "vv. 1185-1222"
         },
         {
@@ -107,7 +107,7 @@
                 "fr": "*Exodos*",
                 "it": "Esodo"
             },
-            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj:1223-1420",
+            "passage_urn": "urn:cts:greekLit:tlg0011.tlg003:1223-1420",
             "passage_ref": "vv. 1223-1420"
         }
     ]

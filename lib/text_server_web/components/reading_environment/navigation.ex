@@ -16,7 +16,8 @@ defmodule TextServerWeb.ReadingEnvironment.Navigation do
             class={[if(passage.passage_number == @current_passage.passage_number, do: "active", else: "")]}
           >
             <span class="items-start">
-              <%= raw(Markdown.sanitize_and_parse_markdown(passage.label)) %> (vv. <%= passage.urn.citations |> List.first() %>&ndash;<%= passage.urn.citations
+              <%= raw(Gettext.gettext(TextServerWeb.Gettext, passage.label) |> Markdown.sanitize_and_parse_markdown()) %> (<%= passage.urn.citations
+              |> List.first() %>&ndash;<%= passage.urn.citations
               |> List.last() %>)
             </span>
           </.link>

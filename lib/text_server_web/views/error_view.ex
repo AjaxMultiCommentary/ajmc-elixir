@@ -7,6 +7,10 @@ defmodule TextServerWeb.ErrorView do
   #   "Internal Server Error"
   # end
 
+  def render("403.html", _assigns) do
+    "Forbidden"
+  end
+
   # By default, Phoenix returns the status message from
   # the template name. For example, "404.html" becomes
   # "Not Found".
