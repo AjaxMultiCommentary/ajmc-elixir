@@ -7,7 +7,6 @@ This repository is a hard fork of the Open Commentaries' [main server](https://g
 In order to start the app locally, you will need to set a few
 environment variables:
 
-- `IIIF_ROOT_URL`: The URL for our IIIF Image API. Defaults to https://ajaxmulticommentary.github.io/ajmc_iiif/.
 - `ZOTERO_API_URL`: for now, set it to something like https://api.zotero.org/groups/YOUR_GROUP_HERE, since Zotero prefixes most API queries by the user or group. (See https://www.zotero.org/support/dev/web_api/v3/basics.)
 - `ZOTERO_API_TOKEN`: See https://www.zotero.org/settings/keys.
 
