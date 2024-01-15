@@ -8,7 +8,7 @@ defmodule TextServer.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Open Commentaries", "contact@opencommentaries.org"})
+      |> from({"Charles @ Ajax Multi-Commentary", "charles.pletcher@unil.ch"})
       |> subject(subject)
       |> text_body(body)
 
