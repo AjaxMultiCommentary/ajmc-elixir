@@ -16,6 +16,7 @@ In production, a few additional variables are required:
 - `SECRET_KEY_BASE`: For signing cookies etc.
 - `PHX_HOST`: The hostname of the application. ajmc.unil.ch for now. Note that, even though the Phoenix server will not be talking to the outside world directly (all traffic goes through a proxy), it still needs to know what hostname to expect in requests so that it can respond properly.
 - `PORT`: The local port for the server. This is where you'll send the proxied requests to, so if the proxy is serving the app at https://ajmc.unil.ch:443, it should proxy requests to something like http://127.0.0.1:4000.
+- `SENDGRID_API_KEY`: Sign up at sendgrid.com. This API key is needed to send account verification emails for trusted users.
 
 ## Deployment
 

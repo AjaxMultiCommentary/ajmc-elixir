@@ -6,8 +6,6 @@ defmodule TextServerWeb.Plugs.Locale do
   def init(_opts), do: nil
 
   def call(conn, _opts) do
-    IO.inspect(conn)
-
     case locale_from_params(conn) || locale_from_cookies(conn) do
       nil ->
         conn

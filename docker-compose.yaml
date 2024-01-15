@@ -13,6 +13,7 @@ services:
       - DATABASE_URL=${DATABASE_URL:-postgres://postgres:postgres@ajmc-postgres:5432/ajmc}
       - PHX_HOST=${PHX_HOST:-0.0.0.0}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-overwrite_this_key_on_deployment_overwrite_this_key_on_deployment}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-See sendgrid.com}
       - ZOTERO_API_URL=${ZOTERO_API_URL:-https://api.zotero.org/groups/your_group_here}
       - ZOTERO_API_TOKEN=${ZOTERO_API_TOKEN:-See https://www.zotero.org/settings/keys}
     networks:
