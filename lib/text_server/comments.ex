@@ -72,7 +72,7 @@ defmodule TextServer.Comments do
             c.canonical_commentary_id in ^canonical_commentary_ids and
             parent.public_domain_year < ^NaiveDateTime.utc_now().year() and
             not is_nil(parent.public_domain_year),
-        preload: [:start_text_node, :end_text_node, [canonical_commentary: :creators]]
+        preload: [canonical_commentary: :creators]
       )
 
     Repo.all(query)
@@ -88,8 +88,6 @@ defmodule TextServer.Comments do
         c.canonical_commentary_id in ^canonical_commentary_ids
     )
     |> preload(canonical_commentary: :creators)
-    |> preload(:start_text_node)
-    |> preload(:end_text_node)
     |> Repo.all()
   end
 
