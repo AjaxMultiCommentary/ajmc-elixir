@@ -283,9 +283,6 @@ defmodule TextServer.Ingestion.Commentary do
     lemmas =
       children
       |> Map.get("lemmas", [])
-
-    lemmas =
-      lemmas
       |> Enum.filter(&Enum.member?(~w(scope-anchor word-anchor), Map.get(&1, "label")))
 
     pages = children |> Map.get("pages")

@@ -28,8 +28,8 @@ defmodule TextServer.Accounts.UserNotifier do
     email =
       new()
       |> to(user.email)
-      |> from({"Open Commentaries", "contact@opencommentaries.org"})
-      |> subject("Please confirm your Open Commentaries email address")
+      |> from({"Charles @ Ajax Multi-Commentary", "charles.pletcher@unil.ch"})
+      |> subject("Please confirm your AjMC email address")
       |> html_body("""
       <tr>
         <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;" valign="top">
@@ -37,7 +37,7 @@ defmodule TextServer.Accounts.UserNotifier do
                 <tr>
                     <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Hi there,</p>
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Please confirm your email address on <a href="#{url}">Open Commentaries</a>.</p>
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Please confirm your email address on <a href="#{url}">Ajax Multi-Commentary</a>.</p>
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; box-sizing: border-box; width: 100%;" width="100%">
                             <tbody>
                                 <tr>
@@ -75,7 +75,7 @@ defmodule TextServer.Accounts.UserNotifier do
 
     Hi #{email},
 
-    Please confirm your Open Commentaries account by visiting the URL below:
+    Please confirm your Ajax Multi-Commentary account by visiting the URL below:
 
     #{url}
 
@@ -89,13 +89,13 @@ defmodule TextServer.Accounts.UserNotifier do
   Deliver instructions to reset a user password.
   """
   def deliver_reset_password_instructions(user, url) do
-    deliver(user.email, "Open Commentaries reset password instructions", """
+    deliver(user.email, "Ajax Multi-Commentary reset password instructions", """
 
     ==============================
 
     Hi #{user.email},
 
-    You can reset your Open Commentaries password by visiting the URL below:
+    You can reset your Ajax Multi-Commentary password by visiting the URL below:
 
     #{url}
 
@@ -109,13 +109,13 @@ defmodule TextServer.Accounts.UserNotifier do
   Deliver instructions to update a user email.
   """
   def deliver_update_email_instructions(user, url) do
-    deliver(user.email, "Open Commentaries update email instructions", """
+    deliver(user.email, "Ajax Multi-Commentary update email instructions", """
 
     ==============================
 
     Hi #{user.email},
 
-    You can change your Open Commentaries email by visiting the URL below:
+    You can change your Ajax Multi-Commentary email by visiting the URL below:
 
     #{url}
 
