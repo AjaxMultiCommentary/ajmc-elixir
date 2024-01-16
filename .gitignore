@@ -51,3 +51,10 @@ priv/static/uploads/exemplar_files/*
 priv/static/json/*_tess_retrained.json
 priv/static/ajmc_iiif/*
 !priv/static/ajmc_iiif/.gitkeep
+
+!priv/static/json/345lSC_tess_retrained.json
+!priv/static/json/345nnG_tess_retrained.json
+!priv/static/json/3461yf_tess_retrained.json
+!priv/static/json/3464N4_tess_retrained.json
+!priv/static/json/3467O2_tess_retrained.json
+!priv/static/json/3468MH_tess_retrained.json
