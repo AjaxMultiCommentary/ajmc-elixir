@@ -126,7 +126,7 @@ defmodule TextServerWeb.VersionLive.Show do
     passage = Versions.get_version_passage(version.id, passage_number)
     text_nodes = passage.text_nodes
 
-    commentaries = list_commentaries(socket.assigns.current_user)
+    commentaries = list_commentaries(socket, text_nodes)
 
     personae_loquentes = get_personae_loquentes(text_nodes)
 
@@ -170,7 +170,7 @@ defmodule TextServerWeb.VersionLive.Show do
     send(
       self(),
       {:updated_options,
-       list_commentaries(socket.assigns.current_user)
+       list_commentaries(socket, socket.assigns.text_nodes)
        |> Enum.filter(&String.starts_with?(String.downcase(&1.label), filter_s))}
     )
 
@@ -253,10 +253,15 @@ defmodule TextServerWeb.VersionLive.Show do
   defp build_options(options) do
     Enum.map(options, fn
       {_idx, data} ->
-        %SelectOption{id: data["id"], label: data["label"], selected: data["selected"]}
+        %SelectOption{
+          id: data["id"],
+          count: data["count"],
+          label: data["label"],
+          selected: data["selected"]
+        }
 
       data ->
-        %SelectOption{id: data.id, label: data.label, selected: data.selected}
+        %SelectOption{id: data.id, count: data.count, label: data.label, selected: data.selected}
     end)
     |> Enum.sort_by(&Map.get(&1, :label))
   end
@@ -327,10 +332,22 @@ defmodule TextServerWeb.VersionLive.Show do
     Enum.member?(lemmaless_comment_ids, comment.id)
   end
 
-  defp list_commentaries(user) do
-    Commentaries.list_viewable_commentaries(user)
+  defp list_commentaries(socket, text_nodes) do
+    comments = filter_comments(socket, text_nodes, [])
+    lemmaless_comments = filter_lemmaless_comments(socket, text_nodes, [])
+    all_comments = comments ++ lemmaless_comments
+
+    commentary_frequencies =
+      all_comments |> Enum.frequencies_by(&Map.get(&1, :canonical_commentary_id))
+
+    Commentaries.list_viewable_commentaries(socket.assigns.current_user)
     |> Enum.map(fn c ->
-      %{id: c.id, label: CanonicalCommentary.commentary_label(c), selected: false}
+      %{
+        id: c.id,
+        count: commentary_frequencies[c.id] || 0,
+        label: CanonicalCommentary.commentary_label(c),
+        selected: false
+      }
     end)
     |> build_options()
   end
