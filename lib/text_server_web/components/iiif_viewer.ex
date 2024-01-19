@@ -6,7 +6,7 @@ defmodule TextServerWeb.Components.IiifViewer do
   def render(assigns) do
     ~H"""
     <div
-      id={"comment-#{@comment.id}"}
+      id={"iiif_comment_viewer-#{@comment.id}"}
       class="openseadragon-iiif-viewer"
       phx-hook="IIIFHook"
       data-tiles={tiles(@comment)}
