@@ -9,19 +9,19 @@ defmodule TextServerWeb.Components do
   def card(assigns) do
     ~H"""
     <div class="group relative">
-      <div class="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+      <div class="w-full min-h-80 bg-slate-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
         <p class="align-text-center flex items-center justify-center w-full h-full text-9xl">
           <%= render_slot(@inner_block) %>
         </p>
       </div>
       <div class="mt-4 flex justify-between">
         <div>
-          <h3 class="font-bold text-gray-700">
+          <h3 class="font-bold text-slate-700">
             <a href={@url}>
               <span aria-hidden="true" class="absolute inset-0"></span> <%= Map.get(@item, :title) %>
             </a>
           </h3>
-          <p class="mt-1 text-sm text-gray-500"><%= @item.description %></p>
+          <p class="mt-1 text-sm text-slate-500"><%= @item.description %></p>
         </div>
       </div>
     </div>
@@ -43,13 +43,13 @@ defmodule TextServerWeb.Components do
       >
         <input type="checkbox" class="min-h-0" />
         <summary class="collapse-title">
-          <h3 class="text-md font-medium leading-6 text-gray-900">
+          <h3 class="text-md font-medium leading-6 text-slate-900">
             <%= c.attributes |> Map.get("lemma") %>
           </h3>
-          <small class="mt-1 mx-w-2xl text-sm text-gray-500"><%= c.author %></small>
+          <small class="mt-1 mx-w-2xl text-sm text-slate-500"><%= c.author %></small>
         </summary>
         <div class="collapse-content float-right">
-          <p class="mt-1 max-w-2xl text-sm text-gray-800"><%= c.content %></p>
+          <p class="mt-1 max-w-2xl text-sm text-slate-800"><%= c.content %></p>
         </div>
       </details>
     </div>
@@ -74,7 +74,7 @@ defmodule TextServerWeb.Components do
 
   def search_list(assigns) do
     ~H"""
-    <ul role="list" class="divide-y divide-gray-200 sm:max-w-lg">
+    <ul role="list" class="divide-y divide-slate-200 sm:max-w-lg">
       <%= for item <- @items do %>
         <%= render_slot(@inner_block, item) %>
       <% end %>
@@ -122,9 +122,9 @@ defmodule TextServerWeb.Components do
                 py-2
                 mb-4
                 border
-                border-gray-300
-                placeholder-gray-500
-                text-gray-900
+                border-slate-300
+                placeholder-slate-500
+                text-slate-900
                 focus:outline-none
                 focus:ring-stone-500
                 focus:border-stone-500
@@ -147,12 +147,12 @@ defmodule TextServerWeb.Components do
       <div class="flex py-6 rounded shadow-md hover:shadow-lg">
         <div class="ml-4 flex flex-1 flex-col">
           <div>
-            <div class="flex justify-between text-base font-medium text-gray-900">
+            <div class="flex justify-between text-base font-medium text-slate-900">
               <h3><%= @title %></h3>
             </div>
           </div>
           <div class="flex flex-1 justify-between text-sm">
-            <p class="text-sm text-gray-500"><%= @description %></p>
+            <p class="text-sm text-slate-500"><%= @description %></p>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@ defmodule TextServerWeb.Components do
         <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
           <.first_page_button current_page={@current_page} />
           <.prev_button current_page={@current_page} />
-          <!-- Current: "z-10 bg-stone-50 border-stone-500 text-stone-600", Default: "bg-white border-gray-300 text-gray-500 hover:bg-gray-50" -->
+          <!-- Current: "z-10 bg-stone-50 border-stone-500 text-stone-600", Default: "bg-white border-slate-300 text-slate-500 hover:bg-slate-50" -->
           <.numbered_buttons current_page={@current_page} total_pages={@total_pages} />
           <.next_button current_page={@current_page} total_pages={@total_pages} />
           <.last_page_button current_page={@current_page} total_pages={@total_pages} />
@@ -198,7 +198,7 @@ defmodule TextServerWeb.Components do
         "text-sm",
         "font-medium",
         "text-stone-100",
-        if(@current_page == 1, do: "cursor-default", else: "hover:bg-gray-50 text-stone-700")
+        if(@current_page == 1, do: "cursor-default", else: "hover:bg-slate-50 text-stone-700")
       ]}
     >
       <span class="sr-only">First page</span>
@@ -235,8 +235,8 @@ defmodule TextServerWeb.Components do
         "py-2",
         "text-sm",
         "font-medium",
-        "text-gray-100",
-        if(@current_page == @total_pages, do: "cursor-default", else: "hover:bg-gray-50 text-stone-700")
+        "text-slate-100",
+        if(@current_page == @total_pages, do: "cursor-default", else: "hover:bg-slate-50 text-stone-700")
       ]}
     >
       <span class="sr-only">Last page</span>
@@ -272,8 +272,8 @@ defmodule TextServerWeb.Components do
         "py-2",
         "text-sm",
         "font-medium",
-        "text-gray-100",
-        if(@current_page == @total_pages, do: "cursor-default", else: "hover:bg-gray-50 text-stone-700")
+        "text-slate-100",
+        if(@current_page == @total_pages, do: "cursor-default", else: "hover:bg-slate-50 text-stone-700")
       ]}
     >
       <span class="sr-only">Next</span>
@@ -314,7 +314,7 @@ defmodule TextServerWeb.Components do
       "font-medium",
       if(current_page == i,
         do: "bg-stone-100 border-stone-500 text-stone-600 z-20",
-        else: "text-gray-500 hover:bg-gray-50"
+        else: "text-slate-500 hover:bg-slate-50"
       )
     ]
   end
@@ -335,8 +335,8 @@ defmodule TextServerWeb.Components do
         "py-2",
         "text-sm",
         "font-medium",
-        "text-gray-100",
-        if(@current_page == 1, do: "cursor-default", else: "hover:bg-gray-50 text-stone-700")
+        "text-slate-100",
+        if(@current_page == 1, do: "cursor-default", else: "hover:bg-slate-50 text-stone-700")
       ]}
     >
       <span class="sr-only">Previous</span>

@@ -16,7 +16,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
     <section>
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold leading-6 text-gray-900"><%= gettext("Bibliography") %></h1>
+          <h1 class="text-base font-semibold leading-6 text-slate-900"><%= gettext("Bibliography") %></h1>
         </div>
       </div>
       <CoreComponents.table id="bibliography" rows={@commentaries} row_id={fn row -> "commentary_#{row.id}" end}>

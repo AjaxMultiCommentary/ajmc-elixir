@@ -52,7 +52,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           <% else %>
             <CoreComponents.button
               type="button"
-              class="rounded-sm bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              class="rounded-sm bg-white px-2 py-1 text-xs font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50"
               phx-click="show-iiif-viewer"
               phx-target={@myself}
             >

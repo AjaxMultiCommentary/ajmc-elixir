@@ -2,6 +2,7 @@ defmodule TextServerWeb.VersionLive.Show do
   use TextServerWeb, :live_view
 
   alias TextServerWeb.ReadingEnvironment.Navigation
+  alias TextServerWeb.Icons
 
   alias TextServer.Comments
   alias TextServer.Comments.Comment
@@ -24,7 +25,7 @@ defmodule TextServerWeb.VersionLive.Show do
      |> assign(
        urn: urn,
        focused_text_node: nil,
-       version_command_palette_open: false
+       multi_select_filter_value: ""
      )}
   end
 
@@ -37,6 +38,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :highlighted_lemmaless_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
+  attr :multi_select_filter_value, :string, default: ""
   attr :passage, Versions.Passage
   attr :passages, :list, default: []
   attr :personae_loquentes, :map, default: %{}
@@ -59,16 +61,20 @@ defmodule TextServerWeb.VersionLive.Show do
             <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
           </.form>
         </div>
-        <div class="col-span-3 border max-h-full overflow-y-scroll">
-          <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
-            <.live_component
-              id="commentaries-filter"
-              module={TextServerWeb.Components.MultiSelect}
-              options={@commentaries}
-              form={f}
-              selected={fn opts -> send(self(), {:updated_options, opts}) end}
-            />
-          </.form>
+        <div class="dropdown">
+          <div tabindex="0" role="button" class="btn m-1"><Icons.filter /></div>
+          <div tabindex="0" class="p-4 shadow dropdown-content z-[1] bg-base-100 max-h-64 w-fit overflow-y-scroll">
+            <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
+              <input type="text" name="multi-select-filter" value={@multi_select_filter_value} phx-change="filter-change" />
+              <.live_component
+                id="commentaries-filter"
+                module={TextServerWeb.Components.MultiSelect}
+                options={@commentaries}
+                form={f}
+                selected={fn opts -> send(self(), {:updated_options, opts}) end}
+              />
+            </.form>
+          </div>
         </div>
 
         <hr class="my-4 col-span-10" />
@@ -120,12 +126,7 @@ defmodule TextServerWeb.VersionLive.Show do
     passage = Versions.get_version_passage(version.id, passage_number)
     text_nodes = passage.text_nodes
 
-    commentaries =
-      Commentaries.list_viewable_commentaries(socket.assigns.current_user)
-      |> Enum.map(fn c ->
-        %{id: c.id, label: CanonicalCommentary.commentary_label(c), selected: false}
-      end)
-      |> build_options()
+    commentaries = list_commentaries(socket.assigns.current_user)
 
     personae_loquentes = get_personae_loquentes(text_nodes)
 
@@ -163,6 +164,17 @@ defmodule TextServerWeb.VersionLive.Show do
   def handle_event("change-version", %{"version" => %{"id" => urn}}, socket) do
     {:noreply,
      push_navigate(socket, to: ~p"/versions/#{urn}?page=#{socket.assigns.passage.passage_number}")}
+  end
+
+  def handle_event("filter-change", %{"multi-select-filter" => filter_s}, socket) do
+    send(
+      self(),
+      {:updated_options,
+       list_commentaries(socket.assigns.current_user)
+       |> Enum.filter(&String.starts_with?(String.downcase(&1.label), filter_s))}
+    )
+
+    {:noreply, socket |> assign(:multi_select_filter_value, filter_s)}
   end
 
   def handle_event("highlight-comments", %{"comments" => comment_ids}, socket) do
@@ -313,6 +325,14 @@ defmodule TextServerWeb.VersionLive.Show do
 
   defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
     Enum.member?(lemmaless_comment_ids, comment.id)
+  end
+
+  defp list_commentaries(user) do
+    Commentaries.list_viewable_commentaries(user)
+    |> Enum.map(fn c ->
+      %{id: c.id, label: CanonicalCommentary.commentary_label(c), selected: false}
+    end)
+    |> build_options()
   end
 
   defp list_versions do
