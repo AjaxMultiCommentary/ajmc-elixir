@@ -57,18 +57,24 @@ export const IIIFHook = {
 
 		this.viewer = OpenSeadragon({
 			element: this.el,
+			maxZoomLevel: 4,
 			prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
 			preserveViewport: true,
+			sequenceMode: true,
 			tileSources: tiles,
-			sequenceMode: true
 		});
 
 		this.viewer.addOnceHandler('add-overlay', ({ eventSource }) => {
-			const overlay = eventSource.currentOverlays[0];
-			const viewport = eventSource.viewport;
-
 			window.requestAnimationFrame(() => {
-				viewport.fitBounds(overlay.getBounds(viewport));
+				let overlay = eventSource.currentOverlays.at(1);
+
+				if (overlay == undefined) {
+					overlay = eventSource.currentOverlays[0]
+				}
+
+				const viewport = eventSource.viewport;
+
+				viewport.fitBoundsWithConstraints(overlay.getBounds(viewport));
 			});
 		});
 	}
