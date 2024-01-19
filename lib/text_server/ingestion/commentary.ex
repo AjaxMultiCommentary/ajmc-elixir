@@ -176,9 +176,14 @@ defmodule TextServer.Ingestion.Commentary do
         if length(citation) == 2 and citation != [first_line_n, last_line_n] do
           [last_line_offset, first_line_offset]
         else
-          [first_line_offset, last_line_offset]
+          # If the lemma is on a single line, make sure that the
+          # offsets are in text order (left to right)
+          if length(citation) == 1 do
+            [first_line_offset, last_line_offset] |> Enum.sort()
+          else
+            [first_line_offset, last_line_offset]
+          end
         end
-        |> Enum.sort()
 
       attributes = Map.put(no_content_lemma, :citation, citation)
 
