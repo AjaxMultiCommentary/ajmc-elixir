@@ -172,12 +172,13 @@ defmodule TextServer.Ingestion.Commentary do
         end)
         |> Enum.dedup()
 
-      {start_offset, end_offset} =
+      [start_offset, end_offset] =
         if length(citation) == 2 and citation != [first_line_n, last_line_n] do
-          {last_line_offset, first_line_offset}
+          [last_line_offset, first_line_offset]
         else
-          {first_line_offset, last_line_offset}
+          [first_line_offset, last_line_offset]
         end
+        |> Enum.sort()
 
       attributes = Map.put(no_content_lemma, :citation, citation)
 

@@ -17,7 +17,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     <div
       class={[
         "border-2 collapse collapse-arrow rounded-sm mb-2",
-        if(@is_highlighted, do: "border-stone-800", else: ""),
+        if(@is_highlighted, do: "border-slate-800", else: ""),
         if(@is_open, do: "collapse-open", else: "collapse-close")
       ]}
       id={"comment-#{@comment.id}"}
