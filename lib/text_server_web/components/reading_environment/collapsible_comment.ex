@@ -8,6 +8,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   attr :comment, :map, required: true
   attr :color, :string, default: "#fff"
+  attr :current_user, Accounts.User
   attr :is_highlighted, :boolean
   attr :is_iiif_viewer_shown, :boolean, default: false
   attr :is_open, :boolean, default: false
@@ -23,11 +24,11 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
       id={"comment-#{@comment.id}"}
     >
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
-        <h3 class="text-sm font-medium text-gray-900 cursor-pointer">
-          <span class="text-sm font-light text-gray-600">
+        <h3 class="text-sm font-medium text-slate-900 cursor-pointer">
+          <span class="text-sm font-light text-slate-600">
             <%= citation(@comment.attributes) %>
           </span>
-          <small class="mt-1 mx-w-2xl text-sm text-gray-500">
+          <small class="mt-1 mx-w-2xl text-sm text-slate-500">
             <.link navigate={~p"/bibliography/#{@comment.canonical_commentary.pid}"} class="hover:underline">
               <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
             </.link>
@@ -40,7 +41,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
         <% end %>
       </div>
       <div class="collapse-content float-right">
-        <p class="max-w-2xl text-sm text-gray-800"><%= @comment.content %></p>
+        <p class="max-w-2xl text-sm text-slate-800"><%= @comment.content %></p>
         <div class="flex mt-2 justify-center">
           <%= if @is_iiif_viewer_shown do %>
             <.live_component
@@ -59,6 +60,11 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
             </CoreComponents.button>
           <% end %>
         </div>
+        <%= unless is_nil(@current_user) do %>
+          <small class="mt-1 text-xs text-slate-500">
+            <%= @comment.attributes["page_ids"] |> Enum.join(", ") %>
+          </small>
+        <% end %>
       </div>
     </div>
     """

@@ -372,7 +372,8 @@ defmodule TextServer.Ingestion.Commentary do
           commentary_id = page_id |> String.split("_") |> List.first()
 
           "#{commentary_id}/#{page_id}/full/max/0/default.png"
-        end)
+        end),
+      "page_ids" => pages |> Enum.map(&Map.get(&1, "id"))
     })
   end
 
@@ -449,7 +450,8 @@ defmodule TextServer.Ingestion.Commentary do
           commentary_id = page_id |> String.split("_") |> List.first()
 
           "#{commentary_id}/#{page_id}/full/max/0/default.png"
-        end)
+        end),
+      "page_ids" => pages |> Enum.map(&Map.get(&1, "id"))
     })
   end
 

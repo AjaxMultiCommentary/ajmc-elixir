@@ -97,6 +97,7 @@ defmodule TextServerWeb.VersionLive.Show do
               id={comment.id}
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
+              current_user={@current_user}
               is_highlighted={is_highlighted(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
             />
           <% end %>

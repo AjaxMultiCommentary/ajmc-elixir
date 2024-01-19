@@ -2,5 +2,8 @@
     "css.customData": [
         "\".vscode/css_custom_data.json\""
     ],
-    "files.associations": {"*.css": "tailwindcss"}
+    "files.associations": {"*.css": "tailwindcss"},
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
 }
