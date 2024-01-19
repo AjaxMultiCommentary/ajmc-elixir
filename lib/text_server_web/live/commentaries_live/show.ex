@@ -45,7 +45,7 @@ defmodule TextServerWeb.CommentariesLive.Show do
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-slate-900">Wikidata</dt>
               <dd class="mt-1 text-sm leading-6 text-slate-700 sm:col-span-2 sm:mt-0">
-                <.link href={"https://wikidata.org/#{@commentary.wikidata_qid}"}>
+                <.link href={"https://wikidata.org/wiki/#{@commentary.wikidata_qid}"}>
                   <%= @commentary.wikidata_qid %>
                 </.link>
               </dd>

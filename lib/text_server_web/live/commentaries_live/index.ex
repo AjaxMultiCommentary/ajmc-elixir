@@ -34,7 +34,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
           <%= commentary.languages |> Enum.join(", ") %>
         </:col>
         <:col :let={commentary} label="Wikidata">
-          <.link href={"https://wikidata.org/#{commentary.wikidata_qid}"}>
+          <.link href={"https://wikidata.org/wiki/#{commentary.wikidata_qid}"}>
             <%= commentary.wikidata_qid %>
           </.link>
         </:col>
