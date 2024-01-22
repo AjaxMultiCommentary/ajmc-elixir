@@ -451,8 +451,8 @@ defmodule TextServerWeb.CoreComponents do
     ~H"""
     <div class="overflow-y-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-          <table class="min-w-full divide-y divide-primary">
+        <div class="overflow-hidden shadow ring-1 ring-secondary ring-opacity-5 sm:rounded-lg">
+          <table class="min-w-full divide-y divide-base-300">
             <thead class="bg-primary-50">
               <tr>
                 <th :for={col <- @col} class="px-3 py-3.5 text-left text-sm font-semibold base-content">
@@ -464,7 +464,7 @@ defmodule TextServerWeb.CoreComponents do
             <tbody
               id={@id}
               phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-              class="divide-y divide-primary bg-white"
+              class="divide-y divide-base-300 bg-white"
             >
               <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-primary-50">
                 <td

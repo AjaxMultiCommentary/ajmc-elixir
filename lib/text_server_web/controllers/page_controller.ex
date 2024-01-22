@@ -3,7 +3,6 @@ defmodule TextServerWeb.PageController do
 
   def home(conn, _params) do
     conn
-    |> put_root_layout(false)
-    |> render(:home, layout: false)
+    |> redirect(to: ~p"/versions/urn:cts:greekLit:tlg0011.tlg003.ajmc-lj")
   end
 end

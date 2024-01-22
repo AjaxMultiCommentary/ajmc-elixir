@@ -152,7 +152,7 @@ defmodule TextServerWeb.VersionLive.Show do
           <% end %>
         </div>
         <section class="col-span-10 shadow-xl p-4 bg-base-200">
-          <div class="flex items-center mt-2">
+          <div class="flex items-center mb-2">
             <h3 class="prose prose-h3 text-sm font-bold mr-1"><%= gettext("Dynamic apparatus") %></h3>
             <Tooltip.info
               icon_class="h-5 w-5"
