@@ -1,6 +1,8 @@
 defmodule TextServerWeb.VersionLive.Show do
   use TextServerWeb, :live_view
 
+  require Logger
+
   alias TextServerWeb.ReadingEnvironment.Navigation
   alias TextServerWeb.Components.Tooltip
 
@@ -256,8 +258,7 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   def handle_event(event, params, socket) do
-    IO.puts("Failed to capture event #{event}")
-    IO.inspect(params)
+    Logger.error("Failed to capture event #{event} with params \n #{inspect(params)}")
 
     {:noreply, socket}
   end
