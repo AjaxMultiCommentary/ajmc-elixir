@@ -210,7 +210,7 @@ defmodule TextServerWeb.VersionLive.Show do
 
   @impl true
   def handle_info({:comments_highlighted, [id | _]}, socket) do
-    {:noreply, push_event(socket, "highlight-comment", %{id: "comment-#{id}"})}
+    {:noreply, push_event(socket, "highlight-comment", %{id: "#{id}"})}
   end
 
   def handle_info({:updated_options, options}, socket) do
@@ -325,11 +325,11 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   defp is_highlighted(%Comment{} = comment, comment_ids, _) do
-    Enum.member?(comment_ids, comment.id)
+    Enum.member?(comment_ids, "#{comment.__struct__}-#{comment.id}")
   end
 
   defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
-    Enum.member?(lemmaless_comment_ids, comment.id)
+    Enum.member?(lemmaless_comment_ids, "#{comment.__struct__}-#{comment.id}")
   end
 
   defp list_commentaries(socket, text_nodes) do

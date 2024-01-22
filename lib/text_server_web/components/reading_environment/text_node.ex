@@ -39,7 +39,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
       ]}
       phx-click="highlight-lemmaless-comments"
-      phx-value-comments={@lemmaless_comments |> Enum.map(& &1.id) |> Jason.encode!()}
+      phx-value-comments={@lemmaless_comments |> Enum.map(&"#{&1.__struct__}-#{&1.id}") |> Jason.encode!()}
     >
       <%= Enum.join(@location, ".") %>
     </span>
@@ -72,7 +72,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             comments:
               tags
               |> Enum.filter(&(&1.name == "comment"))
-              |> Enum.map(& &1.metadata.id),
+              |> Enum.map(&"#{&1.metadata.__struct__}-#{&1.metadata.id}"),
             commentary_ids:
               tags
               |> Enum.filter(&(&1.name == "comment"))
