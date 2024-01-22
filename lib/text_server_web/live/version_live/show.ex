@@ -171,7 +171,7 @@ defmodule TextServerWeb.VersionLive.Show do
       self(),
       {:updated_options,
        list_commentaries(socket, socket.assigns.text_nodes)
-       |> Enum.filter(&String.starts_with?(String.downcase(&1.label), filter_s))}
+       |> Enum.filter(&String.starts_with?(String.downcase(&1.label), String.downcase(filter_s)))}
     )
 
     {:noreply, socket |> assign(:multi_select_filter_value, filter_s)}
