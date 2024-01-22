@@ -100,7 +100,7 @@ defmodule TextServerWeb.VersionLive.Show do
         <div class="col-span-3 overflow-y-scroll">
           <%= for comment <- @all_comments do %>
             <.live_component
-              id={comment.id}
+              id={"#{comment.__struct__}-#{comment.id}"}
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
               current_user={@current_user}
