@@ -189,4 +189,8 @@ defmodule TextServer.Comments do
   def change_comment(%Comment{} = comment, attrs \\ %{}) do
     Comment.changeset(comment, attrs)
   end
+
+  def with_interface_id(%Comment{} = comment) do
+    %{comment | interface_id: "comment-#{comment.id}"}
+  end
 end

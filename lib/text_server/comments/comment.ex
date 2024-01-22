@@ -9,6 +9,7 @@ defmodule TextServer.Comments.Comment do
     field :start_offset, :integer
     field :end_offset, :integer
     field :urn, TextServer.Ecto.Types.CTS_URN
+    field :interface_id, :string, virtual: true
 
     belongs_to :canonical_commentary, TextServer.Commentaries.CanonicalCommentary
 

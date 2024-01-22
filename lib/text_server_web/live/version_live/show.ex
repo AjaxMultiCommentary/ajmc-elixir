@@ -100,7 +100,7 @@ defmodule TextServerWeb.VersionLive.Show do
         <div class="col-span-3 overflow-y-scroll">
           <%= for comment <- @all_comments do %>
             <.live_component
-              id={"#{comment.__struct__}-#{comment.id}"}
+              id={comment.interface_id}
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
               current_user={@current_user}
@@ -229,8 +229,15 @@ defmodule TextServerWeb.VersionLive.Show do
       end)
 
     text_nodes = socket.assigns.text_nodes
-    comments = filter_comments(socket, text_nodes, selected_options)
-    lemmaless_comments = filter_lemmaless_comments(socket, text_nodes, selected_options)
+
+    comments =
+      filter_comments(socket, text_nodes, selected_options)
+      |> Enum.map(&Comments.with_interface_id/1)
+
+    lemmaless_comments =
+      filter_lemmaless_comments(socket, text_nodes, selected_options)
+      |> Enum.map(&LemmalessComments.with_interface_id/1)
+
     text_nodes = TextNodes.tag_text_nodes(socket.assigns.text_nodes, comments)
 
     all_comments =
@@ -325,11 +332,11 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   defp is_highlighted(%Comment{} = comment, comment_ids, _) do
-    Enum.member?(comment_ids, "#{comment.__struct__}-#{comment.id}")
+    Enum.member?(comment_ids, "#{comment.interface_id}")
   end
 
   defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
-    Enum.member?(lemmaless_comment_ids, "#{comment.__struct__}-#{comment.id}")
+    Enum.member?(lemmaless_comment_ids, "#{comment.interface_id}")
   end
 
   defp list_commentaries(socket, text_nodes) do

@@ -176,6 +176,10 @@ defmodule TextServer.LemmalessComments do
     LemmalessComment.changeset(lemmaless_comment, attrs)
   end
 
+  def with_interface_id(%LemmalessComment{} = comment) do
+    %{comment | interface_id: "lemmaless_comment-#{comment.id}"}
+  end
+
   defp public_commentaries_query do
     from(c in LemmalessComment,
       join: parent in assoc(c, :canonical_commentary),

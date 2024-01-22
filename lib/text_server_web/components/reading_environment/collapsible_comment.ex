@@ -21,7 +21,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
         if(@is_highlighted, do: "border-slate-800", else: ""),
         if(@is_open, do: "collapse-open", else: "collapse-close")
       ]}
-      id={"#{@comment.__struct__}-#{@comment.id}"}
+      id={@comment.interface_id}
     >
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium text-slate-900 cursor-pointer">
