@@ -58,7 +58,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
             From: "opacity-100"
             To: "opacity-0"
         -->
-        <div class="fixed inset-0 bg-slate-500 bg-opacity-25 transition-opacity"></div>
+        <div class="fixed inset-0 bg-primary bg-opacity-25 transition-opacity"></div>
 
         <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
           <!--
@@ -78,7 +78,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
               max-w-3xl
               transform
               divide-y
-              divide-slate-100
+              divide-primary
               overflow-hidden
               rounded-xl
               bg-white
@@ -99,7 +99,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
                 <CoreComponents.basic_input
                   type="text"
                   field={@changeset[:search_string]}
-                  class="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-slate-800 placeholder:text-slate-400 focus:ring-0 sm:text-sm"
+                  class="h-12 w-full border-0 bg-transparent pl-11 pr-4 base-content placeholder:base-content focus:ring-0 sm:text-sm"
                   placeholder="Search for comparanda in other versions"
                   role="combobox"
                   aria-expanded="false"
@@ -110,15 +110,15 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
             <!-- Empty state, show/hide based on command palette state -->
             <div :if={@search_results == []} class="px-6 py-14 text-center text-sm sm:px-14">
               <Icons.comparanda_icon />
-              <p class="mt-4 font-semibold text-slate-900">No comparanda found.</p>
-              <p class="mt-2 text-slate-500">We couldn&apos;t find anything with that term. Please try again.</p>
+              <p class="mt-4 font-semibold base-content">No comparanda found.</p>
+              <p class="mt-2 base-content">We couldn&apos;t find anything with that term. Please try again.</p>
             </div>
-            <div :if={@search_results != []} class="flex divide-x divide-slate-100">
+            <div :if={@search_results != []} class="flex divide-x divide-primary">
               <!-- Preview Visible: "sm:h-96" -->
               <div class="max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4 sm:h-96">
                 <!-- Default state, show/hide based on command palette state. -->
-                <h2 class="mb-4 mt-2 text-xs font-semibold text-slate-500">Comparanda</h2>
-                <ul class="-mx-2 text-sm text-slate-700" id="text-node-command-palette_search-results" role="listbox">
+                <h2 class="mb-4 mt-2 text-xs font-semibold base-content">Comparanda</h2>
+                <ul class="-mx-2 text-sm base-content" id="text-node-command-palette_search-results" role="listbox">
                   <.list_item
                     :for={text_node <- @search_results}
                     active={@previewed_text_node_id == Integer.to_string(text_node.id)}
@@ -144,7 +144,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
 
   def list_item(assigns) do
     ~H"""
-    <!-- Active: "bg-slate-100 text-slate-900" -->
+    <!-- Active: "bg-primary base-content" -->
     <li
       class="group flex cursor-pointer select-none items-center rounded-md p-2 hover:bg-stone-200"
       id={"text_node_preview-#{@text_node.id}"}
@@ -156,7 +156,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
     >
       <section class="truncate">
         <h1 class="font-bold"><%= @text_node.version.label %></h1>
-        <span class="text-slate-400"><%= @text_node.version.description %></span>
+        <span class="base-content"><%= @text_node.version.description %></span>
         <p class="flex-auto truncate"><%= @text_node.text %></p>
       </section>
       <!-- Not Active: "hidden" -->
@@ -170,13 +170,13 @@ defmodule TextServerWeb.ReadingEnvironment.TextNodeCommandPalette do
   def preview(assigns) do
     ~H"""
     <!-- Active item side-panel, show/hide based on active state -->
-    <div class="hidden h-96 w-1/2 flex-none flex-col divide-y divide-slate-100 overflow-y-auto sm:flex">
+    <div class="hidden h-96 w-1/2 flex-none flex-col divide-y divide-primary overflow-y-auto sm:flex">
       <div class="flex-none p-6 text-center">
-        <h2 class="mt-3 font-semibold text-slate-900"><%= @text_node.version.label %></h2>
-        <h3 class="text-sm leading-6 text-slate-500">
+        <h2 class="mt-3 font-semibold base-content"><%= @text_node.version.label %></h2>
+        <h3 class="text-sm leading-6 base-content">
           <%= @text_node.version.urn %>:<%= @text_node.location |> Enum.join(".") %>
         </h3>
-        <p class="text-sm leading-6 text-slate-500"><%= @text_node.version.description %></p>
+        <p class="text-sm leading-6 base-content"><%= @text_node.version.description %></p>
       </div>
       <div class="flex flex-auto flex-col justify-between p-6">
         <p class="flex-auto"><%= @text_node.text %></p>

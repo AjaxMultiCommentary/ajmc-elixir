@@ -24,7 +24,7 @@ defmodule TextServerWeb.Icons do
     ~H"""
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="mx-auto h-6 w-6 text-slate-400"
+      class="mx-auto h-6 w-6 base-content"
       fill="none"
       viewBox="0 0 24 24"
       stroke-width="1.5"
@@ -60,6 +60,8 @@ defmodule TextServerWeb.Icons do
     """
   end
 
+  attr :class, :string, default: "w-6 h-6"
+
   def info(assigns) do
     ~H"""
     <svg
@@ -68,7 +70,7 @@ defmodule TextServerWeb.Icons do
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      class="w-6 h-6"
+      class={@class}
     >
       <path
         stroke-linecap="round"
@@ -81,7 +83,7 @@ defmodule TextServerWeb.Icons do
 
   def right_chevron(assigns) do
     ~H"""
-    <svg class="ml-3 h-5 w-5 flex-none text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    <svg class="ml-3 h-5 w-5 flex-none base-content" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
       <path
         fill-rule="evenodd"
         d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
@@ -94,7 +96,7 @@ defmodule TextServerWeb.Icons do
   def search_icon(assigns) do
     ~H"""
     <svg
-      class="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-slate-400"
+      class="pointer-events-none absolute left-4 top-3.5 h-5 w-5 base-content"
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-hidden="true"

@@ -35,7 +35,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     ~H"""
     <span
       class={[
-        "text-slate-500 hover:text-slate-800 cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
+        "base-content hover:base-content cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
         "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
       ]}
       phx-click="highlight-lemmaless-comments"

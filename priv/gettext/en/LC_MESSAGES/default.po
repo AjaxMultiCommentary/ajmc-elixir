@@ -54,7 +54,7 @@ msgstr ""
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "Prologue"
-msgstr "Prologo"
+msgstr ""
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "*Parodos*"

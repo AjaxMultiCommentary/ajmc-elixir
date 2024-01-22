@@ -2,7 +2,7 @@ defmodule TextServerWeb.VersionLive.Show do
   use TextServerWeb, :live_view
 
   alias TextServerWeb.ReadingEnvironment.Navigation
-  alias TextServerWeb.Icons
+  alias TextServerWeb.Components.Tooltip
 
   alias TextServer.Comments
   alias TextServer.Comments.Comment
@@ -51,36 +51,79 @@ defmodule TextServerWeb.VersionLive.Show do
     ~H"""
     <article class="mx-auto">
       <div class="grid grid-cols-10 gap-x-8 gap-y-2 h-screen max-h-[64rem]">
-        <div class="col-span-2">
-          <h1 class="text-2xl font-bold"><%= raw(@version.label) %></h1>
+        <div class="col-span-full">
+          <h1 class="text-2xl font-bold"><em>Ajax</em> Multi-Commentary</h1>
 
-          <p><%= @version.description %></p>
-        </div>
-        <div class="col-span-5">
-          <.form :let={f} for={to_form(Versions.change_version(%Version{}))} id="version-select" phx-change="change-version">
-            <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
-          </.form>
-        </div>
-        <div class="dropdown">
-          <div tabindex="0" role="button" class="btn m-1"><Icons.filter /></div>
-          <div tabindex="0" class="p-4 shadow dropdown-content z-[1] bg-base-100 max-h-64 w-fit overflow-y-scroll">
-            <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
-              <input type="text" name="multi-select-filter" value={@multi_select_filter_value} phx-change="filter-change" />
-              <.live_component
-                id="commentaries-filter"
-                module={TextServerWeb.Components.MultiSelect}
-                options={@commentaries}
-                form={f}
-                selected={fn opts -> send(self(), {:updated_options, opts}) end}
-              />
-            </.form>
-          </div>
+          <p><%= gettext("about_the_multi_commentary") %></p>
         </div>
 
         <hr class="my-4 col-span-10" />
 
         <div class="col-span-2">
-          <Navigation.nav_menu passages={@passages} current_passage={@passage} />
+          <section>
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-sm font-bold prose prose-h3">
+                <%= gettext("Change critical text") %>
+              </h3>
+              <Tooltip.info
+                icon_class="h-5 w-5"
+                tip={
+                  gettext(
+                    "You can change the edition used for the critical text here. Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones version of the text, so they might not match up if you prefer to use another edition."
+                  )
+                }
+              />
+            </div>
+            <.form
+              :let={f}
+              for={to_form(Versions.change_version(%Version{}))}
+              id="version-select"
+              phx-change="change-version"
+            >
+              <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
+            </.form>
+          </section>
+          <section class="mt-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Navigation") %></h3>
+              <Tooltip.info
+                icon_class="h-5 w-5"
+                tip={
+                  gettext(
+                    "This synopsis is based on the Lloyd-Jones edition of the text, and the line numbers might not line up exactly with other editions. Click on a section of the synopsis to view it in the critical text area."
+                  )
+                }
+              />
+            </div>
+            <Navigation.nav_menu passages={@passages} current_passage={@passage} />
+          </section>
+          <section class="mt-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Filter glosses") %></h3>
+              <Tooltip.info
+                icon_class="h-5 w-5"
+                tip={
+                  gettext(
+                    "Use this filter to show or hide comments on the right. You can search for a commentary by name using the text box."
+                  )
+                }
+              />
+            </div>
+            <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
+              <input type="text" name="multi-select-filter" value={@multi_select_filter_value} class={~w(
+                  w-full input input-secondary input-sm
+                )} phx-change="filter-change" placeholder="Filter commentaries" />
+              <div class="max-h-48 overflow-y-scroll">
+                <.live_component
+                  id="commentaries-filter"
+                  module={TextServerWeb.Components.MultiSelect}
+                  options={@commentaries}
+                  form={f}
+                  selected={fn opts -> send(self(), {:updated_options, opts}) end}
+                />
+              </div>
+            </.form>
+          </section>
         </div>
         <div class="col-span-5 overflow-y-scroll -mt-4">
           <.live_component

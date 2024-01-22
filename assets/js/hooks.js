@@ -2,7 +2,7 @@ import CETEI from "CETEIcean";
 import OpenSeadragon from "openseadragon";
 
 const DRAG_ATTRIBUTE_NAME = "phx-drop-target";
-const DROP_TARGET_BG = "bg-slate-50";
+const DROP_TARGET_BG = "bg-primary-50";
 
 /**
  * Begin DragHook
