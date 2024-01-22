@@ -151,13 +151,24 @@ defmodule TextServerWeb.VersionLive.Show do
             />
           <% end %>
         </div>
-        <div class="col-span-10 flex shadow-xl p-4 bg-base-200">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-          dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-          ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
-          eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
-          in culpa qui officia deserunt mollit anim id est laborum.
-        </div>
+        <section class="col-span-10 shadow-xl p-4 bg-base-200">
+          <div class="flex items-center mt-2">
+            <h3 class="prose prose-h3 text-sm font-bold mr-1"><%= gettext("Dynamic apparatus") %></h3>
+            <Tooltip.info
+              icon_class="h-5 w-5"
+              tip={
+                gettext(
+                  "The dynamic apparatus shows the difference between the current critical text and other available critical texts."
+                )
+              }
+            />
+          </div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+            eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+            in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </section>
       </div>
     </article>
     """
