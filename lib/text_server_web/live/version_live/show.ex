@@ -60,7 +60,7 @@ defmodule TextServerWeb.VersionLive.Show do
         <hr class="my-4 col-span-10" />
 
         <div class="col-span-2">
-          <section>
+          <section class="mb-8">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-sm font-bold prose prose-h3">
                 <%= gettext("Change critical text") %>
@@ -83,7 +83,7 @@ defmodule TextServerWeb.VersionLive.Show do
               <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
             </.form>
           </section>
-          <section class="mt-4">
+          <section class="mb-8">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Navigation") %></h3>
               <Tooltip.info
@@ -97,7 +97,7 @@ defmodule TextServerWeb.VersionLive.Show do
             </div>
             <Navigation.nav_menu passages={@passages} current_passage={@passage} />
           </section>
-          <section class="mt-4">
+          <section>
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Filter glosses") %></h3>
               <Tooltip.info
@@ -111,7 +111,7 @@ defmodule TextServerWeb.VersionLive.Show do
             </div>
             <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
               <input type="text" name="multi-select-filter" value={@multi_select_filter_value} class={~w(
-                  w-full input input-secondary input-sm
+                  w-full input input-secondary input-sm mb-2
                 )} phx-change="filter-change" placeholder="Filter commentaries" />
               <div class="max-h-48 overflow-y-scroll">
                 <.live_component

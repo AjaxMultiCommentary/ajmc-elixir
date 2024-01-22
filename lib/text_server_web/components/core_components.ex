@@ -312,7 +312,7 @@ defmodule TextServerWeb.CoreComponents do
     ~H"""
     <div phx-feedback-for={@name} class="form-control">
       <.label for={@id}><%= @label %></.label>
-      <select id={@id} name={@name} class="select select-secondary" multiple={@multiple} {@rest}>
+      <select id={@id} name={@name} class="select select-secondary select-sm" multiple={@multiple} {@rest}>
         <option :if={@prompt} value=""><%= @prompt %></option>
         <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
       </select>

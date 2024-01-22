@@ -170,15 +170,14 @@ defmodule TextServer.Ingestion.Commentary do
           n when is_integer(n) ->
             n
         end)
-        |> Enum.dedup()
 
       [start_offset, end_offset] =
-        if length(citation) == 2 and citation != [first_line_n, last_line_n] do
+        if citation != [first_line_n, last_line_n] do
           [last_line_offset, first_line_offset]
         else
           # If the lemma is on a single line, make sure that the
           # offsets are in text order (left to right)
-          if length(citation) == 1 do
+          if Enum.at(citation, 0) == Enum.at(citation, 1) do
             [first_line_offset, last_line_offset] |> Enum.sort()
           else
             [first_line_offset, last_line_offset]
@@ -199,7 +198,7 @@ defmodule TextServer.Ingestion.Commentary do
             commentary.urn
             | citations: citation,
               passage_component:
-                "#{Enum.at(citation, 0)}@#{start_offset}-#{Enum.at(citation, 1)}@#{end_offset}",
+                "#{Enum.at(citation, 0)}@#{start_offset}-#{Enum.at(citation, -1)}@#{end_offset}",
               subsections: [start_offset, end_offset]
           }
         }
