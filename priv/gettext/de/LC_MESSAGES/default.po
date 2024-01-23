@@ -55,7 +55,7 @@ msgstr "Ersteller(n)"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "Prologue"
-msgstr "Prologo"
+msgstr "Prolog"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "*Parodos*"

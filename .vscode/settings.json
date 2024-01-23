@@ -3,6 +3,7 @@
         "\".vscode/css_custom_data.json\""
     ],
     "files.associations": {"*.css": "tailwindcss"},
+    "git.ignoreSubmodules": true,
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
       }
