@@ -83,7 +83,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   defp citation(attributes) do
     citation = attributes |> Map.get("citation")
 
-    if Enum.count(citation) > 1 do
+    if Enum.at(citation, 0) != Enum.at(citation, 1) do
       "#{gettext("vv.")} #{Enum.join(citation, "–")}."
     else
       "#{gettext("v.")} #{List.first(citation)}."

@@ -5,7 +5,7 @@ defmodule TextServerWeb.Components.MultiSelect do
     ~H"""
     <div class="mt-1" id={"options-container-#{@id}"}>
       <%= inputs_for @form, :options, fn value -> %>
-        <div class="text-sm">
+        <div class="text-sm mb-1">
           <%= label(value, :label) do %>
             <%= checkbox(value, :selected,
               phx_change: "checked",
