@@ -96,6 +96,12 @@ defmodule TextServer.LemmalessComments do
   """
   def get_lemmaless_comment!(id), do: Repo.get!(LemmalessComment, id)
 
+  def get_lemmaless_comment_by_urn!(%CTS.URN{} = urn) do
+    LemmalessComment
+    |> where([c], c.urn == ^urn)
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a lemmaless_comment.
 

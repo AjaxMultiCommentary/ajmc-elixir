@@ -36,7 +36,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :comments, :list
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
-  attr :highlighted_comments, :list
+  attr :highlighted_comments, :list, default: []
   attr :highlighted_lemmaless_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
@@ -149,7 +149,7 @@ defmodule TextServerWeb.VersionLive.Show do
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
               current_user={@current_user}
-              is_highlighted={is_highlighted(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
+              highlighted?={highlighted?(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
             />
           <% end %>
         </div>
@@ -183,14 +183,12 @@ defmodule TextServerWeb.VersionLive.Show do
     text_nodes = passage.text_nodes
 
     commentaries = list_commentaries(socket, text_nodes)
-
     personae_loquentes = get_personae_loquentes(text_nodes)
 
     socket =
       socket
       |> assign(
         form: to_form(params),
-        highlighted_comments: [],
         passage: passage,
         passages: Passages.list_passages_for_version(version),
         page_title: version.label,
@@ -204,6 +202,7 @@ defmodule TextServerWeb.VersionLive.Show do
           end)
       )
       |> assign_multi_select_options(commentaries)
+      |> maybe_highlight_gloss(Map.get(params, "gloss"))
 
     {:noreply, socket}
   end
@@ -386,11 +385,11 @@ defmodule TextServerWeb.VersionLive.Show do
     end)
   end
 
-  defp is_highlighted(%Comment{} = comment, comment_ids, _) do
+  defp highlighted?(%Comment{} = comment, comment_ids, _) do
     Enum.member?(comment_ids, "#{comment.interface_id}")
   end
 
-  defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
+  defp highlighted?(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
     Enum.member?(lemmaless_comment_ids, "#{comment.interface_id}")
   end
 
@@ -416,5 +415,25 @@ defmodule TextServerWeb.VersionLive.Show do
 
   defp list_versions do
     Versions.list_versions()
+  end
+
+  defp maybe_highlight_gloss(socket, nil), do: socket
+
+  defp maybe_highlight_gloss(socket, gloss) do
+    gloss_urn = CTS.URN.parse("urn:cts:greekLit:#{gloss}")
+
+    case gloss_urn do
+      %CTS.URN{subsections: [nil, nil]} ->
+        comment =
+          LemmalessComments.get_lemmaless_comment_by_urn!(gloss_urn)
+          |> LemmalessComments.with_interface_id()
+
+        highlights = [comment.interface_id]
+        send(self(), {:comments_highlighted, highlights})
+        assign(socket, :highlighted_lemmaless_comments, highlights)
+
+      _ ->
+        socket
+    end
   end
 end

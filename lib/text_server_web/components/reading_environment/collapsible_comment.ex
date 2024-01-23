@@ -9,7 +9,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   attr :comment, :map, required: true
   attr :color, :string, default: "#fff"
   attr :current_user, Accounts.User
-  attr :is_highlighted, :boolean
+  attr :highlighted?, :boolean
   attr :is_iiif_viewer_shown, :boolean, default: false
   attr :is_open, :boolean, default: false
 
@@ -18,8 +18,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     <div
       class={[
         "border-2 collapse collapse-arrow rounded-sm mb-2",
-        if(@is_highlighted, do: "border-secondary", else: ""),
-        if(@is_open, do: "collapse-open", else: "collapse-close")
+        if(@highlighted?, do: "border-secondary collapse-open", else: "")
       ]}
       id={@comment.interface_id}
     >
