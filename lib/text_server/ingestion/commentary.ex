@@ -387,7 +387,7 @@ defmodule TextServer.Ingestion.Commentary do
     next_lemma_words = WordRange.get_words_for_range(words, next_lemma_range)
 
     if next_lemma_last < lemma_last do
-      Logger.error("overlapping lemmata: #{inspect(lemma)}\n#{inspect(next_lemma)}")
+      Logger.error("out of order lemmata: #{inspect(lemma)}\n#{inspect(next_lemma)}")
     end
 
     commentaries =
