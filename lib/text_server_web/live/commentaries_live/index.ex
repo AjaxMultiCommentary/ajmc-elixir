@@ -1,9 +1,9 @@
 defmodule TextServerWeb.CommentariesLive.Index do
-  alias TextServerWeb.CoreComponents
   use TextServerWeb, :live_view
 
   alias TextServer.Commentaries
   alias TextServer.Commentaries.CanonicalCommentary
+  alias TextServerWeb.CoreComponents
 
   def mount(_params, _session, socket) do
     {:ok,

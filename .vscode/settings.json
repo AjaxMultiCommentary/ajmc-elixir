@@ -3,7 +3,13 @@
         "\".vscode/css_custom_data.json\""
     ],
     "files.associations": {"*.css": "tailwindcss"},
-    "git.ignoreSubmodules": true,
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/.ruby-lsp": true,
+        "**/commentaries_data": true
+    },
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
       }

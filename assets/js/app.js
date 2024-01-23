@@ -33,12 +33,27 @@ window.addEventListener("phx:page-loading-start", (info) => topbar.show());
 window.addEventListener("phx:page-loading-stop", (info) => topbar.hide());
 
 window.addEventListener("phx:change-locale", (e) => {
-	let searchParams = new URLSearchParams(window.location.search);
+	setLocale(e.detail.locale);
+});
 
-	searchParams.set("locale", e.detail.locale);
+const validLocales = ["de", "en", "fr", "it"];
+
+function setLocale(locale = "en") {
+	if (!validLocales.includes(locale)) {
+		return console.error(`Invalid locale: ${locale}.`);
+	}
+
+	const searchParams = new URLSearchParams(window.location.search);
+	const currentLocale = searchParams.get("locale");
+
+	if (currentLocale === locale) {
+		return;
+	}
+
+	searchParams.set("locale", locale);
 
 	window.location.search = searchParams;
-});
+}
 
 window.addEventListener("phx:highlight-comment", (e) => {
 	const el = document.getElementById(e.detail.id);
