@@ -63,6 +63,10 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
         <%= unless is_nil(@current_user) do %>
           <small class="mt-1 text-xs base-content">
             <%= @comment.attributes["page_ids"] |> Enum.join(", ") %>
+
+            <%= for {k, v} <- @comment.canonical_commentary.metadata do %>
+              <p><%= k %>: <%= v %></p>
+            <% end %>
           </small>
         <% end %>
       </div>
@@ -81,12 +85,12 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   end
 
   defp citation(attributes) do
-    citation = attributes |> Map.get("citation")
+    citations = attributes |> Map.get("citations")
 
-    if Enum.at(citation, 0) != Enum.at(citation, 1) do
-      "#{gettext("vv.")} #{Enum.join(citation, "–")}."
+    if Enum.at(citations, 0) != Enum.at(citations, 1) do
+      "#{gettext("vv.")} #{Enum.join(citations, "–")}."
     else
-      "#{gettext("v.")} #{List.first(citation)}."
+      "#{gettext("v.")} #{List.first(citations)}."
     end
   end
 end

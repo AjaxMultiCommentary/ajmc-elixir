@@ -1,0 +1,3 @@
+[submodule "commentaries_data"]
+	path = priv/commentaries_data
+	url = git@github.com:AjaxMultiCommentary/commentaries_data.git

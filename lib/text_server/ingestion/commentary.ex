@@ -75,15 +75,11 @@ defmodule TextServer.Ingestion.Commentary do
   The public entrypoint for this module. Takes a path
   to the AjMC canonical JSON fil and the metadata from commentaries.toml. Returns `:ok` on success.
   """
-  def ingest_commentary(path, commentaries_meta) do
+  def ingest_commentary(path, commentary_meta) do
     s = File.read!(path)
     json = Jason.decode!(s)
-    pid = json |> Map.get("id")
 
-    commentary_meta =
-      commentaries_meta |> Enum.find(&(Map.get(&1, "ajmc_id") == pid))
-
-    commentary = create_commentary(path, pid, commentary_meta)
+    commentary = create_commentary(path, json, commentary_meta)
 
     _lemma_comments =
       prepare_lemmas_from_canonical_json(json)
@@ -92,7 +88,10 @@ defmodule TextServer.Ingestion.Commentary do
     :ok
   end
 
-  defp create_commentary(path, pid, commentary_meta) do
+  defp create_commentary(path, json, commentary_meta) do
+    pid = json |> Map.get("id")
+    metadata = json |> Map.get("metadata")
+
     basename = path |> Path.basename() |> Path.rootname()
     zotero_id = commentary_meta |> Map.get("zotero_id")
     zotero_data = Zotero.API.item(zotero_id)
@@ -122,6 +121,7 @@ defmodule TextServer.Ingestion.Commentary do
     wikidata_qid = zotero_extra |> Map.get("QID")
     source_url = zotero_data |> Map.get("url")
     title = zotero_data |> Map.get("title")
+    urn = zotero_extra |> Map.get("URN")
 
     zotero_link =
       zotero_data |> Map.get("links", %{}) |> Map.get("alternate", %{}) |> Map.get("href")
@@ -131,12 +131,13 @@ defmodule TextServer.Ingestion.Commentary do
         creators: creators,
         filename: basename,
         languages: languages,
+        metadata: metadata,
         pid: pid,
         publication_date: publication_date,
         public_domain_year: public_domain_year,
         source_url: source_url,
         title: title,
-        urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-#{pid}",
+        urn: "urn:cts:greekLit:#{urn}",
         wikidata_qid: wikidata_qid,
         zotero_id: zotero_id,
         zotero_link: zotero_link
@@ -161,7 +162,7 @@ defmodule TextServer.Ingestion.Commentary do
     else
       lemma_transcript = Map.get(lemma, "lemma")
 
-      citation =
+      citations =
         [first_line_n, last_line_n]
         |> Enum.sort_by(fn
           n when is_binary(n) ->
@@ -172,19 +173,19 @@ defmodule TextServer.Ingestion.Commentary do
         end)
 
       [start_offset, end_offset] =
-        if citation != [first_line_n, last_line_n] do
+        if citations != [first_line_n, last_line_n] do
           [last_line_offset, first_line_offset]
         else
           # If the lemma is on a single line, make sure that the
           # offsets are in text order (left to right)
-          if Enum.at(citation, 0) == Enum.at(citation, 1) do
+          if Enum.at(citations, 0) == Enum.at(citations, 1) do
             [first_line_offset, last_line_offset] |> Enum.sort()
           else
             [first_line_offset, last_line_offset]
           end
         end
 
-      attributes = Map.put(no_content_lemma, :citation, citation)
+      attributes = Map.put(no_content_lemma, :citations, citations)
 
       if Map.get(lemma, "label") == "word-anchor" do
         %{
@@ -196,9 +197,9 @@ defmodule TextServer.Ingestion.Commentary do
           start_offset: start_offset,
           urn: %{
             commentary.urn
-            | citations: citation,
+            | citations: citations,
               passage_component:
-                "#{Enum.at(citation, 0)}@#{start_offset}-#{Enum.at(citation, -1)}@#{end_offset}",
+                "#{Enum.at(citations, 0)}@#{start_offset}-#{Enum.at(citations, -1)}@#{end_offset}",
               subsections: [start_offset, end_offset]
           }
         }
@@ -208,7 +209,7 @@ defmodule TextServer.Ingestion.Commentary do
           attributes: attributes,
           canonical_commentary_id: commentary.id,
           content: content,
-          urn: "#{commentary.urn}:#{Enum.join(citation, "-")}"
+          urn: "#{commentary.urn}:#{citations |> Enum.dedup() |> Enum.join("-")}"
         }
         |> LemmalessComments.upsert_lemmaless_comment()
       end
@@ -386,7 +387,7 @@ defmodule TextServer.Ingestion.Commentary do
     next_lemma_words = WordRange.get_words_for_range(words, next_lemma_range)
 
     if next_lemma_last < lemma_last do
-      Logger.error("overlapping lemmata", current_lemma: lemma, next_lemma: next_lemma)
+      Logger.error("overlapping lemmata: #{inspect(lemma)}\n#{inspect(next_lemma)}")
     end
 
     commentaries =

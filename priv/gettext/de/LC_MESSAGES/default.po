@@ -11,32 +11,33 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: lib/text_server_web/components/core_components.ex:467
+#: lib/text_server_web/components/core_components.ex:461
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:18
+#: lib/text_server_web/live/commentaries_live/index.ex:19
 #, elixir-autogen, elixir-format
 msgid "Bibliography"
 msgstr "Literaturverzeichnis"
 
-#: lib/text_server_web/live/commentaries_live/index.ex:30
+#: lib/text_server_web/live/commentaries_live/index.ex:33
+#: lib/text_server_web/live/commentaries_live/show.ex:40
 #, elixir-autogen, elixir-format
 msgid "Languages"
 msgstr "Sprachen"
 
-#: lib/text_server_web/live/commentaries_live/index.ex:27
+#: lib/text_server_web/live/commentaries_live/index.ex:30
 #, elixir-autogen, elixir-format
 msgid "Public Domain?"
 msgstr "Gemeinfrei?"
 
-#: lib/text_server_web/live/commentaries_live/index.ex:26
+#: lib/text_server_web/live/commentaries_live/index.ex:29
 #, elixir-autogen, elixir-format
 msgid "Publication Date"
 msgstr "Erscheinungsdatum"
 
-#: lib/text_server_web/live/commentaries_live/index.ex:25
+#: lib/text_server_web/live/commentaries_live/index.ex:26
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr "Titel"
@@ -47,14 +48,14 @@ msgstr "Titel"
 msgid "close"
 msgstr "schließen"
 
-#: lib/text_server_web/live/commentaries_live/index.ex:22
+#: lib/text_server_web/live/commentaries_live/index.ex:23
 #, elixir-autogen, elixir-format
 msgid "Creator(s)"
 msgstr "Ersteller(n)"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "Prologue"
-msgstr "Prolog"
+msgstr "Prologo"
 
 #: lib/text_server_web/components/reading_environment/navigation.ex:19
 msgid "*Parodos*"
@@ -96,12 +97,98 @@ msgstr "Dritter Stasimon"
 msgid "*Exodos*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:81
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:89
 #, elixir-autogen, elixir-format
 msgid "v."
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:79
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:87
 #, elixir-autogen, elixir-format
 msgid "vv."
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:73
+#, elixir-autogen, elixir-format
+msgid "Ancient Greek"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:68
+#, elixir-autogen, elixir-format
+msgid "Change critical text"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:158
+#, elixir-autogen, elixir-format
+msgid "Dynamic apparatus"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:67
+#: lib/text_server_web/live/commentaries_live/show.ex:68
+#, elixir-autogen, elixir-format
+msgid "English"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:104
+#, elixir-autogen, elixir-format
+msgid "Filter glosses"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:69
+#: lib/text_server_web/live/commentaries_live/show.ex:70
+#: lib/text_server_web/live/commentaries_live/show.ex:71
+#, elixir-autogen, elixir-format
+msgid "French"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:66
+#: lib/text_server_web/live/commentaries_live/show.ex:72
+#, elixir-autogen, elixir-format
+msgid "German"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:74
+#: lib/text_server_web/live/commentaries_live/show.ex:75
+#, elixir-autogen, elixir-format
+msgid "Italian"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:76
+#: lib/text_server_web/live/commentaries_live/show.ex:77
+#, elixir-autogen, elixir-format
+msgid "Latin"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:90
+#, elixir-autogen, elixir-format
+msgid "Navigation"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/show.ex:34
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Public domain year"
+msgstr "Gemeinfrei?"
+
+#: lib/text_server_web/live/version_live/show.ex:162
+#, elixir-autogen, elixir-format
+msgid "The dynamic apparatus shows the difference between the current critical text and other available critical texts."
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:94
+#, elixir-autogen, elixir-format
+msgid "This synopsis is based on the Lloyd-Jones edition of the text, and the line numbers might not line up exactly with other editions. Click on a section of the synopsis to view it in the critical text area."
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:108
+#, elixir-autogen, elixir-format
+msgid "Use this filter to show or hide comments on the right. You can search for a commentary by name using the text box."
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:73
+#, elixir-autogen, elixir-format
+msgid "You can change the edition used for the critical text here. Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones version of the text, so they might not match up if you prefer to use another edition."
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:59
+#, elixir-autogen, elixir-format
+msgid "about_the_multi_commentary"
 msgstr ""

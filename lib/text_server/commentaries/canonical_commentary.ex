@@ -8,11 +8,12 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
 
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:filename, :pid]}
+  @derive {Jason.Encoder, only: [:filename, :pid, :metadata]}
 
   schema "canonical_commentaries" do
     field :filename, :string
     field :languages, {:array, :string}
+    field :metadata, :map
     field :pid, :string
     field :publication_date, :integer
     field :public_domain_year, :integer
@@ -38,6 +39,7 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     |> cast(attrs, [
       :filename,
       :languages,
+      :metadata,
       :pid,
       :publication_date,
       :public_domain_year,
