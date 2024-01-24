@@ -182,7 +182,6 @@ defmodule TextServerWeb.VersionLive.Show do
     passage = Versions.get_version_passage(version.id, passage_number)
     text_nodes = passage.text_nodes
 
-    commentaries = list_commentaries(socket, text_nodes)
     personae_loquentes = get_personae_loquentes(text_nodes)
 
     socket =
@@ -201,6 +200,12 @@ defmodule TextServerWeb.VersionLive.Show do
             {raw("#{v.label} #{v.description}"), CTS.URN.to_string(v.urn)}
           end)
       )
+
+    commentaries = list_commentaries(socket)
+
+    socket =
+      socket
+      |> assign(commentaries: commentaries)
       |> assign_multi_select_options(commentaries)
       |> maybe_highlight_gloss(Map.get(params, "gloss"))
 
@@ -225,7 +230,7 @@ defmodule TextServerWeb.VersionLive.Show do
     send(
       self(),
       {:updated_options,
-       list_commentaries(socket, socket.assigns.text_nodes)
+       list_commentaries(socket)
        |> Enum.filter(&String.starts_with?(String.downcase(&1.label), String.downcase(filter_s)))}
     )
 
@@ -393,7 +398,8 @@ defmodule TextServerWeb.VersionLive.Show do
     Enum.member?(lemmaless_comment_ids, "#{comment.interface_id}")
   end
 
-  defp list_commentaries(socket, text_nodes) do
+  defp list_commentaries(socket) do
+    text_nodes = socket.assigns.text_nodes
     comments = filter_comments(socket, text_nodes, [])
     lemmaless_comments = filter_lemmaless_comments(socket, text_nodes, [])
     all_comments = comments ++ lemmaless_comments
@@ -407,7 +413,12 @@ defmodule TextServerWeb.VersionLive.Show do
         id: c.id,
         count: commentary_frequencies[c.id] || 0,
         label: CanonicalCommentary.commentary_label(c),
-        selected: false
+        selected:
+          Enum.find_value(Map.get(socket.assigns, :commentaries, []), fn assigned_c ->
+            if assigned_c.id == c.id do
+              assigned_c.selected
+            end
+          end)
       }
     end)
     |> build_options()
