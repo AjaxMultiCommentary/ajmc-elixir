@@ -67,14 +67,11 @@ defmodule TextServerWeb.VersionLive.Show do
               <h3 class="text-sm font-bold prose prose-h3">
                 <%= gettext("Change critical text") %>
               </h3>
-              <Tooltip.info
-                icon_class="h-5 w-5"
-                tip={
-                  gettext(
-                    "You can change the edition used for the critical text here. Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones version of the text, so they might not match up if you prefer to use another edition."
-                  )
-                }
-              />
+              <Tooltip.info icon_class="h-5 w-5" tip={gettext("
+                    You can change the edition used for the critical text here.
+                    Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones
+                    version of the text, so they might not match up if you prefer to use another edition.
+                      ")} />
             </div>
             <.form
               :let={f}
@@ -90,11 +87,10 @@ defmodule TextServerWeb.VersionLive.Show do
               <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Navigation") %></h3>
               <Tooltip.info
                 icon_class="h-5 w-5"
-                tip={
-                  gettext(
-                    "This synopsis is based on the Lloyd-Jones edition of the text, and the line numbers might not line up exactly with other editions. Click on a section of the synopsis to view it in the critical text area."
-                  )
-                }
+                tip={gettext("This synopsis is based on the Lloyd-Jones edition of the text,
+                    and the line numbers might not line up exactly with other editions.
+                    Click on a section of the synopsis to view it in the critical text area.
+                    ")}
               />
             </div>
             <Navigation.nav_menu passages={@passages} current_passage={@passage} />
@@ -150,7 +146,7 @@ defmodule TextServerWeb.VersionLive.Show do
               comment={comment}
               current_user={@current_user}
               highlighted?={highlighted?(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
-              version_urn={@version.urn}
+              passage_urn={@passage.passage.urn}
             />
           <% end %>
         </div>
@@ -178,9 +174,17 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   @impl true
-  def handle_params(%{"urn" => urn, "page" => passage_number} = params, _, socket) do
+  def handle_params(%{"urn" => urn} = params, _, socket) do
+    urn = CTS.URN.parse(urn)
     version = Versions.get_version_by_urn!(urn)
-    passage = Versions.get_version_passage(version.id, passage_number)
+
+    passage =
+      if is_nil(urn.passage_component) do
+        Versions.get_version_passage(version.id, 1)
+      else
+        Versions.get_version_passage_by_location(version.id, urn.citations)
+      end
+
     text_nodes = passage.text_nodes
 
     personae_loquentes = get_personae_loquentes(text_nodes)
@@ -223,8 +227,8 @@ defmodule TextServerWeb.VersionLive.Show do
 
   @impl true
   def handle_event("change-version", %{"version" => %{"id" => urn}}, socket) do
-    {:noreply,
-     push_navigate(socket, to: ~p"/versions/#{urn}?page=#{socket.assigns.passage.passage_number}")}
+    urn = "#{urn}:#{socket.assigns.passage.passage.urn.passage_component}"
+    {:noreply, push_navigate(socket, to: ~p"/versions/#{urn}")}
   end
 
   def handle_event("filter-change", %{"multi-select-filter" => filter_s}, socket) do
@@ -443,6 +447,15 @@ defmodule TextServerWeb.VersionLive.Show do
         highlights = [comment.interface_id]
         send(self(), {:comments_highlighted, highlights})
         assign(socket, :highlighted_lemmaless_comments, highlights)
+
+      %CTS.URN{subsections: _subsections} ->
+        comment =
+          Comments.get_comment_by_urn!(gloss_urn)
+          |> Comments.with_interface_id()
+
+        highlights = [comment.interface_id]
+        send(self(), {:comments_highlighted, highlights})
+        assign(socket, :highlighted_comments, highlights)
 
       _ ->
         socket

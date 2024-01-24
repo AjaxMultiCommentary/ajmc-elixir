@@ -348,17 +348,17 @@ defmodule TextServer.Versions do
     end
   end
 
-  def get_version_passage_by_location(version_id, location) when is_list(location) do
+  def get_version_passage_by_location(version_id, [start, _] = location) do
     case Passage
          |> where(
            [p],
            p.version_id == ^version_id and
-             p.start_location <= ^location and
-             p.end_location >= ^location
+             ^[start] >= p.start_location and
+             ^[start] <= p.end_location
          )
          |> Repo.one() do
       nil ->
-        Logger.warning("No text_nodes found.")
+        Logger.warning("No text_nodes found.", location: location)
         nil
 
       passage ->

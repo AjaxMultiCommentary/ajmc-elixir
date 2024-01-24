@@ -12,7 +12,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   attr :highlighted?, :boolean
   attr :is_iiif_viewer_shown, :boolean, default: false
   attr :is_open, :boolean, default: false
-  attr :version_urn, :map, required: true
+  attr :passage_urn, :map
 
   def render(assigns) do
     ~H"""
@@ -27,7 +27,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium base-content cursor-pointer">
           <span class="text-sm font-light base-content">
-            <.link patch={~p"/versions/#{@version_urn}"}><%= citation(@comment.attributes) %></.link>
+            <.link patch={~p"/versions/#{@passage_urn}?gloss=#{citable_gloss(@comment.urn)}"}>
+              <%= citation(@comment.attributes) %>
+            </.link>
           </span>
           <small class="mt-1 mx-w-2xl text-sm base-content">
             <.link navigate={~p"/bibliography/#{@comment.canonical_commentary.pid}"} class="hover:underline">
@@ -93,5 +95,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     else
       "#{gettext("v.")} #{List.first(citations)}."
     end
+  end
+
+  defp citable_gloss(comment_urn) do
+    "#{comment_urn.work_component}:#{comment_urn.passage_component}"
   end
 end

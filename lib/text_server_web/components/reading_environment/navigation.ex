@@ -12,7 +12,7 @@ defmodule TextServerWeb.ReadingEnvironment.Navigation do
       <%= for passage <- @passages do %>
         <li class="text-sm">
           <.link
-            patch={"?page=#{passage.passage_number}"}
+            patch={~p"/versions/#{passage.urn}"}
             class={[if(passage.passage_number == @current_passage.passage_number, do: "active", else: "")]}
           >
             <span class="items-start">

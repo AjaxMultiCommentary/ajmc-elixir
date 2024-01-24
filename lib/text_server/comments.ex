@@ -107,6 +107,12 @@ defmodule TextServer.Comments do
   """
   def get_comment!(id), do: Repo.get!(Comment, id)
 
+  def get_comment_by_urn!(%CTS.URN{} = urn) do
+    Comment
+    |> where([c], c.urn == ^urn)
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a comment.
 
