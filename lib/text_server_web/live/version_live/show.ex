@@ -150,6 +150,7 @@ defmodule TextServerWeb.VersionLive.Show do
               comment={comment}
               current_user={@current_user}
               highlighted?={highlighted?(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
+              version_urn={@version.urn}
             />
           <% end %>
         </div>

@@ -12,20 +12,22 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   attr :highlighted?, :boolean
   attr :is_iiif_viewer_shown, :boolean, default: false
   attr :is_open, :boolean, default: false
+  attr :version_urn, :map, required: true
 
   def render(assigns) do
     ~H"""
     <div
       class={[
         "border-2 collapse collapse-arrow rounded-sm mb-2",
-        if(@highlighted?, do: "border-secondary collapse-open", else: "")
+        if(@highlighted?, do: "border-secondary collapse-open", else: ""),
+        if(@is_open, do: "collapse-open")
       ]}
       id={@comment.interface_id}
     >
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium base-content cursor-pointer">
           <span class="text-sm font-light base-content">
-            <%= citation(@comment.attributes) %>
+            <.link patch={~p"/versions/#{@version_urn}"}><%= citation(@comment.attributes) %></.link>
           </span>
           <small class="mt-1 mx-w-2xl text-sm base-content">
             <.link navigate={~p"/bibliography/#{@comment.canonical_commentary.pid}"} class="hover:underline">
