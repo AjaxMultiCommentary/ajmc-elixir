@@ -49,18 +49,10 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
           lemmaless_comments={
             @lemmaless_comments
             |> Enum.filter(fn c ->
-              [first_citation, last_citation] = c.urn.citations
+              first_citation = List.first(c.urn.citations)
               location = List.first(text_node.location)
 
-              if is_nil(last_citation) do
-                location == first_citation
-              else
-                # The call to String.replace/3 strips away alphabet characters from locations like 587b
-                # so that we can just use the citations as a (numerical) range
-                (location |> String.replace(~r/[[:alpha:]]/u, "") |> String.to_integer()) in String.to_integer(
-                  first_citation
-                )..String.to_integer(last_citation)
-              end
+              location == first_citation
             end)
           }
           id={text_node.id}

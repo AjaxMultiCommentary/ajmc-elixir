@@ -1,9 +1,9 @@
 defmodule TextServerWeb.CommentariesLive.Index do
-  alias TextServerWeb.CoreComponents
   use TextServerWeb, :live_view
 
   alias TextServer.Commentaries
   alias TextServer.Commentaries.CanonicalCommentary
+  alias TextServerWeb.CoreComponents
 
   def mount(_params, _session, socket) do
     {:ok,
@@ -16,7 +16,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
     <section>
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold leading-6 text-gray-900"><%= gettext("Bibliography") %></h1>
+          <h1 class="text-base font-semibold leading-6 base-content"><%= gettext("Bibliography") %></h1>
         </div>
       </div>
       <CoreComponents.table id="bibliography" rows={@commentaries} row_id={fn row -> "commentary_#{row.id}" end}>
@@ -34,7 +34,7 @@ defmodule TextServerWeb.CommentariesLive.Index do
           <%= commentary.languages |> Enum.join(", ") %>
         </:col>
         <:col :let={commentary} label="Wikidata">
-          <.link href={"https://wikidata.org/#{commentary.wikidata_qid}"}>
+          <.link href={"https://wikidata.org/wiki/#{commentary.wikidata_qid}"}>
             <%= commentary.wikidata_qid %>
           </.link>
         </:col>

@@ -3,18 +3,17 @@ defmodule TextServerWeb.Components.MultiSelect do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-wrap" id={"options-container-#{@id}"}>
+    <div class="mt-1" id={"options-container-#{@id}"}>
       <%= inputs_for @form, :options, fn value -> %>
-        <div class="px-2">
-          <%= checkbox(value, :selected,
-            phx_change: "checked",
-            phx_target: @myself,
-            value: value.data.selected
-          ) %>
-          <label class="text-gray-800">
-            <%= label(value, :label, value.data.label) %>
-            <%= hidden_input(value, :label, value: value.data.label) %>
-          </label>
+        <div class="text-sm mb-1">
+          <%= label(value, :label) do %>
+            <%= checkbox(value, :selected,
+              phx_change: "checked",
+              phx_target: @myself,
+              value: value.data.selected
+            ) %>
+            <%= value.data.label %> <span class="base-content float-right">(<%= value.data.count %>)</span>
+          <% end %>
         </div>
       <% end %>
     </div>

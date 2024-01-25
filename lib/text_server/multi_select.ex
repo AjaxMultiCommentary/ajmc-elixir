@@ -9,8 +9,9 @@ defmodule TextServer.MultiSelect do
     use Ecto.Schema
 
     embedded_schema do
-      field :selected, :boolean, default: false
+      field :count, :integer
       field :label, :string
+      field :selected, :boolean, default: false
     end
   end
 end

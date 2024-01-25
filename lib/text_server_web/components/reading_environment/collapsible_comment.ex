@@ -3,44 +3,49 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   alias TextServer.Comments.Comment
   alias TextServer.Commentaries.CanonicalCommentary
+  alias TextServer.LemmalessComments.LemmalessComment
 
   alias TextServerWeb.CoreComponents
 
   attr :comment, :map, required: true
   attr :color, :string, default: "#fff"
-  attr :is_highlighted, :boolean
+  attr :current_user, Accounts.User
+  attr :highlighted?, :boolean
   attr :is_iiif_viewer_shown, :boolean, default: false
   attr :is_open, :boolean, default: false
+  attr :passage_urn, :map
 
   def render(assigns) do
     ~H"""
     <div
       class={[
         "border-2 collapse collapse-arrow rounded-sm mb-2",
-        if(@is_highlighted, do: "border-stone-800", else: ""),
-        if(@is_open, do: "collapse-open", else: "collapse-close")
+        if(@highlighted?, do: "border-secondary collapse-open", else: ""),
+        if(@is_open, do: "collapse-open")
       ]}
-      id={"comment-#{@comment.id}"}
+      id={@comment.interface_id}
     >
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
-        <h3 class="text-sm font-medium text-gray-900 cursor-pointer">
-          <span class="text-sm font-light text-gray-600">
-            <%= citation(@comment.attributes) %>
+        <h3 class="text-sm font-medium base-content cursor-pointer">
+          <span class="text-sm font-light base-content">
+            <.link patch={~p"/versions/#{@passage_urn}?gloss=#{citable_gloss(@comment)}"}>
+              <%= citation(@comment.attributes) %>
+            </.link>
           </span>
-          <small class="mt-1 mx-w-2xl text-sm text-gray-500">
+          <small class="mt-1 mx-w-2xl text-sm base-content">
             <.link navigate={~p"/bibliography/#{@comment.canonical_commentary.pid}"} class="hover:underline">
               <%= CanonicalCommentary.commentary_label(@comment.canonical_commentary) %>
             </.link>
           </small>
         </h3>
         <%= if match?(%Comment{}, @comment) do %>
-          <small class="text-sm text-slate-700">
+          <small class="text-sm base-content">
             <%= @comment.attributes |> Map.get("lemma") %>
           </small>
         <% end %>
       </div>
       <div class="collapse-content float-right">
-        <p class="max-w-2xl text-sm text-gray-800"><%= @comment.content %></p>
+        <p class="max-w-2xl text-sm base-content font-serif"><%= @comment.content %></p>
         <div class="flex mt-2 justify-center">
           <%= if @is_iiif_viewer_shown do %>
             <.live_component
@@ -51,7 +56,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           <% else %>
             <CoreComponents.button
               type="button"
-              class="rounded-sm bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              class="btn btn-xs btn-outline btn-secondary"
               phx-click="show-iiif-viewer"
               phx-target={@myself}
             >
@@ -59,6 +64,15 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
             </CoreComponents.button>
           <% end %>
         </div>
+        <%= unless is_nil(@current_user) do %>
+          <small class="mt-1 text-xs base-content">
+            <%= @comment.attributes["page_ids"] |> Enum.join(", ") %>
+
+            <%= for {k, v} <- @comment.canonical_commentary.metadata do %>
+              <p><%= k %>: <%= v %></p>
+            <% end %>
+          </small>
+        <% end %>
       </div>
     </div>
     """
@@ -75,12 +89,20 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   end
 
   defp citation(attributes) do
-    citation = attributes |> Map.get("citation")
+    citations = attributes |> Map.get("citations")
 
-    if Enum.count(citation) > 1 do
-      "#{gettext("vv.")} #{Enum.join(citation, "–")}."
+    if Enum.at(citations, 0) != Enum.at(citations, 1) do
+      "#{gettext("vv.")} #{Enum.join(citations, "–")}."
     else
-      "#{gettext("v.")} #{List.first(citation)}."
+      "#{gettext("v.")} #{List.first(citations)}."
     end
+  end
+
+  defp citable_gloss(%Comment{} = comment) do
+    "#{comment.urn.work_component}:#{comment.urn.citations |> Enum.dedup() |> Enum.join("-")}@#{comment.lemma}"
+  end
+
+  defp citable_gloss(%LemmalessComment{} = comment) do
+    "#{comment.urn.work_component}:#{comment.urn.passage_component}"
   end
 end

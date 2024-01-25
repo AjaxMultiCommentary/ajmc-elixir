@@ -69,6 +69,10 @@ defmodule TextServerWeb do
         layout: {TextServerWeb.Layouts, :app}
 
       unquote(html_helpers())
+
+      def handle_event("change-locale", %{"language_select" => locale}, socket) do
+        {:noreply, push_event(socket, "change-locale", %{locale: locale})}
+      end
     end
   end
 

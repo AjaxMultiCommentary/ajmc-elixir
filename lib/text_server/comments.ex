@@ -107,6 +107,29 @@ defmodule TextServer.Comments do
   """
   def get_comment!(id), do: Repo.get!(Comment, id)
 
+  def get_comment_by_urn!(%CTS.URN{} = urn) do
+    Comment
+    |> where([c], c.urn == ^urn)
+    |> Repo.one!()
+  end
+
+  def get_comment_by_urn_with_lemma!(%CTS.URN{} = urn, lemma) do
+    query =
+      Comment
+      |> where([c], fragment("? ->> ? = ?", c.urn, "text_group", ^urn.text_group))
+      |> where([c], fragment("? ->> ? = ?", c.urn, "work", ^urn.work))
+      |> where([c], fragment("? ->> ? = ?", c.urn, "version", ^urn.version))
+      |> where(
+        [c],
+        fragment("(? ->> ?)::json ->> 0 = ?", c.urn, "citations", ^List.first(urn.citations))
+      )
+
+    wildcard_lemma = "%#{lemma}%"
+
+    from(c in query, where: ilike(c.lemma, fragment("?", ^wildcard_lemma)))
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a comment.
 
@@ -188,5 +211,9 @@ defmodule TextServer.Comments do
   """
   def change_comment(%Comment{} = comment, attrs \\ %{}) do
     Comment.changeset(comment, attrs)
+  end
+
+  def with_interface_id(%Comment{} = comment) do
+    %{comment | interface_id: "comment-#{comment.id}"}
   end
 end

@@ -51,7 +51,7 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
             From: "opacity-100"
             To: "opacity-0"
         -->
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
+        <div class="fixed inset-0 bg-primary bg-opacity-25 transition-opacity"></div>
 
         <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
           <!--
@@ -71,7 +71,7 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
               max-w-3xl
               transform
               divide-y
-              divide-gray-100
+              divide-primary
               overflow-hidden
               rounded-xl
               bg-white
@@ -92,7 +92,7 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
                 <CoreComponents.basic_input
                   type="text"
                   field={@changeset[:version_search_string]}
-                  class="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-800 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
+                  class="h-12 w-full border-0 bg-transparent pl-11 pr-4 base-content placeholder:base-content focus:ring-0 sm:text-sm"
                   placeholder="Search for comparanda in other versions"
                   role="combobox"
                   aria-expanded="false"
@@ -104,15 +104,15 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
             <!-- Empty state, show/hide based on command palette state -->
             <div :if={@search_results == []} class="px-6 py-14 text-center text-sm sm:px-14">
               <Icons.comparanda_icon />
-              <p class="mt-4 font-semibold text-gray-900">No comparanda found.</p>
-              <p class="mt-2 text-gray-500">We couldn&apos;t find anything with that term. Please try again.</p>
+              <p class="mt-4 font-semibold base-content">No comparanda found.</p>
+              <p class="mt-2 base-content">We couldn&apos;t find anything with that term. Please try again.</p>
             </div>
-            <div :if={@search_results != []} class="flex divide-x divide-gray-100">
+            <div :if={@search_results != []} class="flex divide-x divide-primary">
               <!-- Preview Visible: "sm:h-96" -->
               <div class="max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4 sm:h-96">
                 <!-- Default state, show/hide based on command palette state. -->
-                <h2 class="mb-4 mt-2 text-xs font-semibold text-gray-500">Comparanda</h2>
-                <ul class="-mx-2 text-sm text-gray-700" id="page-command-palette_search-results" role="listbox">
+                <h2 class="mb-4 mt-2 text-xs font-semibold base-content">Comparanda</h2>
+                <ul class="-mx-2 text-sm base-content" id="page-command-palette_search-results" role="listbox">
                   <.list_item
                     :for={version <- @search_results}
                     active={@previewed_version_id == Integer.to_string(version.id)}
@@ -138,7 +138,7 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
 
   def list_item(assigns) do
     ~H"""
-    <!-- Active: "bg-gray-100 text-gray-900" -->
+    <!-- Active: "bg-primary base-content" -->
     <li
       class="group flex cursor-pointer select-none items-center rounded-md p-2 hover:bg-stone-200"
       id={"version_preview-#{@version.id}"}
@@ -151,7 +151,7 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
       <section class="truncate">
         <h1 class="font-bold"><%= @version.label %></h1>
         <p class="flex-auto"><%= @version.urn %></p>
-        <p class="text-gray-400"><%= @version.description %></p>
+        <p class="base-content"><%= @version.description %></p>
       </section>
       <!-- Not Active: "hidden" -->
       <Icons.right_chevron :if={@active} />
@@ -164,13 +164,13 @@ defmodule TextServerWeb.ReadingEnvironment.VersionCommandPalette do
   def preview(assigns) do
     ~H"""
     <!-- Active item side-panel, show/hide based on active state -->
-    <div class="hidden h-96 w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
+    <div class="hidden h-96 w-1/2 flex-none flex-col divide-y divide-primary overflow-y-auto sm:flex">
       <div class="flex-none p-6 text-center">
-        <h2 class="mt-3 font-semibold text-gray-900"><%= @version.label %></h2>
-        <h3 class="text-sm leading-6 text-gray-500">
+        <h2 class="mt-3 font-semibold base-content"><%= @version.label %></h2>
+        <h3 class="text-sm leading-6 base-content">
           <%= @version.urn %>
         </h3>
-        <p class="text-sm leading-6 text-gray-500"><%= @version.description %></p>
+        <p class="text-sm leading-6 base-content"><%= @version.description %></p>
       </div>
       <div class="flex flex-auto flex-col justify-between p-6">
         <button

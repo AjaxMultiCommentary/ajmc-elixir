@@ -9,5 +9,7 @@ defmodule TextServerWeb.Hooks.RestoreLocale do
     {:cont, socket}
   end
 
-  def on_mount(:default, _params, _session, socket), do: {:cont, socket}
+  def on_mount(:default, _params, _session, socket) do
+    {:cont, socket}
+  end
 end

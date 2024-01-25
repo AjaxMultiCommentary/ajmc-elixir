@@ -1,24 +1,24 @@
 <%= if @current_user do %>
   <%= link("My projects",
     to: Routes.project_user_project_index_path(@conn, :index, @current_user.id),
-    class: "text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
+    class: "text-white hover:base-content px-3 py-2 text-sm font-medium"
   ) %>
   <%= link(@current_user.email,
     to: Routes.user_settings_path(@conn, :edit),
-    class: "text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
+    class: "text-white hover:base-content px-3 py-2 text-sm font-medium"
   ) %>
   <%= link("Log out",
     to: Routes.user_session_path(@conn, :delete),
     method: :delete,
-    class: "text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
+    class: "text-white hover:base-content px-3 py-2 text-sm font-medium"
   ) %>
 <% else %>
   <%= link("Sign up",
     to: Routes.user_registration_path(@conn, :new),
-    class: "text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
+    class: "text-white hover:base-content px-3 py-2 text-sm font-medium"
   ) %>
   <%= link("Log in",
     to: Routes.user_session_path(@conn, :new),
-    class: "text-white hover:text-gray-300 px-3 py-2 text-sm font-medium"
+    class: "text-white hover:base-content px-3 py-2 text-sm font-medium"
   ) %>
 <% end %>

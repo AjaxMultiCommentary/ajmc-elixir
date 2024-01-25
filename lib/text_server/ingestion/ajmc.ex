@@ -9,22 +9,28 @@ defmodule TextServer.Ingestion.Ajmc do
 
     TextServer.Ingestion.Versions.create_versions()
 
-    commentaries_meta =
-      File.read!(commentaries_meta_path())
-      |> Toml.decode!()
-      |> Map.get("commentaries")
-      |> Enum.filter(fn c -> Map.get(c, "zotero_id") != "" end)
+    File.read!(commentaries_meta_path())
+    |> Toml.decode!()
+    |> Map.get("commentaries")
+    |> Enum.filter(fn c -> Map.get(c, "zotero_id") != "" end)
+    |> Enum.each(fn %{"ajmc_id" => ajmc_id} = commentary_meta ->
+      path = commentary_path(ajmc_id)
 
-    for p <- commentary_paths() do
-      TextServer.Ingestion.Commentary.ingest_commentary(p, commentaries_meta)
-    end
+      TextServer.Ingestion.Commentary.ingest_commentary(path, commentary_meta)
+    end)
   end
 
   defp commentaries_meta_path do
     Application.app_dir(:text_server, "priv/commentaries.toml")
   end
 
-  defp commentary_paths do
-    Path.wildcard(Application.app_dir(:text_server, "priv/static/json/*_tess_retrained.json"))
+  defp commentary_path(ajmc_id) do
+    Path.wildcard(
+      Application.app_dir(
+        :text_server,
+        "priv/commentaries_data/#{ajmc_id}/canonical/*_tess_retrained.json"
+      )
+    )
+    |> List.first()
   end
 end

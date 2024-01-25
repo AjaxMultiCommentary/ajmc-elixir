@@ -53,6 +53,10 @@ defmodule TextServer.Ingestion.Versions do
     |> Enum.with_index(1)
     |> Enum.map(fn {passage, i} ->
       passage_urn = passage |> Map.get("passage_urn") |> CTS.URN.parse()
+
+      passage_urn =
+        Map.merge(version.urn, Map.take(passage_urn, [:passage_component, :citations]))
+
       passage_label = passage |> Map.get("label") |> Map.get("en") |> String.trim()
       [start_location, end_location] = passage_urn.citations
 

@@ -1,7 +1,10 @@
 defmodule TextServerWeb.VersionLive.Show do
   use TextServerWeb, :live_view
 
+  require Logger
+
   alias TextServerWeb.ReadingEnvironment.Navigation
+  alias TextServerWeb.Components.Tooltip
 
   alias TextServer.Comments
   alias TextServer.Comments.Comment
@@ -24,7 +27,7 @@ defmodule TextServerWeb.VersionLive.Show do
      |> assign(
        urn: urn,
        focused_text_node: nil,
-       version_command_palette_open: false
+       multi_select_filter_value: ""
      )}
   end
 
@@ -33,10 +36,11 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :comments, :list
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
-  attr :highlighted_comments, :list
+  attr :highlighted_comments, :list, default: []
   attr :highlighted_lemmaless_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
+  attr :multi_select_filter_value, :string, default: ""
   attr :passage, Versions.Passage
   attr :passages, :list, default: []
   attr :personae_loquentes, :map, default: %{}
@@ -49,32 +53,75 @@ defmodule TextServerWeb.VersionLive.Show do
     ~H"""
     <article class="mx-auto">
       <div class="grid grid-cols-10 gap-x-8 gap-y-2 h-screen max-h-[64rem]">
-        <div class="col-span-2">
-          <h1 class="text-2xl font-bold"><%= raw(@version.label) %></h1>
+        <div class="col-span-full">
+          <h1 class="text-2xl font-bold"><em>Ajax</em> Multi-Commentary</h1>
 
-          <p><%= @version.description %></p>
-        </div>
-        <div class="col-span-5">
-          <.form :let={f} for={to_form(Versions.change_version(%Version{}))} id="version-select" phx-change="change-version">
-            <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
-          </.form>
-        </div>
-        <div class="col-span-3 border max-h-full overflow-y-scroll">
-          <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
-            <.live_component
-              id="commentaries-filter"
-              module={TextServerWeb.Components.MultiSelect}
-              options={@commentaries}
-              form={f}
-              selected={fn opts -> send(self(), {:updated_options, opts}) end}
-            />
-          </.form>
+          <p><%= gettext("about_the_multi_commentary") %></p>
         </div>
 
         <hr class="my-4 col-span-10" />
 
         <div class="col-span-2">
-          <Navigation.nav_menu passages={@passages} current_passage={@passage} />
+          <section class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-sm font-bold prose prose-h3">
+                <%= gettext("Change critical text") %>
+              </h3>
+              <Tooltip.info icon_class="h-5 w-5" tip={gettext("
+                    You can change the edition used for the critical text here.
+                    Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones
+                    version of the text, so they might not match up if you prefer to use another edition.
+                      ")} />
+            </div>
+            <.form
+              :let={f}
+              for={to_form(Versions.change_version(%Version{}))}
+              id="version-select"
+              phx-change="change-version"
+            >
+              <.input field={f[:id]} type="select" options={@versions_for_select} value={CTS.URN.to_string(@version.urn)} />
+            </.form>
+          </section>
+          <section class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Navigation") %></h3>
+              <Tooltip.info
+                icon_class="h-5 w-5"
+                tip={gettext("This synopsis is based on the Lloyd-Jones edition of the text,
+                    and the line numbers might not line up exactly with other editions.
+                    Click on a section of the synopsis to view it in the critical text area.
+                    ")}
+              />
+            </div>
+            <Navigation.nav_menu passages={@passages} current_passage={@passage} />
+          </section>
+          <section>
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-sm font-bold prose prose-h3"><%= gettext("Filter glosses") %></h3>
+              <Tooltip.info
+                icon_class="h-5 w-5"
+                tip={
+                  gettext(
+                    "Use this filter to show or hide comments on the right. You can search for a commentary by name using the text box."
+                  )
+                }
+              />
+            </div>
+            <.form :let={f} for={@commentary_filter_changeset} id="commentaries-filter-form" phx-change="validate">
+              <input type="text" name="multi-select-filter" value={@multi_select_filter_value} class={~w(
+                  w-full input input-secondary input-sm mb-2
+                )} phx-change="filter-change" placeholder="Filter commentaries" />
+              <div class="max-h-48 overflow-y-scroll">
+                <.live_component
+                  id="commentaries-filter"
+                  module={TextServerWeb.Components.MultiSelect}
+                  options={@commentaries}
+                  form={f}
+                  selected={fn opts -> send(self(), {:updated_options, opts}) end}
+                />
+              </div>
+            </.form>
+          </section>
         </div>
         <div class="col-span-5 overflow-y-scroll -mt-4">
           <.live_component
@@ -94,37 +141,51 @@ defmodule TextServerWeb.VersionLive.Show do
         <div class="col-span-3 overflow-y-scroll">
           <%= for comment <- @all_comments do %>
             <.live_component
-              id={comment.id}
+              id={comment.interface_id}
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
-              is_highlighted={is_highlighted(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
+              current_user={@current_user}
+              highlighted?={highlighted?(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
+              passage_urn={@passage.passage.urn}
             />
           <% end %>
         </div>
-        <div class="col-span-10 flex shadow-xl p-4 bg-base-200">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-          dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-          ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
-          eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
-          in culpa qui officia deserunt mollit anim id est laborum.
-        </div>
+        <section class="col-span-10 shadow-xl p-4 bg-base-200">
+          <div class="flex items-center mb-2">
+            <h3 class="prose prose-h3 text-sm font-bold mr-1"><%= gettext("Dynamic apparatus") %></h3>
+            <Tooltip.info
+              icon_class="h-5 w-5"
+              tip={
+                gettext(
+                  "The dynamic apparatus shows the difference between the current critical text and other available critical texts."
+                )
+              }
+            />
+          </div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+            eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+            in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </section>
       </div>
     </article>
     """
   end
 
   @impl true
-  def handle_params(%{"urn" => urn, "page" => passage_number} = params, _, socket) do
+  def handle_params(%{"urn" => urn} = params, _, socket) do
+    urn = CTS.URN.parse(urn)
     version = Versions.get_version_by_urn!(urn)
-    passage = Versions.get_version_passage(version.id, passage_number)
-    text_nodes = passage.text_nodes
 
-    commentaries =
-      Commentaries.list_viewable_commentaries(socket.assigns.current_user)
-      |> Enum.map(fn c ->
-        %{id: c.id, label: CanonicalCommentary.commentary_label(c), selected: false}
-      end)
-      |> build_options()
+    passage =
+      if is_nil(urn.passage_component) do
+        Versions.get_version_passage(version.id, 1)
+      else
+        Versions.get_version_passage_by_location(version.id, urn.citations)
+      end
+
+    text_nodes = passage.text_nodes
 
     personae_loquentes = get_personae_loquentes(text_nodes)
 
@@ -132,7 +193,6 @@ defmodule TextServerWeb.VersionLive.Show do
       socket
       |> assign(
         form: to_form(params),
-        highlighted_comments: [],
         passage: passage,
         passages: Passages.list_passages_for_version(version),
         page_title: version.label,
@@ -145,7 +205,18 @@ defmodule TextServerWeb.VersionLive.Show do
             {raw("#{v.label} #{v.description}"), CTS.URN.to_string(v.urn)}
           end)
       )
+
+    commentaries = list_commentaries(socket)
+
+    gloss = Map.get(params, "gloss")
+
+    socket =
+      socket
+      |> assign(commentaries: commentaries)
       |> assign_multi_select_options(commentaries)
+      |> maybe_highlight_gloss(gloss)
+
+    maybe_scroll_line_into_view(gloss)
 
     {:noreply, socket}
   end
@@ -160,8 +231,19 @@ defmodule TextServerWeb.VersionLive.Show do
 
   @impl true
   def handle_event("change-version", %{"version" => %{"id" => urn}}, socket) do
-    {:noreply,
-     push_navigate(socket, to: ~p"/versions/#{urn}?page=#{socket.assigns.passage.passage_number}")}
+    urn = "#{urn}:#{socket.assigns.passage.passage.urn.passage_component}"
+    {:noreply, push_navigate(socket, to: ~p"/versions/#{urn}")}
+  end
+
+  def handle_event("filter-change", %{"multi-select-filter" => filter_s}, socket) do
+    send(
+      self(),
+      {:updated_options,
+       list_commentaries(socket)
+       |> Enum.filter(&String.starts_with?(String.downcase(&1.label), String.downcase(filter_s)))}
+    )
+
+    {:noreply, socket |> assign(:multi_select_filter_value, filter_s)}
   end
 
   def handle_event("highlight-comments", %{"comments" => comment_ids}, socket) do
@@ -189,15 +271,18 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   def handle_event(event, params, socket) do
-    IO.puts("Failed to capture event #{event}")
-    IO.inspect(params)
+    Logger.error("Failed to capture event #{event} with params \n #{inspect(params)}")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:comments_highlighted, [id | _]}, socket) do
-    {:noreply, push_event(socket, "highlight-comment", %{id: "comment-#{id}"})}
+    {:noreply, push_event(socket, "scroll-into-view", %{id: id})}
+  end
+
+  def handle_info({:focus_line, interface_id}, socket) do
+    {:noreply, push_event(socket, "scroll-into-view", %{id: interface_id})}
   end
 
   def handle_info({:updated_options, options}, socket) do
@@ -216,8 +301,15 @@ defmodule TextServerWeb.VersionLive.Show do
       end)
 
     text_nodes = socket.assigns.text_nodes
-    comments = filter_comments(socket, text_nodes, selected_options)
-    lemmaless_comments = filter_lemmaless_comments(socket, text_nodes, selected_options)
+
+    comments =
+      filter_comments(socket, text_nodes, selected_options)
+      |> Enum.map(&Comments.with_interface_id/1)
+
+    lemmaless_comments =
+      filter_lemmaless_comments(socket, text_nodes, selected_options)
+      |> Enum.map(&LemmalessComments.with_interface_id/1)
+
     text_nodes = TextNodes.tag_text_nodes(socket.assigns.text_nodes, comments)
 
     all_comments =
@@ -240,10 +332,15 @@ defmodule TextServerWeb.VersionLive.Show do
   defp build_options(options) do
     Enum.map(options, fn
       {_idx, data} ->
-        %SelectOption{id: data["id"], label: data["label"], selected: data["selected"]}
+        %SelectOption{
+          id: data["id"],
+          count: data["count"],
+          label: data["label"],
+          selected: data["selected"]
+        }
 
       data ->
-        %SelectOption{id: data.id, label: data.label, selected: data.selected}
+        %SelectOption{id: data.id, count: data.count, label: data.label, selected: data.selected}
     end)
     |> Enum.sort_by(&Map.get(&1, :label))
   end
@@ -306,15 +403,78 @@ defmodule TextServerWeb.VersionLive.Show do
     end)
   end
 
-  defp is_highlighted(%Comment{} = comment, comment_ids, _) do
-    Enum.member?(comment_ids, comment.id)
+  defp highlighted?(%Comment{} = comment, comment_ids, _) do
+    Enum.member?(comment_ids, "#{comment.interface_id}")
   end
 
-  defp is_highlighted(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
-    Enum.member?(lemmaless_comment_ids, comment.id)
+  defp highlighted?(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
+    Enum.member?(lemmaless_comment_ids, "#{comment.interface_id}")
+  end
+
+  defp list_commentaries(socket) do
+    text_nodes = socket.assigns.text_nodes
+    comments = filter_comments(socket, text_nodes, [])
+    lemmaless_comments = filter_lemmaless_comments(socket, text_nodes, [])
+    all_comments = comments ++ lemmaless_comments
+
+    commentary_frequencies =
+      all_comments |> Enum.frequencies_by(&Map.get(&1, :canonical_commentary_id))
+
+    Commentaries.list_viewable_commentaries(socket.assigns.current_user)
+    |> Enum.map(fn c ->
+      %{
+        id: c.id,
+        count: commentary_frequencies[c.id] || 0,
+        label: CanonicalCommentary.commentary_label(c),
+        selected:
+          Enum.find_value(Map.get(socket.assigns, :commentaries, []), fn assigned_c ->
+            if assigned_c.id == c.id do
+              assigned_c.selected
+            end
+          end)
+      }
+    end)
+    |> build_options()
   end
 
   defp list_versions do
     Versions.list_versions()
+  end
+
+  defp maybe_highlight_gloss(socket, nil), do: socket
+
+  defp maybe_highlight_gloss(socket, gloss) do
+    gloss_urn = CTS.URN.parse("urn:cts:greekLit:#{gloss}")
+
+    case gloss_urn do
+      %CTS.URN{subsections: [nil, nil]} ->
+        comment =
+          LemmalessComments.get_lemmaless_comment_by_urn!(gloss_urn)
+          |> LemmalessComments.with_interface_id()
+
+        highlights = [comment.interface_id]
+        send(self(), {:comments_highlighted, highlights})
+        assign(socket, :highlighted_lemmaless_comments, highlights)
+
+      %CTS.URN{subsections: [lemma, _]} ->
+        comment =
+          Comments.get_comment_by_urn_with_lemma!(gloss_urn, lemma)
+          |> Comments.with_interface_id()
+
+        highlights = [comment.interface_id]
+        send(self(), {:comments_highlighted, highlights})
+        assign(socket, :highlighted_comments, highlights)
+    end
+  end
+
+  defp maybe_scroll_line_into_view(nil), do: nil
+
+  defp maybe_scroll_line_into_view(gloss) do
+    gloss_urn = CTS.URN.parse("urn:cts:greekLit:#{gloss}")
+    line_n = gloss_urn.citations |> List.first()
+
+    send(self(), {:focus_line, "line-#{line_n}"})
+
+    :ok
   end
 end

@@ -96,6 +96,12 @@ defmodule TextServer.LemmalessComments do
   """
   def get_lemmaless_comment!(id), do: Repo.get!(LemmalessComment, id)
 
+  def get_lemmaless_comment_by_urn!(%CTS.URN{} = urn) do
+    LemmalessComment
+    |> where([c], c.urn == ^urn)
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a lemmaless_comment.
 
@@ -174,6 +180,10 @@ defmodule TextServer.LemmalessComments do
   """
   def change_lemmaless_comment(%LemmalessComment{} = lemmaless_comment, attrs \\ %{}) do
     LemmalessComment.changeset(lemmaless_comment, attrs)
+  end
+
+  def with_interface_id(%LemmalessComment{} = comment) do
+    %{comment | interface_id: "lemmaless_comment-#{comment.id}"}
   end
 
   defp public_commentaries_query do

@@ -1,6 +1,8 @@
 defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
+  alias TextServer.TextNodes
+
   attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :persona_loquens, :string
@@ -11,7 +13,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
-    <div>
+    <div id={TextNodes.with_interface_id(@text_node).interface_id}>
       <h3 :if={@persona_loquens} class="font-bold pt-4"><%= @persona_loquens %></h3>
       <div class="flex justify-between">
         <p class="max-w-prose text-node" phx-target={@myself}>
@@ -35,11 +37,11 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     ~H"""
     <span
       class={[
-        "text-slate-500 hover:text-slate-800 cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
+        "base-content hover:base-content cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
         "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
       ]}
       phx-click="highlight-lemmaless-comments"
-      phx-value-comments={@lemmaless_comments |> Enum.map(& &1.id) |> Jason.encode!()}
+      phx-value-comments={@lemmaless_comments |> Enum.map(& &1.interface_id) |> Jason.encode!()}
     >
       <%= Enum.join(@location, ".") %>
     </span>
@@ -72,7 +74,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             comments:
               tags
               |> Enum.filter(&(&1.name == "comment"))
-              |> Enum.map(& &1.metadata.id),
+              |> Enum.map(& &1.metadata.interface_id),
             commentary_ids:
               tags
               |> Enum.filter(&(&1.name == "comment"))

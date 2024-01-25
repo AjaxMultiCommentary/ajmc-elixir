@@ -6,6 +6,7 @@ defmodule TextServer.LemmalessComments.LemmalessComment do
     field :attributes, :map
     field :content, :string
     field :urn, TextServer.Ecto.Types.CTS_URN
+    field :interface_id, :string, virtual: true
 
     belongs_to :canonical_commentary, TextServer.Commentaries.CanonicalCommentary
 
