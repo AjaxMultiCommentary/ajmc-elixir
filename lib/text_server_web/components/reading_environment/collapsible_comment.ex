@@ -3,6 +3,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   alias TextServer.Comments.Comment
   alias TextServer.Commentaries.CanonicalCommentary
+  alias TextServer.LemmalessComments.LemmalessComment
 
   alias TextServerWeb.CoreComponents
 
@@ -27,7 +28,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
       <div class="collapse-title" phx-click="toggle-details" phx-target={@myself}>
         <h3 class="text-sm font-medium base-content cursor-pointer">
           <span class="text-sm font-light base-content">
-            <.link patch={~p"/versions/#{@passage_urn}?gloss=#{citable_gloss(@comment.urn)}"}>
+            <.link patch={~p"/versions/#{@passage_urn}?gloss=#{citable_gloss(@comment)}"}>
               <%= citation(@comment.attributes) %>
             </.link>
           </span>
@@ -97,7 +98,11 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     end
   end
 
-  defp citable_gloss(comment_urn) do
-    "#{comment_urn.work_component}:#{comment_urn.passage_component}"
+  defp citable_gloss(%Comment{} = comment) do
+    "#{comment.urn.work_component}:#{comment.urn.citations |> Enum.dedup() |> Enum.join("-")}@#{comment.lemma}"
+  end
+
+  defp citable_gloss(%LemmalessComment{} = comment) do
+    "#{comment.urn.work_component}:#{comment.urn.passage_component}"
   end
 end

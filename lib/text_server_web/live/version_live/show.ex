@@ -448,17 +448,14 @@ defmodule TextServerWeb.VersionLive.Show do
         send(self(), {:comments_highlighted, highlights})
         assign(socket, :highlighted_lemmaless_comments, highlights)
 
-      %CTS.URN{subsections: _subsections} ->
+      %CTS.URN{subsections: [lemma, _]} ->
         comment =
-          Comments.get_comment_by_urn!(gloss_urn)
+          Comments.get_comment_by_urn_with_lemma!(gloss_urn, lemma)
           |> Comments.with_interface_id()
 
         highlights = [comment.interface_id]
         send(self(), {:comments_highlighted, highlights})
         assign(socket, :highlighted_comments, highlights)
-
-      _ ->
-        socket
     end
   end
 end

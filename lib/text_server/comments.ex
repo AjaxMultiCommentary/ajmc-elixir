@@ -113,6 +113,23 @@ defmodule TextServer.Comments do
     |> Repo.one!()
   end
 
+  def get_comment_by_urn_with_lemma!(%CTS.URN{} = urn, lemma) do
+    query =
+      Comment
+      |> where([c], fragment("? ->> ? = ?", c.urn, "text_group", ^urn.text_group))
+      |> where([c], fragment("? ->> ? = ?", c.urn, "work", ^urn.work))
+      |> where([c], fragment("? ->> ? = ?", c.urn, "version", ^urn.version))
+      |> where(
+        [c],
+        fragment("(? ->> ?)::json ->> 0 = ?", c.urn, "citations", ^List.first(urn.citations))
+      )
+
+    wildcard_lemma = "%#{lemma}%"
+
+    from(c in query, where: ilike(c.lemma, fragment("?", ^wildcard_lemma)))
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a comment.
 
