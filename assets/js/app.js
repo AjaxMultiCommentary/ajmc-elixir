@@ -55,6 +55,14 @@ function setLocale(locale = "en") {
 	window.location.search = searchParams;
 }
 
+window.addEventListener("phx:scroll-into-view", (e) => {
+	const el = document.getElementById(e.detail.id);
+
+	if (el) {
+		el.scrollIntoView({ behavior: "smooth" });
+	}
+});
+
 window.addEventListener("phx:highlight-comment", (e) => {
 	const el = document.getElementById(e.detail.id);
 

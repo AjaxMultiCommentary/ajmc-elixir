@@ -14,6 +14,7 @@ defmodule TextServer.TextNodes.TextNode do
     field :_search, TextServer.Ecto.Types.TsVector
 
     field :graphemes_with_tags, :any, virtual: true
+    field :interface_id, :string, virtual: true
 
     belongs_to :version, TextServer.Versions.Version
 

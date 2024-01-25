@@ -208,11 +208,15 @@ defmodule TextServerWeb.VersionLive.Show do
 
     commentaries = list_commentaries(socket)
 
+    gloss = Map.get(params, "gloss")
+
     socket =
       socket
       |> assign(commentaries: commentaries)
       |> assign_multi_select_options(commentaries)
-      |> maybe_highlight_gloss(Map.get(params, "gloss"))
+      |> maybe_highlight_gloss(gloss)
+
+    maybe_scroll_line_into_view(gloss)
 
     {:noreply, socket}
   end
@@ -274,7 +278,11 @@ defmodule TextServerWeb.VersionLive.Show do
 
   @impl true
   def handle_info({:comments_highlighted, [id | _]}, socket) do
-    {:noreply, push_event(socket, "highlight-comment", %{id: "#{id}"})}
+    {:noreply, push_event(socket, "scroll-into-view", %{id: id})}
+  end
+
+  def handle_info({:focus_line, interface_id}, socket) do
+    {:noreply, push_event(socket, "scroll-into-view", %{id: interface_id})}
   end
 
   def handle_info({:updated_options, options}, socket) do
@@ -457,5 +465,16 @@ defmodule TextServerWeb.VersionLive.Show do
         send(self(), {:comments_highlighted, highlights})
         assign(socket, :highlighted_comments, highlights)
     end
+  end
+
+  defp maybe_scroll_line_into_view(nil), do: nil
+
+  defp maybe_scroll_line_into_view(gloss) do
+    gloss_urn = CTS.URN.parse("urn:cts:greekLit:#{gloss}")
+    line_n = gloss_urn.citations |> List.first()
+
+    send(self(), {:focus_line, "line-#{line_n}"})
+
+    :ok
   end
 end

@@ -1,6 +1,8 @@
 defmodule TextServerWeb.ReadingEnvironment.TextNode do
   use TextServerWeb, :live_component
 
+  alias TextServer.TextNodes
+
   attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :persona_loquens, :string
@@ -11,7 +13,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     # NOTE: (charles) It's important, unfortunately, for the `for` statement
     # to be on one line so that we don't get extra spaces around elements.
     ~H"""
-    <div>
+    <div id={TextNodes.with_interface_id(@text_node).interface_id}>
       <h3 :if={@persona_loquens} class="font-bold pt-4"><%= @persona_loquens %></h3>
       <div class="flex justify-between">
         <p class="max-w-prose text-node" phx-target={@myself}>

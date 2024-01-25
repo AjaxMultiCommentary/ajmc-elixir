@@ -315,4 +315,8 @@ defmodule TextServer.TextNodes do
   def change_text_node(%TextNode{} = text_node, attrs \\ %{}) do
     TextNode.changeset(text_node, attrs)
   end
+
+  def with_interface_id(%TextNode{} = text_node) do
+    %{text_node | interface_id: "line-#{text_node.location |> Enum.join("-")}"}
+  end
 end
