@@ -179,7 +179,11 @@ defmodule TextServer.Ingestion.Commentary do
           # If the lemma is on a single line, make sure that the
           # offsets are in text order (left to right)
           if Enum.at(citations, 0) == Enum.at(citations, 1) do
-            [first_line_offset, last_line_offset] |> Enum.sort()
+            [first_line_offset, last_line_offset]
+            |> Enum.sort_by(fn
+              o when is_nil(o) -> 0
+              o when is_binary(o) -> String.to_integer(o)
+            end)
           else
             [first_line_offset, last_line_offset]
           end
