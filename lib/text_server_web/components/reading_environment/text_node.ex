@@ -40,7 +40,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
         "base-content hover:base-content cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
         "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
       ]}
-      phx-click="highlight-lemmaless-comments"
+      phx-click="highlight-comments"
       phx-value-comments={@lemmaless_comments |> Enum.map(& &1.interface_id) |> Jason.encode!()}
     >
       <%= Enum.join(@location, ".") %>

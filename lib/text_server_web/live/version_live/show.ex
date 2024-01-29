@@ -7,11 +7,9 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServerWeb.Components.Tooltip
 
   alias TextServer.Comments
-  alias TextServer.Comments.Comment
   alias TextServer.Commentaries
   alias TextServer.Commentaries.CanonicalCommentary
   alias TextServer.LemmalessComments
-  alias TextServer.LemmalessComments.LemmalessComment
   alias TextServer.MultiSelect
   alias TextServer.MultiSelect.SelectOption
   alias TextServer.TextNodes
@@ -145,12 +143,12 @@ defmodule TextServerWeb.VersionLive.Show do
               module={TextServerWeb.ReadingEnvironment.CollapsibleComment}
               comment={comment}
               current_user={@current_user}
-              highlighted?={highlighted?(comment, @highlighted_comments, @highlighted_lemmaless_comments)}
+              highlighted?={highlighted?(comment, @highlighted_comments)}
               passage_urn={@passage.passage.urn}
             />
           <% end %>
         </div>
-        <section class="col-span-10 shadow-xl p-4 bg-base-200">
+        <section class="col-span-10 shadow-xl p-4 bg-base-200 hidden">
           <div class="flex items-center mb-2">
             <h3 class="prose prose-h3 text-sm font-bold mr-1"><%= gettext("Dynamic apparatus") %></h3>
             <Tooltip.info
@@ -255,15 +253,6 @@ defmodule TextServerWeb.VersionLive.Show do
     {:noreply, socket |> assign(highlighted_comments: ids)}
   end
 
-  def handle_event("highlight-lemmaless-comments", %{"comments" => comment_ids}, socket) do
-    ids =
-      comment_ids
-      |> Jason.decode!()
-
-    send(self(), {:comments_highlighted, ids})
-    {:noreply, socket |> assign(highlighted_lemmaless_comments: ids)}
-  end
-
   def handle_event("validate", %{"multi_select" => multi_component}, socket) do
     options = build_options(multi_component["options"])
 
@@ -283,6 +272,16 @@ defmodule TextServerWeb.VersionLive.Show do
 
   def handle_info({:focus_line, interface_id}, socket) do
     {:noreply, push_event(socket, "scroll-into-view", %{id: interface_id})}
+  end
+
+  def handle_info({:unhighlight_comment, comment_interface_id}, socket) do
+    {:noreply,
+     socket
+     |> assign(
+       highlighted_comments:
+         socket.assigns.highlighted_comments
+         |> Enum.reject(fn c -> c == comment_interface_id end)
+     )}
   end
 
   def handle_info({:updated_options, options}, socket) do
@@ -403,12 +402,8 @@ defmodule TextServerWeb.VersionLive.Show do
     end)
   end
 
-  defp highlighted?(%Comment{} = comment, comment_ids, _) do
-    Enum.member?(comment_ids, "#{comment.interface_id}")
-  end
-
-  defp highlighted?(%LemmalessComment{} = comment, _, lemmaless_comment_ids) do
-    Enum.member?(lemmaless_comment_ids, "#{comment.interface_id}")
+  defp highlighted?(comment, highlighted_comment_ids) do
+    Enum.member?(highlighted_comment_ids, comment.interface_id)
   end
 
   defp list_commentaries(socket) do
