@@ -6,160 +6,160 @@
 
 /* Alerts and form errors used by phx.new */
 .alert {
-	padding: 15px;
-	margin-bottom: 20px;
-	border: 1px solid transparent;
-	border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
 }
 
 .alert-info {
-	color: #31708f;
-	background-color: #d9edf7;
-	border-color: #bce8f1;
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
 }
 
 .alert-warning {
-	color: #8a6d3b;
-	background-color: #fcf8e3;
-	border-color: #faebcc;
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
 }
 
 .alert-danger {
-	color: #a94442;
-	background-color: #f2dede;
-	border-color: #ebccd1;
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
 }
 
 .alert p {
-	margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .alert:empty {
-	display: none;
+    display: none;
 }
 
 .invalid-feedback {
-	color: #a94442;
-	display: block;
-	margin: -1rem 0 2rem;
+    color: #a94442;
+    display: block;
+    margin: -1rem 0 2rem;
 }
 
 /* LiveView specific classes for your customization */
 .phx-no-feedback.invalid-feedback,
 .phx-no-feedback .invalid-feedback {
-	display: none;
+    display: none;
 }
 
 .phx-click-loading {
-	opacity: 0.5;
-	transition: opacity 1s ease-out;
+    opacity: 0.5;
+    transition: opacity 1s ease-out;
 }
 
 .phx-loading {
-	cursor: wait;
+    cursor: wait;
 }
 
 .phx-modal {
-	opacity: 1 !important;
-	position: fixed;
-	z-index: 1;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	overflow: auto;
-	background-color: rgba(0, 0, 0, 0.4);
+    opacity: 1 !important;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .phx-modal-content {
-	background-color: #fefefe;
-	margin: 15vh auto;
-	padding: 20px;
-	border: 1px solid #888;
-	width: 80%;
+    background-color: #fefefe;
+    margin: 15vh auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
 }
 
 .phx-modal-close {
-	color: #aaa;
-	float: right;
-	font-size: 28px;
-	font-weight: bold;
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 .phx-modal-close:hover,
 .phx-modal-close:focus {
-	color: black;
-	text-decoration: none;
-	cursor: pointer;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .fade-in-scale {
-	animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
+    animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
 }
 
 .fade-out-scale {
-	animation: 0.2s ease-out 0s normal forwards 1 fade-out-scale-keys;
+    animation: 0.2s ease-out 0s normal forwards 1 fade-out-scale-keys;
 }
 
 .fade-in {
-	animation: 0.2s ease-out 0s normal forwards 1 fade-in-keys;
+    animation: 0.2s ease-out 0s normal forwards 1 fade-in-keys;
 }
 
 .fade-out {
-	animation: 0.2s ease-out 0s normal forwards 1 fade-out-keys;
+    animation: 0.2s ease-out 0s normal forwards 1 fade-out-keys;
 }
 
 @keyframes fade-in-scale-keys {
-	0% {
-		scale: 0.95;
-		opacity: 0;
-	}
+    0% {
+        scale: 0.95;
+        opacity: 0;
+    }
 
-	100% {
-		scale: 1.0;
-		opacity: 1;
-	}
+    100% {
+        scale: 1;
+        opacity: 1;
+    }
 }
 
 @keyframes fade-out-scale-keys {
-	0% {
-		scale: 1.0;
-		opacity: 1;
-	}
+    0% {
+        scale: 1;
+        opacity: 1;
+    }
 
-	100% {
-		scale: 0.95;
-		opacity: 0;
-	}
+    100% {
+        scale: 0.95;
+        opacity: 0;
+    }
 }
 
 @keyframes fade-in-keys {
-	0% {
-		opacity: 0;
-	}
+    0% {
+        opacity: 0;
+    }
 
-	100% {
-		opacity: 1;
-	}
+    100% {
+        opacity: 1;
+    }
 }
 
 @keyframes fade-out-keys {
-	0% {
-		opacity: 1;
-	}
+    0% {
+        opacity: 1;
+    }
 
-	100% {
-		opacity: 0;
-	}
+    100% {
+        opacity: 0;
+    }
 }
 
 /* OpenSeadragon requires that its
  * viewer have width and height set.
  */
 .openseadragon-iiif-viewer {
-	height: 300px;
-	width: 300px;
-	max-width: 100%;
+    height: 300px;
+    width: 300px;
+    max-width: 100%;
 }
 
 /* Styles for markdown copy (on project homepages)
@@ -169,110 +169,114 @@
  */
 
 .\@\@oc\/user-markdown a {
-	color: #44403c;
-	/* tailwind's stone-700 */
-	text-decoration: underline;
+    color: #44403c;
+    /* tailwind's stone-700 */
+    text-decoration: underline;
 }
 
 .\@\@oc\/user-markdown a:visited {
-	color: #78716c;
-	/* tailwind's stone-500 */
-	text-decoration: underline;
+    color: #78716c;
+    /* tailwind's stone-500 */
+    text-decoration: underline;
 }
 
-.\@\@oc\/user-markdown>h1 {
-	font-weight: bolder;
-	font-size: xx-large;
-	margin-bottom: 1.1rem;
+.\@\@oc\/user-markdown > h1 {
+    font-weight: bolder;
+    font-size: xx-large;
+    margin-bottom: 1.1rem;
 }
 
-.\@\@oc\/user-markdown>h2 {
-	font-weight: bold;
-	font-size: x-large;
-	margin-bottom: 1.0rem;
-	margin-top: 2.0rem;
+.\@\@oc\/user-markdown > h2 {
+    font-weight: bold;
+    font-size: x-large;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
 }
 
-.\@\@oc\/user-markdown>h3 {
-	font-weight: bold;
-	font-size: large;
-	margin-bottom: 1.0rem;
+.\@\@oc\/user-markdown > h3 {
+    font-weight: bold;
+    font-size: large;
+    margin-bottom: 1rem;
 }
 
-.\@\@oc\/user-markdown>h4 {
-	font-weight: bold;
-	font-size: medium;
-	margin-bottom: 0.9rem;
+.\@\@oc\/user-markdown > h4 {
+    font-weight: bold;
+    font-size: medium;
+    margin-bottom: 0.9rem;
 }
 
-.\@\@oc\/user-markdown>h5 {
-	font-weight: 500;
-	font-size: medium;
-	margin-bottom: 0.9rem;
+.\@\@oc\/user-markdown > h5 {
+    font-weight: 500;
+    font-size: medium;
+    margin-bottom: 0.9rem;
 }
 
-.\@\@oc\/user-markdown>h6 {
-	font-weight: 500;
-	font-size: medium;
-	margin-bottom: 0.9rem;
+.\@\@oc\/user-markdown > h6 {
+    font-weight: 500;
+    font-size: medium;
+    margin-bottom: 0.9rem;
 }
 
 .\@\@oc\/user-markdown li {
-	line-height: 1.5;
-	list-style-type: disc;
-	margin-left: 0.9rem;
+    line-height: 1.5;
+    list-style-type: disc;
+    margin-left: 0.9rem;
 }
 
-.\@\@oc\/user-markdown>p {
-	margin-bottom: 0.9rem;
+.\@\@oc\/user-markdown > p {
+    margin-bottom: 0.9rem;
 }
 
 .\@\@oc\/user-markdown ul {
-	margin-bottom: 0.9rem;
+    margin-bottom: 0.9rem;
 }
 
 .\@\@ajmc-addition::before {
-	content: "[";
+    content: "[";
 }
 
 .\@\@ajmc-addition::after {
-	content: "]";
+    content: "]";
 }
 
 .\@\@ajmc-comment-box-shadow.comments-1 {
-	background-color: rgb(99, 162, 187, 0.2);
+    background-color: rgb(99, 162, 187, 0.2);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-2 {
-	background-color: rgba(99, 162, 187, 0.4);
+    background-color: rgba(99, 162, 187, 0.4);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-3 {
-	background-color: rgba(99, 162, 187, 0.6);
+    background-color: rgba(99, 162, 187, 0.6);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-4 {
-	background-color: rgba(99, 162, 187, 0.8);
+    background-color: rgba(99, 162, 187, 0.8);
+}
+
+.\@\@ajmc-comment-box-shadow.comments-4 {
+    background-color: rgba(99, 162, 187, 0.9);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-6 {
-	background-color: rgba(99, 162, 187, 1);
+    background-color: rgba(99, 162, 187, 1);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-7 {
-	background-color: rgba(67, 121, 142, 0.8);
+    background-color: rgba(67, 121, 142, 0.8);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-8 {
-	background-color: rgba(67, 121, 142, 0.9);
+    background-color: rgba(67, 121, 142, 0.9);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-9 {
-	background-color: rgba(67, 121, 142, 1);
+    background-color: rgba(67, 121, 142, 1);
 }
 
 .\@\@ajmc-comment-box-shadow.comments-10 {
-	background-color: rgb(67, 121, 142, 1);
+    background-color: rgb(67, 121, 142, 1);
 }
 
 /** Begin tei.css --- based on work by Luke Hollis and the IIP Project */
@@ -280,68 +284,68 @@
 /* 2023-03-22 CR editing multiple elements */
 /* 2020-02-11 EM editing gap CSS */
 
-tei-gap[reason='ellipsis'] {
-	content: '...';
+tei-gap[reason="ellipsis"] {
+    content: "...";
 }
 
 tei-num {
-	unicode-bidi: bidi-override;
-	direction: ltr;
-	text-align: left;
+    unicode-bidi: bidi-override;
+    direction: ltr;
+    text-align: left;
 }
 
 tei-div {
-	display: block;
-	margin-left: 3em;
+    display: block;
+    margin-left: 3em;
 }
 
 tei-l {
-	display: block;
-	margin-left: 3em;
+    display: block;
+    margin-left: 3em;
 }
 
 tei-l::before {
-	content: attr(n);
-	display: inline;
-	padding-right: 1em;
-	color: lightgray;
+    content: attr(n);
+    display: inline;
+    padding-right: 1em;
+    color: lightgray;
 }
 
 tei-l:hover::before {
-	color: lightslategray;
+    color: lightslategray;
 }
 
 tei-q {
-	display: block;
-	border-left: 4px solid #efefeffd;
-	margin: 1em 0;
-	quotes: "\201C""\201D""\2018""\2019";
+    display: block;
+    border-left: 4px solid #efefeffd;
+    margin: 1em 0;
+    quotes: "\201C" "\201D" "\2018" "\2019";
 }
 
 tei-q::before {
-	color: #ccc;
-	content: open-quote;
-	font-size: 4em;
-	line-height: 0.1em;
-	margin-right: 0.25em;
-	vertical-align: -0.4em;
+    color: #ccc;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
 }
 
 tei-q::after {
-	color: #ccc;
-	content: close-quote;
-	font-size: 4em;
-	line-height: 0.1em;
-	margin-right: 0.25em;
-	vertical-align: -0.4em;
+    color: #ccc;
+    content: close-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
 }
 
-tei-div[type='textpart']::before {
-	display: block;
-	margin-left: -1em;
-	margin-top: 4px;
-	text-transform: capitalize;
-	font-variant: small-caps;
-	opacity: 0.7;
-	content: attr(subtype) ' ' attr(n);
+tei-div[type="textpart"]::before {
+    display: block;
+    margin-left: -1em;
+    margin-top: 4px;
+    text-transform: capitalize;
+    font-variant: small-caps;
+    opacity: 0.7;
+    content: attr(subtype) " " attr(n);
 }
