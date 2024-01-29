@@ -39,6 +39,7 @@ defmodule TextServerWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/about", PageController, :about
 
     # these logged-out routes must come last, otherwise they
     # match on /{resource}/new

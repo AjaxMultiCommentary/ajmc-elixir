@@ -50,6 +50,7 @@ defmodule TextServer.MixProject do
       {:html_sanitize_ex, "~> 1.4"},
       {:iteraptor, "~> 1.12.0"},
       {:jason, "~> 1.3"},
+      {:nimble_publisher, "~> 1.1.0"},
       {:oban, "~> 2.13"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.0"},
