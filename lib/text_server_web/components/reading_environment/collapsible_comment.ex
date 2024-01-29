@@ -11,8 +11,8 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   attr :color, :string, default: "#fff"
   attr :current_user, Accounts.User
   attr :highlighted?, :boolean
-  attr :is_iiif_viewer_shown, :boolean, default: false
-  attr :is_open, :boolean, default: false
+  attr :iiif_viewer_shown?, :boolean, default: false
+  attr :open?, :boolean, default: false
   attr :passage_urn, :map
 
   def render(assigns) do
@@ -21,7 +21,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
       class={[
         "border-2 collapse collapse-arrow rounded-sm mb-2",
         if(@highlighted?, do: "border-secondary collapse-open", else: ""),
-        if(@is_open, do: "collapse-open")
+        if(@open?, do: "collapse-open")
       ]}
       id={@comment.interface_id}
     >
@@ -47,7 +47,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
       <div class="collapse-content float-right">
         <p class="max-w-2xl text-sm base-content font-serif"><%= @comment.content %></p>
         <div class="flex mt-2 justify-center">
-          <%= if @is_iiif_viewer_shown do %>
+          <%= if @iiif_viewer_shown? do %>
             <.live_component
               id={"iiif-viewer-comment-#{@comment.id}"}
               module={TextServerWeb.Components.IiifViewer}
@@ -78,14 +78,22 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     """
   end
 
-  def handle_event("toggle-details", _, socket) do
-    is_open = Map.get(socket.assigns, :is_open, false)
+  def handle_event("toggle-details", _params, socket) do
+    socket =
+      if socket.assigns.highlighted? do
+        send(self(), {:unhighlight_comment, socket.assigns.comment.interface_id})
+        assign(socket, highlighted?: false, open?: false)
+      else
+        open? = Map.get(socket.assigns, :open?, false)
 
-    {:noreply, socket |> assign(:is_open, !is_open)}
+        assign(socket, :open?, !open?)
+      end
+
+    {:noreply, socket}
   end
 
   def handle_event("show-iiif-viewer", _, socket) do
-    {:noreply, socket |> assign(:is_iiif_viewer_shown, true)}
+    {:noreply, socket |> assign(:iiif_viewer_shown?, true)}
   end
 
   defp citation(attributes) do
