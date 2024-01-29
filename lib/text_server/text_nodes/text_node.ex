@@ -197,13 +197,22 @@ defmodule TextServer.TextNodes.TextNode do
               i <= c.end_offset
 
             # entire text node is in this comment
-            true ->
+            Enum.at(c.urn.citations, 0) |> to_integer() <= to_integer(text_node_location) &&
+                Enum.at(c.urn.citations, 1) |> to_integer() >= to_integer(text_node_location) ->
               true
+
+            # fallback: comment does not apply to this text_node
+            true ->
+              false
           end
         end)
         |> Enum.map(fn c -> %Tag{name: "comment", metadata: c} end)
 
       {i, g, tags ++ applicable_comments}
     end)
+  end
+
+  defp to_integer(n) do
+    n |> String.replace(~r/[[:alpha:]]/u, "") |> String.to_integer()
   end
 end
