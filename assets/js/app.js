@@ -59,9 +59,11 @@ window.addEventListener("phx:scroll-into-view", (e) => {
   const el = document.getElementById(e.detail.id);
 
   if (el) {
-    window.requestAnimationFrame(() => {
+    // this is a little janky, but it gives LiveView enough time
+    // to open/close the comments before scrolling them into view
+    window.setTimeout(() => {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
+    }, 300);
   }
 });
 

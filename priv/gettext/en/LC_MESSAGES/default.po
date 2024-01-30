@@ -53,56 +53,67 @@ msgstr ""
 msgid "Creator(s)"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:7
+#, elixir-autogen
 msgid "Prologue"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:8
+#, elixir-autogen
 msgid "*Parodos*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:9
+#, elixir-autogen
 msgid "First episode"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:10
+#, elixir-autogen
 msgid "First *stasimon*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:11
+#, elixir-autogen
 msgid "Second episode"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:12
+#, elixir-autogen
 msgid "Second *stasimon*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:13
+#, elixir-autogen
 msgid "Third episode"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:14
+#, elixir-autogen
 msgid "*Epiparodos* and *kommos*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:15
+#, elixir-autogen
 msgid "Fourth episode"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:16
+#, elixir-autogen
 msgid "Third *stasimon*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/navigation.ex:19
+#: lib/text_server_web/components/reading_environment/navigation.ex:17
+#, elixir-autogen
 msgid "*Exodos*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:89
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:105
 #, elixir-autogen, elixir-format
 msgid "v."
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:87
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:103
 #, elixir-autogen, elixir-format
 msgid "vv."
 msgstr ""
@@ -112,12 +123,12 @@ msgstr ""
 msgid "Ancient Greek"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:68
+#: lib/text_server_web/live/version_live/show.ex:64
 #, elixir-autogen, elixir-format
 msgid "Change critical text"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:158
+#: lib/text_server_web/live/version_live/show.ex:150
 #, elixir-autogen, elixir-format
 msgid "Dynamic apparatus"
 msgstr ""
@@ -128,7 +139,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:104
+#: lib/text_server_web/live/version_live/show.ex:96
 #, elixir-autogen, elixir-format
 msgid "Filter glosses"
 msgstr ""
@@ -158,7 +169,7 @@ msgstr ""
 msgid "Latin"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:90
+#: lib/text_server_web/live/version_live/show.ex:83
 #, elixir-autogen, elixir-format
 msgid "Navigation"
 msgstr ""
@@ -168,27 +179,27 @@ msgstr ""
 msgid "Public domain year"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:162
+#: lib/text_server_web/live/version_live/show.ex:154
 #, elixir-autogen, elixir-format
 msgid "The dynamic apparatus shows the difference between the current critical text and other available critical texts."
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:94
-#, elixir-autogen, elixir-format
-msgid "This synopsis is based on the Lloyd-Jones edition of the text, and the line numbers might not line up exactly with other editions. Click on a section of the synopsis to view it in the critical text area."
-msgstr ""
-
-#: lib/text_server_web/live/version_live/show.ex:108
+#: lib/text_server_web/live/version_live/show.ex:100
 #, elixir-autogen, elixir-format
 msgid "Use this filter to show or hide comments on the right. You can search for a commentary by name using the text box."
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:73
-#, elixir-autogen, elixir-format
-msgid "You can change the edition used for the critical text here. Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones version of the text, so they might not match up if you prefer to use another edition."
-msgstr ""
-
-#: lib/text_server_web/live/version_live/show.ex:59
+#: lib/text_server_web/live/version_live/show.ex:55
 #, elixir-autogen, elixir-format
 msgid "about_the_multi_commentary"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:66
+#, elixir-autogen, elixir-format, fuzzy
+msgid "\n                You can change the edition used for the critical text here.\n                Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones\n                version of the text, so they might not match up if you prefer to use another edition.\n                  "
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:86
+#, elixir-autogen, elixir-format, fuzzy
+msgid "This synopsis is based on the Lloyd-Jones edition of the text,\n                and the line numbers might not line up exactly with other editions.\n                Click on a section of the synopsis to view it in the critical text area.\n                "
 msgstr ""
