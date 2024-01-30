@@ -58,3 +58,9 @@ priv/static/ajmc_iiif/*
 !priv/static/json/3464N4_tess_retrained.json
 !priv/static/json/3467O2_tess_retrained.json
 !priv/static/json/3468MH_tess_retrained.json
+
+venv
+.venv
+
+collated.json
+for_collation.json
