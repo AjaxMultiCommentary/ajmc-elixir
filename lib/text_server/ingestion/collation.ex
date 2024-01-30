@@ -5,6 +5,7 @@ defmodule TextServer.Ingestion.Collation do
   def prepare_versions do
     witnesses =
       Versions.list_versions()
+      |> Enum.reject(fn version -> version.urn.version == "ajmc-lobeck" end)
       |> Enum.map(fn version ->
         text_nodes =
           TextNodes.list_text_nodes_by_version_between_locations(version, ["693"], ["718"])
