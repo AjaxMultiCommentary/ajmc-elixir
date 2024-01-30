@@ -14,7 +14,6 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServer.MultiSelect.SelectOption
   alias TextServer.TextNodes
   alias TextServer.Versions
-  alias TextServer.Versions.Passages
   alias TextServer.Versions.Version
 
   @impl true
@@ -32,6 +31,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :commentaries, :list
   attr :commentary_filter_changeset, Ecto.Changeset
   attr :comments, :list
+  attr :current_urn, CTS.URN, default: %CTS.URN{}
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
   attr :highlighted_comments, :list, default: []
@@ -39,8 +39,6 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
   attr :multi_select_filter_value, :string, default: ""
-  attr :passage, Versions.Passage
-  attr :passages, :list, default: []
   attr :personae_loquentes, :map, default: %{}
   attr :text_nodes, :list, default: []
   attr :version, Versions.Version, required: true
@@ -91,7 +89,7 @@ defmodule TextServerWeb.VersionLive.Show do
                     ")}
               />
             </div>
-            <Navigation.nav_menu passages={@passages} current_passage={@passage} />
+            <Navigation.nav_menu current_urn={@current_urn} version={@version} />
           </section>
           <section>
             <div class="flex justify-between items-center mb-2">
@@ -130,7 +128,6 @@ defmodule TextServerWeb.VersionLive.Show do
             highlighted_comments={@highlighted_comments}
             lemmaless_comments={@lemmaless_comments}
             location={@location}
-            passage={@passage}
             personae_loquentes={@personae_loquentes}
             text_nodes={@text_nodes}
             version_urn={@version.urn}
@@ -144,7 +141,7 @@ defmodule TextServerWeb.VersionLive.Show do
               comment={comment}
               current_user={@current_user}
               highlighted?={highlighted?(comment, @highlighted_comments)}
-              passage_urn={@passage.passage.urn}
+              passage_urn={@current_urn}
             />
           <% end %>
         </div>
@@ -176,23 +173,27 @@ defmodule TextServerWeb.VersionLive.Show do
     urn = CTS.URN.parse(urn)
     version = Versions.get_version_by_urn!(urn)
 
-    passage =
+    [start_location, end_location] =
       if is_nil(urn.passage_component) do
-        Versions.get_version_passage(version.id, 1)
+        [["1"], ["133"]]
       else
-        Versions.get_version_passage_by_location(version.id, urn.citations)
+        urn.passage_component |> String.split("-") |> Enum.map(&[&1])
       end
 
-    text_nodes = passage.text_nodes
+    text_nodes =
+      TextNodes.list_text_nodes_by_version_between_locations(
+        version,
+        start_location,
+        end_location
+      )
 
     personae_loquentes = get_personae_loquentes(text_nodes)
 
     socket =
       socket
       |> assign(
+        current_urn: urn,
         form: to_form(params),
-        passage: passage,
-        passages: Passages.list_passages_for_version(version),
         page_title: version.label,
         personae_loquentes: personae_loquentes,
         text_nodes: text_nodes,
@@ -229,7 +230,7 @@ defmodule TextServerWeb.VersionLive.Show do
 
   @impl true
   def handle_event("change-version", %{"version" => %{"id" => urn}}, socket) do
-    urn = "#{urn}:#{socket.assigns.passage.passage.urn.passage_component}"
+    urn = "#{urn}:#{socket.assigns.current_urn.passage_component}"
     {:noreply, push_navigate(socket, to: ~p"/versions/#{urn}")}
   end
 

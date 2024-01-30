@@ -56,7 +56,7 @@
             </langUsage>
         </profileDesc>
         <revisionDesc>
-            <!-- NOTE: The change on 2023-11-03 also added @n attributes to <w> tags, which represent the 
+            <!-- NOTE: The change on 2023-11-03 also added @n attributes to <w> tags, which represent the
             character offset of the <w> tag's text content in the original string. -->
             <change when="2023-11-03" who="Charles Pletcher">"Tokenized" lines (ignoring crasis)</change>
             <change when="2017-12-30" who="GRC">Created the initial rough version.</change>
@@ -2807,6 +2807,8 @@
                 <l n="1218">ὑπὸ πλάκα Σουνίου,</l>
                 <l n="1219">τὰς ἱερὰς ὅπως</l>
                 <l n="1220">προσείποιμεν Ἀθάνας.</l>
+                <l n="1221">[]</l>
+                <l n="1222">[]</l>
             </sp>
 
             <sp>
