@@ -9,7 +9,7 @@ defmodule TextServerWeb.ReadingEnvironment.Navigation do
     {gettext("First episode"), "201-595"},
     {gettext("First *stasimon*"), "596-645"},
     {gettext("Second episode"), "646-692"},
-    {gettext("Second *stasimon"), "693-718"},
+    {gettext("Second *stasimon*"), "693-718"},
     {gettext("Third episode"), "719-865"},
     {gettext("*Epiparodos* and *kommos*"), "866-973"},
     {gettext("Fourth episode"), "974-1184"},
