@@ -65,4 +65,5 @@ venv
 collated.json
 for_collation.json
 
-priv/commentaries_data
+priv/commentaries_data/*
+!priv/commentaries_data/.gitkeep
