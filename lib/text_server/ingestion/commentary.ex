@@ -215,7 +215,7 @@ defmodule TextServer.Ingestion.Commentary do
               subsections: [start_offset, end_offset]
           }
         }
-        |> Comments.upsert_comment()
+        |> Comments.create_comment()
       else
         %{
           attributes: attributes,
@@ -223,7 +223,7 @@ defmodule TextServer.Ingestion.Commentary do
           content: content,
           urn: "#{commentary.urn}:#{citations |> Enum.dedup() |> Enum.join("-")}"
         }
-        |> LemmalessComments.upsert_lemmaless_comment()
+        |> LemmalessComments.create_lemmaless_comment()
       end
     end
   end

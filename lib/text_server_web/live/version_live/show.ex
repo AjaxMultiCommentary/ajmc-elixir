@@ -177,6 +177,7 @@ defmodule TextServerWeb.VersionLive.Show do
       if is_nil(urn.passage_component) do
         [["1"], ["133"]]
       else
+        IO.inspect(urn.passage_component)
         urn.passage_component |> String.split("-") |> Enum.map(&[&1])
       end
 
@@ -352,8 +353,11 @@ defmodule TextServerWeb.VersionLive.Show do
   end
 
   defp filter_comments(socket, text_nodes, selected_options) do
-    first_line_n = List.first(text_nodes).location |> Enum.at(0) |> String.to_integer()
-    last_line_n = List.last(text_nodes).location |> Enum.at(0) |> String.to_integer()
+    first_line_n =
+      text_nodes |> List.first() |> Map.get(:location) |> List.first() |> String.to_integer()
+
+    last_line_n =
+      text_nodes |> List.last() |> Map.get(:location) |> List.first() |> String.to_integer()
 
     Comments.filter_comments(
       socket.assigns.current_user,
