@@ -75,7 +75,15 @@ defmodule TextServer.Ingestion.Commentary do
   The public entrypoint for this module. Takes a path
   to the AjMC canonical JSON fil and the metadata from commentaries.toml. Returns `:ok` on success.
   """
+  def ingest_commentary(path, commentary_meta) when is_nil(path) do
+    Logger.warning(
+      "Failed to ingest commentary! No tess_retrained JSON found: #{inspect(commentary_meta)}"
+    )
+  end
+
   def ingest_commentary(path, commentary_meta) do
+    Logger.info("Attempting to ingest #{path}")
+
     s = File.read!(path)
     json = Jason.decode!(s)
 
