@@ -75,19 +75,15 @@ defmodule TextServer.Ingestion.Commentary do
   The public entrypoint for this module. Takes a path
   to the AjMC canonical JSON fil and the metadata from commentaries.toml. Returns `:ok` on success.
   """
-  def ingest_commentary(path, commentary_meta) when is_nil(path) do
-    Logger.warning(
-      "Failed to ingest commentary! No tess_retrained JSON found: #{inspect(commentary_meta)}"
-    )
-  end
 
-  def ingest_commentary(path, commentary_meta) do
-    Logger.info("Attempting to ingest #{path}")
+  def ingest_commentary(commentary_meta) do
+    ajmc_id = commentary_meta["ajmc_id"]
+    Logger.info("Attempting to ingest #{ajmc_id}")
 
-    s = File.read!(path)
-    json = Jason.decode!(s)
+    tess_retrained = GitHub.API.get_tess_retrained_file!(ajmc_id)
+    json = GitHub.API.get_commentary_data!(tess_retrained["download_url"])
 
-    commentary = create_commentary(path, json, commentary_meta)
+    commentary = create_commentary(tess_retrained["name"], json, commentary_meta)
 
     _lemma_comments =
       prepare_lemmas_from_canonical_json(json)
@@ -96,11 +92,10 @@ defmodule TextServer.Ingestion.Commentary do
     :ok
   end
 
-  defp create_commentary(path, json, commentary_meta) do
+  defp create_commentary(filename, json, commentary_meta) do
     pid = json |> Map.get("id")
     metadata = json |> Map.get("metadata")
 
-    basename = path |> Path.basename() |> Path.rootname()
     zotero_id = commentary_meta |> Map.get("zotero_id")
     zotero_data = Zotero.API.item(zotero_id)
     zotero_extra = zotero_data |> Map.get("extra", %{})
@@ -137,7 +132,7 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, commentary} =
       Commentaries.upsert_canonical_commentary(%{
         creators: creators,
-        filename: basename,
+        filename: filename,
         languages: languages,
         metadata: metadata,
         pid: pid,

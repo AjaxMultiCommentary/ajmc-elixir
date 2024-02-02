@@ -25,6 +25,14 @@ config :ex_aws, :s3,
   host: System.get_env("S3_HOST", ""),
   port: System.get_env("S3_PORT", "")
 
+config :text_server, GitHub.API,
+  base_url:
+    System.get_env(
+      "GITHUB_API_URL",
+      "https://api.github.com/repos/ajaxmulticommentary/commentaries_data"
+    ),
+  token: System.get_env("GITHUB_API_TOKEN")
+
 config :text_server, Zotero.API,
   base_url: System.get_env("ZOTERO_API_URL"),
   token: System.get_env("ZOTERO_API_TOKEN")
