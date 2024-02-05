@@ -115,7 +115,7 @@ defmodule TextServerWeb.CoreComponents do
       class={[
         "fixed top-2 right-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
         @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-error-50 text-error-900 shadow-md ring-error-500 fill-error-900"
+        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
       ]}
       {@rest}
     >
@@ -332,7 +332,7 @@ defmodule TextServerWeb.CoreComponents do
           "mt-2 block w-full rounded-lg base-content focus:ring-0 sm:text-sm sm:leading-6",
           "min-h-[6rem] phx-no-feedback:border-primary phx-no-feedback:focus:border-primary",
           @errors == [] && "border-primary focus:border-primary",
-          @errors != [] && "border-error-400 focus:border-error-400"
+          @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -355,7 +355,7 @@ defmodule TextServerWeb.CoreComponents do
           "mt-2 block w-full rounded-sm border border-secondary base-content focus:ring-0 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-primary phx-no-feedback:focus:border-primary",
           @errors == [] && "border-primary focus:border-primary",
-          @errors != [] && "border-error-400 focus:border-error-400"
+          @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
       />
@@ -385,7 +385,7 @@ defmodule TextServerWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-error-600 phx-no-feedback:hidden">
+    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>
