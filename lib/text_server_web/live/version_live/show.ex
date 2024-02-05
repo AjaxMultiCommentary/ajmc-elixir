@@ -55,7 +55,7 @@ defmodule TextServerWeb.VersionLive.Show do
           <p>
             <%= raw(
               Earmark.as_html!(
-                gettext("A digital platform for the comparative analysis of commentaries on Sopchocles' _Ajax_")
+                gettext("A digital platform for the comparative analysis of commentaries on Sophocles' _Ajax_")
               )
             ) %>
           </p>
