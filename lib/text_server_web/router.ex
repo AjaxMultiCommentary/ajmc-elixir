@@ -57,7 +57,8 @@ defmodule TextServerWeb.Router do
   scope "/iiif", TextServerWeb do
     pipe_through :browser
 
-    get "/:commentary_pid/*image", IiifController, :show
+    # /iiif/Wecklein1894/Wecklein1894_0015/full/max/0/default.png
+    get "/:commentary_pid/:image_id/full/max/0/default.png", IiifController, :full_image
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
