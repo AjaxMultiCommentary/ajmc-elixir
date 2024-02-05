@@ -52,7 +52,13 @@ defmodule TextServerWeb.VersionLive.Show do
         <div class="col-span-full">
           <h1 class="text-2xl font-bold"><em>Ajax</em> Multi-Commentary</h1>
 
-          <p><%= gettext("about_the_multi_commentary") %></p>
+          <p>
+            <%= raw(
+              Earmark.as_html!(
+                gettext("A digital platform for the comparative analysis of commentaries on Sopchocles' _Ajax_")
+              )
+            ) %>
+          </p>
         </div>
 
         <hr class="my-4 col-span-10" />
