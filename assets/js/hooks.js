@@ -44,7 +44,6 @@ export const IIIFHook = {
 
 	_updateViewer() {
 		const comment = JSON.parse(this.el.dataset.comment);
-		console.log(comment);
 		const tiles = JSON.parse(this.el.dataset.tiles).map((tile) => {
 			const overlays = comment.overlays
 				.filter((overlay) => tile.url.indexOf(overlay.page_id) > -1)

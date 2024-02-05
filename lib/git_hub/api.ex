@@ -3,6 +3,19 @@ defmodule GitHub.API do
     base_req() |> Req.get!(url: "/contents")
   end
 
+  def get_commentary_data!(tess_retrained_url) do
+    commentary_data =
+      Req.get!(tess_retrained_url)
+
+    commentary_data.body |> Jason.decode!()
+  end
+
+  def get_image!(ajmc_id, image_id) do
+    resp = base_req() |> Req.get!(url: "/contents/#{ajmc_id}/images/png/#{image_id}.png")
+
+    resp.body["content"]
+  end
+
   def get_tess_retrained_file!(ajmc_id) do
     resp = base_req() |> Req.get!(url: "/contents/#{ajmc_id}/canonical")
     files = resp.body
@@ -10,13 +23,6 @@ defmodule GitHub.API do
     Enum.find(files, fn file ->
       String.ends_with?(file["name"], "_tess_retrained.json")
     end)
-  end
-
-  def get_commentary_data!(tess_retrained_url) do
-    commentary_data =
-      Req.get!(tess_retrained_url)
-
-    commentary_data.body |> Jason.decode!()
   end
 
   defp base_req do

@@ -9,22 +9,24 @@ defmodule TextServerWeb.IiifController do
 
   /iiif/DeRomilly1976/DeRomilly1976_0037/full/max/0/default.png
   """
-  def show(conn, %{"commentary_pid" => commentary_pid, "image" => image}) do
+  def full_image(conn, %{"commentary_pid" => commentary_pid, "image_id" => image_id}) do
     current_user = conn.assigns.current_user
     commentary = Commentaries.get_canonical_commentary_by(%{pid: commentary_pid})
 
     with :ok <-
            Bodyguard.permit(Commentaries.CanonicalCommentary, :view, current_user, commentary) do
-      full_path = get_image(commentary_pid <> "/" <> Enum.join(image, "/"))
+      image = get_image!(commentary_pid, image_id)
 
-      send_file(conn, 200, full_path)
+      conn
+      |> put_resp_content_type("image/png")
+      |> send_resp(200, Base.decode64!(image, ignore: :whitespace))
     else
       _ ->
         send_resp(conn, 404, "Not found")
     end
   end
 
-  defp get_image(path) do
-    Application.app_dir(:text_server, "priv/static/ajmc_iiif/#{path}")
+  defp get_image!(commentary_id, image_id) do
+    GitHub.API.get_image!(commentary_id, image_id)
   end
 end
