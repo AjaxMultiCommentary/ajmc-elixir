@@ -3,7 +3,6 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
 
   alias TextServer.Comments.Comment
   alias TextServer.Commentaries.CanonicalCommentary
-  alias TextServer.LemmalessComments.LemmalessComment
 
   alias TextServerWeb.CoreComponents
 
@@ -106,11 +105,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
     end
   end
 
-  defp citable_gloss(%Comment{} = comment) do
-    "#{comment.urn.work_component}:#{comment.urn.citations |> Enum.dedup() |> Enum.join("-")}@#{comment.lemma}"
-  end
-
-  defp citable_gloss(%LemmalessComment{} = comment) do
+  defp citable_gloss(comment) do
     "#{comment.urn.work_component}:#{comment.urn.passage_component}"
   end
 end

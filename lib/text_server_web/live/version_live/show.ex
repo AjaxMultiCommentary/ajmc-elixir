@@ -35,7 +35,6 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :focused_text_node, TextNodes.TextNode
   attr :footnotes, :list, default: []
   attr :highlighted_comments, :list, default: []
-  attr :highlighted_lemmaless_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :location, :list, default: []
   attr :multi_select_filter_value, :string, default: ""
@@ -452,25 +451,18 @@ defmodule TextServerWeb.VersionLive.Show do
   defp maybe_highlight_gloss(socket, gloss) do
     gloss_urn = CTS.URN.parse("urn:cts:greekLit:#{gloss}")
 
-    case gloss_urn do
-      %CTS.URN{subsections: [nil, nil]} ->
-        comment =
-          LemmalessComments.get_lemmaless_comment_by_urn!(gloss_urn)
-          |> LemmalessComments.with_interface_id()
+    comment =
+      if Enum.all?(gloss_urn.subsections, &is_nil/1) do
+        LemmalessComments.get_lemmaless_comment_by_urn!(gloss_urn)
+        |> LemmalessComments.with_interface_id()
+      else
+        Comments.get_comment_by_urn!(gloss_urn)
+        |> Comments.with_interface_id()
+      end
 
-        highlights = [comment.interface_id]
-        send(self(), {:comments_highlighted, highlights})
-        assign(socket, :highlighted_lemmaless_comments, highlights)
-
-      %CTS.URN{subsections: [lemma, _]} ->
-        comment =
-          Comments.get_comment_by_urn_with_lemma!(gloss_urn, lemma)
-          |> Comments.with_interface_id()
-
-        highlights = [comment.interface_id]
-        send(self(), {:comments_highlighted, highlights})
-        assign(socket, :highlighted_comments, highlights)
-    end
+    highlights = [comment.interface_id]
+    send(self(), {:comments_highlighted, highlights})
+    assign(socket, :highlighted_comments, highlights)
   end
 
   defp maybe_scroll_line_into_view(nil), do: nil
