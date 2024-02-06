@@ -2,9 +2,16 @@ defmodule TextServer.MixProject do
   use Mix.Project
 
   def project do
+    {epoch, _} = System.cmd("git", ~w|log -1 --date=raw --format=%cd|)
+
+    [sec, tz] =
+      epoch
+      |> String.split(~r/\s+/, trim: true)
+      |> Enum.map(&String.to_integer/1)
+
     [
       app: :text_server,
-      version: "0.1.0",
+      version: "0.1.0+#{sec + tz * 36}",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
