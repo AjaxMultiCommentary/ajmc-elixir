@@ -17,9 +17,9 @@ defmodule TextServerWeb.CommentariesLive.Show do
     ~H"""
     <div>
       <h4 class="text-base leading-7 base-content mb-4">
-        &#10092; <.link navigate={~p"/bibliography"} class="hover:underline">Bibliography</.link>
+        &#10094; <.link navigate={~p"/bibliography"} class="hover:underline">Bibliography</.link>
       </h4>
-      <section class="overflow-hidden bg-white shadow sm:rounded-lg">
+      <section class="overflow-hidden bg-base shadow sm:rounded-lg">
         <div class="px-4 py-6 sm:px-6">
           <h3 class="text-base font-semibold leading-7 base-content">
             <%= @commentary.title %> (<%= @commentary.publication_date %>)
@@ -28,8 +28,8 @@ defmodule TextServerWeb.CommentariesLive.Show do
             <%= CanonicalCommentary.creators_to_string(@commentary.creators) %>
           </p>
         </div>
-        <div class="border-t border-primary">
-          <dl class="divide-y divide-primary">
+        <div class="border-t">
+          <dl class="divide-y">
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium base-content"><%= gettext("Public domain year") %></dt>
               <dd class="mt-1 text-sm leading-6 base-content sm:col-span-2 sm:mt-0">
