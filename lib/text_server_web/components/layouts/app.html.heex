@@ -12,6 +12,9 @@
               Available commentaries
             </.link>
             <.link href={~p"/about"} class="link link-hover">About</.link>
+            <%= unless is_nil(@current_user) do %>
+              <span class="text-secondary">v<%= Application.spec(:text_server, :vsn) %></span>
+            <% end %>
           </div>
         </div>
         <div class="h-16 flex items-center">

@@ -5,7 +5,7 @@ defmodule TextServerWeb.ReadingEnvironment.Navigation do
 
   @passages [
     {gettext("Prologue"), "1-133"},
-    {gettext("*Parodos*"), "144-200"},
+    {gettext("*Parodos*"), "134-200"},
     {gettext("First episode"), "201-595"},
     {gettext("First *stasimon*"), "596-645"},
     {gettext("Second episode"), "646-692"},

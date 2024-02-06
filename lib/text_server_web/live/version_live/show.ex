@@ -176,54 +176,55 @@ defmodule TextServerWeb.VersionLive.Show do
   @impl true
   def handle_params(%{"urn" => urn} = params, _, socket) do
     urn = CTS.URN.parse(urn)
-    version = Versions.get_version_by_urn!(urn)
 
-    [start_location, end_location] =
-      if is_nil(urn.passage_component) do
-        [["1"], ["133"]]
-      else
-        IO.inspect(urn.passage_component)
+    if is_nil(urn.passage_component) do
+      urn_with_location = "#{urn}:1-133"
+      {:noreply, socket |> push_patch(to: ~p"/versions/#{urn_with_location}")}
+    else
+      [start_location, end_location] =
         urn.passage_component |> String.split("-") |> Enum.map(&[&1])
-      end
 
-    text_nodes =
-      TextNodes.list_text_nodes_by_version_between_locations(
-        version,
-        start_location,
-        end_location
-      )
+      version = Versions.get_version_by_urn!(urn)
 
-    personae_loquentes = get_personae_loquentes(text_nodes)
+      text_nodes =
+        TextNodes.list_text_nodes_by_version_between_locations(
+          version,
+          start_location,
+          end_location
+        )
 
-    socket =
-      socket
-      |> assign(
-        current_urn: urn,
-        form: to_form(params),
-        page_title: version.label,
-        personae_loquentes: personae_loquentes,
-        text_nodes: text_nodes,
-        version: version,
-        versions_for_select:
-          list_versions()
-          |> Enum.map(fn v ->
-            {raw("#{v.label} #{v.description}"), CTS.URN.to_string(v.urn)}
-          end)
-      )
+      personae_loquentes = get_personae_loquentes(text_nodes)
 
-    commentaries = list_commentaries(socket)
+      socket =
+        socket
+        |> assign(
+          current_urn: urn,
+          form: to_form(params),
+          page_title: version.label,
+          personae_loquentes: personae_loquentes,
+          text_nodes: text_nodes,
+          version: version,
+          versions_for_select:
+            list_versions()
+            |> Enum.map(fn v ->
+              {raw("#{v.label} #{v.description}"), CTS.URN.to_string(v.urn)}
+            end)
+        )
 
-    gloss = Map.get(params, "gloss")
+      commentaries = list_commentaries(socket)
 
-    socket =
-      socket
-      |> assign(commentaries: commentaries)
-      |> assign_multi_select_options(commentaries)
-      |> maybe_highlight_gloss(gloss)
+      gloss = Map.get(params, "gloss")
 
-    maybe_scroll_line_into_view(gloss)
+      socket =
+        socket
+        |> assign(commentaries: commentaries)
+        |> assign_multi_select_options(commentaries)
+        |> maybe_highlight_gloss(gloss)
 
-    {:noreply, socket}
+      maybe_scroll_line_into_view(gloss)
+
+      {:noreply, socket}
+    end
   end
 
   def handle_params(params, session, socket) do
