@@ -2,12 +2,9 @@ defmodule TextServer.MixProject do
   use Mix.Project
 
   def project do
-    {<<git_sha::binary-size(8), _rest::binary>>, _exit_code} =
-      System.cmd("git", ["rev-parse", "HEAD"])
-
     [
       app: :text_server,
-      version: "0.1.0+#{git_sha}",
+      version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
