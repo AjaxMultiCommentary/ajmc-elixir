@@ -355,7 +355,10 @@ defmodule TextServer.Ingestion.Commentary do
     glossa =
       glossa_words
       |> List.flatten()
-      |> Enum.map(&Map.get(&1, "text"))
+      |> Enum.map(fn w ->
+        # get entities here
+        _text = Map.get(w, "text")
+      end)
       |> Enum.join(" ")
       |> String.trim()
 

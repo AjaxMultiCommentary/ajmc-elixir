@@ -6,7 +6,8 @@ defmodule TextServer.Accounts.User do
     do: [
       "matteo.romanello@unil.ch",
       "sven.najem-meyer@epfl.ch",
-      "charles.pletcher@unil.ch"
+      "charles.pletcher@unil.ch",
+      "mahmoud.assaf@unil.ch"
     ]
 
   schema "users" do
