@@ -279,6 +279,16 @@
     background-color: rgb(67, 121, 142, 1);
 }
 
+.decorate-links a {
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+
+.decorate-links a:hover {
+    opacity: 0.8;
+}
+
 /** Begin tei.css --- based on work by Luke Hollis and the IIP Project */
 
 /* 2023-03-22 CR editing multiple elements */

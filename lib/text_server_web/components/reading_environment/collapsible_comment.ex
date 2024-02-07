@@ -1,4 +1,5 @@
 defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
+  alias TextServerWeb.Helpers.Markdown
   use TextServerWeb, :live_component
 
   alias TextServer.Comments.Comment
@@ -44,7 +45,9 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
         <% end %>
       </div>
       <div class="collapse-content float-right">
-        <p class="max-w-2xl text-sm base-content font-serif"><%= @comment.content %></p>
+        <p class="max-w-2xl text-sm base-content font-serif decorate-links">
+          <%= raw(Markdown.sanitize_and_parse_markdown(@comment.content)) %>
+        </p>
         <div class="flex mt-2 justify-center">
           <%= if @iiif_viewer_shown? do %>
             <.live_component

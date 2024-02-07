@@ -298,12 +298,16 @@ defmodule TextServer.Ingestion.Commentary do
       |> Map.get("lemmas", [])
       |> Enum.filter(&Enum.member?(~w(scope-anchor word-anchor), Map.get(&1, "label")))
 
+    entities = children |> Map.get("entities", [])
+
     pages = children |> Map.get("pages")
 
     words =
       children
       |> Map.get("words")
-      |> Enum.with_index(fn el, index -> Map.put(el, :index, index) end)
+      |> Enum.with_index(fn el, index ->
+        el |> Map.put(:index, index)
+      end)
 
     regions = children |> Map.get("regions")
 
@@ -315,10 +319,10 @@ defmodule TextServer.Ingestion.Commentary do
 
     lemmas
     |> Enum.chunk_every(2, 1)
-    |> Enum.map(&prepare_lemma(commentaries, pages, words, &1))
+    |> Enum.map(&prepare_lemma(commentaries, pages, words, entities, &1))
   end
 
-  defp prepare_lemma(commentaries, pages, words, [lemma]) do
+  defp prepare_lemma(commentaries, pages, words, entities, [lemma]) do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
@@ -352,15 +356,7 @@ defmodule TextServer.Ingestion.Commentary do
 
     glossa_overlays = calculate_overlays(pages, [lemma_words | glossa_words])
 
-    glossa =
-      glossa_words
-      |> List.flatten()
-      |> Enum.map(fn w ->
-        # get entities here
-        _text = Map.get(w, "text")
-      end)
-      |> Enum.join(" ")
-      |> String.trim()
+    glossa = make_glossa_from_words(glossa_words, entities)
 
     lemma_transcript =
       if is_nil(Map.get(lemma, "transcript")) do
@@ -387,7 +383,7 @@ defmodule TextServer.Ingestion.Commentary do
     })
   end
 
-  defp prepare_lemma(commentaries, pages, words, [lemma, next_lemma]) do
+  defp prepare_lemma(commentaries, pages, words, entities, [lemma, next_lemma]) do
     [lemma_first | [lemma_last]] = Map.get(lemma, "word_range")
     lemma_range = lemma_first..lemma_last
     lemma_words = WordRange.get_words_for_range(words, lemma_range)
@@ -396,7 +392,7 @@ defmodule TextServer.Ingestion.Commentary do
     next_lemma_range = next_lemma_first..next_lemma_last
     next_lemma_words = WordRange.get_words_for_range(words, next_lemma_range)
 
-    if next_lemma_last < lemma_last do
+    if lemma_first > next_lemma_first or lemma_last > next_lemma_last do
       Logger.error("out of order lemmata: #{inspect(lemma)}\n#{inspect(next_lemma)}")
     end
 
@@ -437,12 +433,7 @@ defmodule TextServer.Ingestion.Commentary do
 
     glossa_overlays = calculate_overlays(pages, [lemma_words | glossa_words])
 
-    glossa =
-      glossa_words
-      |> List.flatten()
-      |> Enum.map(&Map.get(&1, "text"))
-      |> Enum.join(" ")
-      |> String.trim()
+    glossa = make_glossa_from_words(glossa_words, entities)
 
     lemma_transcript =
       if is_nil(Map.get(lemma, "transcript")) do
@@ -467,6 +458,42 @@ defmodule TextServer.Ingestion.Commentary do
         end),
       "page_ids" => pages |> Enum.map(&Map.get(&1, "id"))
     })
+  end
+
+  defp get_entity_for_word(entities, word) do
+    entities
+    |> Enum.find(fn ent ->
+      word_range = ent["word_range"]
+      word.index in Enum.at(word_range, 0)..Enum.at(word_range, 1)
+    end)
+  end
+
+  defp make_glossa_from_words(glossa_words, entities) do
+    glossa_words
+    |> List.flatten()
+    |> Enum.map(fn w ->
+      {Map.get(w, "text"), get_entity_for_word(entities, w)}
+    end)
+    |> Enum.chunk_by(fn {_, entity} -> entity end)
+    |> Enum.map(fn chunk ->
+      entity = chunk |> List.first() |> elem(1)
+      text = chunk |> Enum.map(fn {t, _} -> t end) |> Enum.join(" ")
+
+      if is_nil(entity) do
+        text
+      else
+        link = entity |> Map.get("wikidata_id")
+
+        if is_nil(link) do
+          Logger.warning("Entity found, but no link provided: #{inspect(chunk)}")
+          text
+        else
+          "[#{text}](#{link})"
+        end
+      end
+    end)
+    |> Enum.join(" ")
+    |> String.trim()
   end
 
   defp calculate_overlays(pages, words_grouped_by_region) do
