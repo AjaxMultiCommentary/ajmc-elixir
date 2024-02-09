@@ -38,6 +38,9 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
 
     belongs_to :version, TextServer.Versions.Version
 
+    has_many :comments, TextServer.Comments.Comment
+    has_many :lemmaless_comments, TextServer.LemmalessComments.LemmalessComment
+
     many_to_many :creators, TextServer.Commentaries.Creator,
       join_through: TextServer.Commentaries.CommentaryCreator,
       on_replace: :delete
@@ -123,6 +126,26 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
     rest = (rest -- [last]) |> Enum.map(fn c -> "#{c.first_name} #{c.last_name}" end)
 
     "#{s}, #{Enum.join(rest, ",")}, and #{last.first_name} #{last.last_name}"
+  end
+
+  def full_urn(urn) do
+    cond do
+      String.starts_with?(urn, "urn:cts:greekLit:tlg0011.tlg003.ajmc") ->
+        {:ok, urn}
+
+      String.starts_with?(urn, "greekLit:tlg0011.tlg003.ajmc") ->
+        {:ok, "urn:cts:#{urn}"}
+
+      String.starts_with?(urn, "tlg0011.tlg003.ajmc") ->
+        {:ok, "urn:cts:greekLit:#{urn}"}
+
+      String.starts_with?(urn, "ajmc") ->
+        {:ok, "urn:cts:greekLit:tlg0011.tlg003.#{urn}"}
+
+      true ->
+        {:error,
+         "Invalid URN `#{urn}`. URN must point to a valid resource, e.g. `urn:cts:greekLit:tlg0011.tlg003.ajmc-cam` or simply `ajmc-cam`."}
+    end
   end
 
   def is_public_domain?(%CanonicalCommentary{} = commentary) do

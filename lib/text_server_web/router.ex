@@ -31,8 +31,9 @@ defmodule TextServerWeb.Router do
 
     get "/:collection/:text_group/:work/:version", VersionController, :show
 
-    get "/commentaries/:urn", CommentaryController, :show
-    resources "/lemmaless_comments", LemmalessCommentController, except: [:new, :edit]
+    resources "/commentaries", CommentaryController, only: [:index, :show], param: "urn" do
+      resources "/comments", CommentController
+    end
   end
 
   scope "/", TextServerWeb do

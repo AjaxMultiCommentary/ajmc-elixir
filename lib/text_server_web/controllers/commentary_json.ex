@@ -1,6 +1,10 @@
 defmodule TextServerWeb.CommentaryJSON do
   alias TextServer.Commentaries.CanonicalCommentary
 
+  def index(%{commentaries: commentaries}) do
+    %{data: for(commentary <- commentaries, do: data(commentary))}
+  end
+
   @doc """
   Renders a single commentary.
   """
