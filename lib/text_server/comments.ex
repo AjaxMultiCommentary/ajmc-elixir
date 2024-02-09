@@ -92,6 +92,44 @@ defmodule TextServer.Comments do
   end
 
   @doc """
+  Used only for the API routes. Allows searching comments by `start`,
+  `end`, and `lemma` parameters.
+  """
+  def search_comments(_current_user, attrs \\ %{}) do
+    query = Comment
+
+    start_n = attrs["start"]
+    end_n = attrs["end"]
+    lemma = attrs["lemma"]
+
+    query =
+      cond do
+        is_integer(start_n) and is_integer(end_n) ->
+          range = Range.new(start_n, end_n) |> Range.to_list()
+          query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
+
+        is_integer(start_n) and is_nil(end_n) ->
+          query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") >= ^start_n)
+
+        is_nil(start_n) and is_integer(end_n) ->
+          query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") <= ^end_n)
+
+        true ->
+          query
+      end
+
+    query =
+      unless is_nil(lemma) do
+        s = "%#{lemma}%"
+        query |> where([c], ilike(c.lemma, ^s))
+      else
+        query
+      end
+
+    Repo.all(query)
+  end
+
+  @doc """
   Gets a single comment.
 
   Raises `Ecto.NoResultsError` if the Comment does not exist.

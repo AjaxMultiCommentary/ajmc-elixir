@@ -4,8 +4,8 @@ defmodule TextServerWeb.CommentController do
   alias TextServer.Commentaries
   alias TextServer.Commentaries.CanonicalCommentary
 
-  # alias TextServer.Comments
-  # alias TextServer.LemmalessComments
+  alias TextServer.Comments
+  alias TextServer.LemmalessComments
 
   action_fallback TextServerWeb.FallbackController
 
@@ -32,6 +32,33 @@ defmodule TextServerWeb.CommentController do
         |> put_status(:not_found)
         |> json(%{error: reason})
     end
+  end
+
+  def glosses(conn, params) do
+    params =
+      params
+      |> Map.update("start", 0, fn s -> String.to_integer(s) end)
+      |> Map.update("end", 2_000_000, fn s -> String.to_integer(s) end)
+
+    comments =
+      Comments.search_comments(
+        "STUB --- THIS ROUTE SHOULD ONLY BE AVAILABLE FOR LOGGED-IN USERS",
+        params
+      )
+
+    comments =
+      if is_nil(params["lemma"]) do
+        comments ++
+          LemmalessComments.list_lemmaless_comments_for_lines(
+            "STUB --- THIS ROUTE SHOULD ONLY BE AVAILABLE FOR LOGGED-IN USERS",
+            params["start"],
+            params["end"]
+          )
+      else
+        comments
+      end
+
+    render(conn, :index, comments: comments)
   end
 
   def lemmas(conn, %{"commentary_urn" => commentary_urn}) do
