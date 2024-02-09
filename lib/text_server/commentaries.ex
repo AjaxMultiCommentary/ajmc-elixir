@@ -60,8 +60,8 @@ defmodule TextServer.Commentaries do
   """
   def get_canonical_commentary!(id), do: Repo.get!(CanonicalCommentary, id)
 
-  def get_canonical_commentary_by(attrs \\ %{}) do
-    Repo.get_by(CanonicalCommentary, attrs)
+  def get_canonical_commentary_by(attrs \\ %{}, preloads \\ []) do
+    Repo.get_by(CanonicalCommentary, attrs) |> Repo.preload(preloads)
   end
 
   @doc """

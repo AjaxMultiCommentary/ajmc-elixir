@@ -8,7 +8,19 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
 
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:filename, :pid, :metadata]}
+  @derive {Jason.Encoder,
+           only: [
+             :filename,
+             :languages,
+             :metadata,
+             :pid,
+             :publication_date,
+             :public_domain_year,
+             :source_url,
+             :title,
+             :urn,
+             :wikidata_qid
+           ]}
 
   schema "canonical_commentaries" do
     field :filename, :string

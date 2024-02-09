@@ -30,8 +30,8 @@ defmodule TextServerWeb.Router do
     end
 
     get "/:collection/:text_group/:work/:version", VersionController, :show
-    get "/:collection/:text_group/:work/:version/lemmas", VersionController, :lemmas
 
+    get "/commentaries/:urn", CommentaryController, :show
     resources "/lemmaless_comments", LemmalessCommentController, except: [:new, :edit]
   end
 

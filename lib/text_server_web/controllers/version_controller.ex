@@ -10,19 +10,6 @@ defmodule TextServerWeb.VersionController do
     send_download(conn, {:file, version.filename})
   end
 
-  def lemmas(conn, %{
-        "collection" => collection,
-        "text_group" => text_group,
-        "version" => version,
-        "work" => work
-      }) do
-    version =
-      Versions.get_version_by_urn!("urn:cts:#{collection}:#{text_group}.#{work}.#{version}")
-      |> Repo.preload(commentaries: :lemmas)
-
-    json(conn, Enum.map(version.commentaries, fn c -> c.lemmas end))
-  end
-
   def show(conn, %{
         "collection" => collection,
         "text_group" => text_group,
