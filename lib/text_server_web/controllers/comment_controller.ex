@@ -33,4 +33,31 @@ defmodule TextServerWeb.CommentController do
         |> json(%{error: reason})
     end
   end
+
+  def lemmas(conn, %{"commentary_urn" => commentary_urn}) do
+    case CanonicalCommentary.full_urn(commentary_urn) do
+      {:ok, urn} ->
+        commentary =
+          Commentaries.get_canonical_commentary_by(%{urn: urn}, [
+            :comments
+          ])
+
+        lemmas =
+          commentary.comments
+          |> Enum.sort_by(fn comment ->
+            {comment.urn.citations |> List.first() |> String.to_integer(),
+             Map.get(comment, :start_offset, 0)}
+          end)
+          |> Enum.map(fn c ->
+            %{lemma: c.lemma, urn: to_string(c.urn)}
+          end)
+
+        json(conn, %{data: lemmas})
+
+      {:error, reason} ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: reason})
+    end
+  end
 end

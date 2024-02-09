@@ -29,10 +29,10 @@ defmodule TextServerWeb.Router do
       get "/:id/download", VersionController, :download
     end
 
-    get "/:collection/:text_group/:work/:version", VersionController, :show
-
     resources "/commentaries", CommentaryController, only: [:index, :show], param: "urn" do
-      resources "/comments", CommentController
+      resources "/comments", CommentController, only: [:index]
+
+      get "/comments/lemmas", CommentController, :lemmas
     end
   end
 
