@@ -13,8 +13,9 @@ if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
 end
 
 config :text_server,
-  iiif_root_url: System.get_env("IIIF_ROOT_URL", "/iiif/"),
-  env: config_env()
+  enable_api: System.get_env("ENABLE_AJMC_API") == "true",
+  env: config_env(),
+  iiif_root_url: System.get_env("IIIF_ROOT_URL", "/iiif/")
 
 config :ex_aws,
   access_key_id: System.get_env("S3_ACCESS_KEY", ""),

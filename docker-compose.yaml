@@ -11,6 +11,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - DATABASE_URL=${DATABASE_URL:-postgres://postgres:postgres@ajmc-postgres:5432/ajmc}
+      - ENABLE_AJMC_API=${ENABLE_AJMC_API:-false}
       - PHX_HOST=${PHX_HOST:-0.0.0.0}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-overwrite_this_key_on_deployment_overwrite_this_key_on_deployment}
       - GITHUB_API_TOKEN=${GITHUB_API_TOKEN:-https://github.com/settings/tokens}

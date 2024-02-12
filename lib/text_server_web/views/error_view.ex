@@ -7,6 +7,10 @@ defmodule TextServerWeb.ErrorView do
   #   "Internal Server Error"
   # end
 
+  def render(<<"404", _rest::binary>>, _assigns) do
+    "Not Found"
+  end
+
   def render("403.html", _assigns) do
     "Forbidden"
   end

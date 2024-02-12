@@ -10,6 +10,7 @@ defmodule TextServerWeb.Plugs.API do
 
   def call(conn, _opts) do
     conn
+    |> verify_api_access()
     |> get_token()
     |> verify_token()
     |> case do
@@ -39,6 +40,18 @@ defmodule TextServerWeb.Plugs.API do
       TextServerWeb.Endpoint.config(:secret_key_base),
       user_id
     )
+  end
+
+  def verify_api_access(conn) do
+    if Application.get_env(:text_server, :enable_api) do
+      conn
+    else
+      conn
+      |> put_status(:not_found)
+      |> put_view(TextServerWeb.ErrorView)
+      |> render(:"404")
+      |> halt()
+    end
   end
 
   @spec verify_token(nil | binary) :: {:error, :expired | :invalid | :missing} | {:ok, any}
