@@ -5,15 +5,12 @@ defmodule TextServer.CommentsFixtures do
   """
 
   alias TextServer.CommentariesFixtures
-  alias TextServer.TextNodesFixtures
 
   @doc """
   Generate a comment.
   """
   def comment_fixture(attrs \\ %{}) do
     commentary = CommentariesFixtures.canonical_commentary_fixture()
-    start_text_node = TextNodesFixtures.text_node_fixture()
-    end_text_node = TextNodesFixtures.text_node_fixture()
 
     {:ok, comment} =
       attrs
@@ -23,9 +20,8 @@ defmodule TextServer.CommentsFixtures do
         content: "some content",
         lemma: "some lemma",
         start_offset: 0,
-        start_text_node_id: start_text_node.id,
-        end_text_node_id: end_text_node.id,
-        end_offset: 5
+        end_offset: 5,
+        urn: "#{commentary.urn}:1@abcdef"
       })
       |> TextServer.Comments.create_comment()
 

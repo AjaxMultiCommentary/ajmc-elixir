@@ -23,15 +23,16 @@ defmodule TextServer.CommentsTest do
     end
 
     test "create_comment/1 with valid data creates a comment" do
+      commentary = canonical_commentary_fixture()
+
       valid_attrs = %{
         attributes: %{},
-        canonical_commentary_id: canonical_commentary_fixture().id,
+        canonical_commentary_id: commentary.id,
         content: "some content",
         lemma: "some lemma",
         start_offset: 0,
-        start_text_node_id: text_node_fixture().id,
         end_offset: 8,
-        end_text_node_id: text_node_fixture().id
+        urn: "#{commentary.urn}:2@abcdefgh"
       }
 
       assert {:ok, %Comment{} = comment} = Comments.create_comment(valid_attrs)
