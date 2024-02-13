@@ -31,9 +31,9 @@ defmodule TextServer.VersionsTest do
   }
 
   describe "versions" do
-    test "list_versions/0 returns a paginated list of versions" do
+    test "list_versions/0 returns an unpaginated list of versions" do
       version = version_fixture()
-      versions = Versions.list_versions().entries
+      versions = Versions.list_versions()
 
       assert List.first(versions).id == version.id
     end
