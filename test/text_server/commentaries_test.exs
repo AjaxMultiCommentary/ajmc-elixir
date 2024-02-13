@@ -12,7 +12,7 @@ defmodule TextServer.CommentariesTest do
     @invalid_attrs %{filename: nil, pid: nil}
 
     test "list_public_commentaries/0 returns all public canonical_commentaries" do
-      canonical_commentary = canonical_commentary_fixture()
+      _canonical_commentary = canonical_commentary_fixture()
       assert Commentaries.list_public_commentaries() == []
     end
 
@@ -21,7 +21,7 @@ defmodule TextServer.CommentariesTest do
 
       comm = Commentaries.get_canonical_commentary!(canonical_commentary.id)
 
-      comm.title == canonical_commentary.title
+      assert comm.title == canonical_commentary.title
     end
 
     test "create_canonical_commentary/1 with valid data creates a canonical_commentary" do
@@ -32,7 +32,8 @@ defmodule TextServer.CommentariesTest do
         languages: ["grc", "ita"],
         title: "some title",
         publication_date: 1980,
-        public_domain_year: 1908
+        public_domain_year: 1908,
+        urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lob"
       }
 
       assert {:ok, %CanonicalCommentary{} = canonical_commentary} =

@@ -22,7 +22,8 @@ defmodule TextServer.CommentariesFixtures do
         filename: unique_filename(),
         title: unique_title(),
         pid: unique_pid(),
-        publication_date: 1980
+        publication_date: 1980,
+        urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-cam"
       })
       |> TextServer.Commentaries.create_canonical_commentary()
 
