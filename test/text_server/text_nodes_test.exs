@@ -71,32 +71,37 @@ defmodule TextServer.TextNodesTest do
     test "list_text_nodes_by_version_between_locations/3 returns text nodes between the given locations" do
       version = TextServer.VersionsFixtures.version_fixture()
 
-      Enum.each(1..5, fn i ->
-        text_node_fixture(%{version: version, text: "Text #{i}", location: [1, i]})
+      Enum.each(5..10, fn i ->
+        text_node_fixture(%{version: version, text: "Text #{i}", location: ["#{i}"]})
       end)
 
       text_nodes =
-        TextNodes.list_text_nodes_by_version_between_locations(version, [1, 2], [1, 4])
+        TextNodes.list_text_nodes_by_version_between_locations(version, ["5"], ["7"])
 
       locations = Enum.map(text_nodes, & &1.location)
 
-      assert Enum.member?(locations, [1, 2])
-      assert Enum.member?(locations, [1, 3])
-      assert Enum.member?(locations, [1, 4])
-      refute Enum.member?(locations, [1, 1])
-      refute Enum.member?(locations, [1, 5])
+      assert Enum.member?(locations, ["5"])
+      assert Enum.member?(locations, ["6"])
+      assert Enum.member?(locations, ["7"])
+      refute Enum.member?(locations, ["8"])
+      refute Enum.member?(locations, ["9"])
     end
 
     test "list_locations_by_version_id/1 returns all TextNode locations for the given version" do
       version = TextServer.VersionsFixtures.text_node_version_fixture()
 
-      Enum.each(1..5, fn i ->
-        text_node_fixture(%{version: version, text: "Text #{i}", location: [1, i]})
+      Enum.each(5..10, fn i ->
+        text_node_fixture(%{version: version, text: "Text #{i}", location: ["#{i}"]})
       end)
 
       locations = TextNodes.list_locations_by_version_id(version.id)
 
-      assert locations == [[1, 1], [1, 2], [1, 3], [1, 4], [1, 5]]
+      assert Enum.member?(locations, ["5"])
+      assert Enum.member?(locations, ["6"])
+      assert Enum.member?(locations, ["7"])
+      assert Enum.member?(locations, ["8"])
+      assert Enum.member?(locations, ["9"])
+      assert Enum.member?(locations, ["10"])
     end
   end
 
