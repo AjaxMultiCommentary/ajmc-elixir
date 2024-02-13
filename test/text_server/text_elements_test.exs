@@ -27,7 +27,9 @@ defmodule TextServer.TextElementsTest do
 
     test "create_text_element/1 with valid data creates a text_element" do
       element_type = TextServer.ElementTypesFixtures.element_type_fixture()
-      end_text_node = TextServer.TextNodesFixtures.text_node_fixture() |> TextServer.Repo.preload(:version)
+
+      end_text_node =
+        TextServer.TextNodesFixtures.text_node_fixture() |> TextServer.Repo.preload(:version)
 
       start_text_node =
         TextServer.TextNodesFixtures.version_text_node_fixture(end_text_node.version)

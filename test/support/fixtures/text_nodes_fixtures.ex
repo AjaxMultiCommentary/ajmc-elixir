@@ -8,7 +8,7 @@ defmodule TextServer.TextNodesFixtures do
   Generate a text_node.
   """
   def version_text_node_fixture(version, attrs \\ %{}) do
-    location = Map.get(attrs, :location, [200, 1, 1])
+    location = Map.get(attrs, :location, ["1"])
 
     {:ok, text_node} =
       attrs
@@ -30,7 +30,7 @@ defmodule TextServer.TextNodesFixtures do
   """
   def text_node_fixture(attrs \\ %{}) do
     version = Map.get(attrs, :version, version_fixture())
-    location = Map.get(attrs, :location, [100, 1, 1])
+    location = Map.get(attrs, :location, ["3"])
 
     {:ok, text_node} =
       attrs
