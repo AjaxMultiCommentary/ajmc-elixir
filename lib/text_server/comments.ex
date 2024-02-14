@@ -6,6 +6,8 @@ defmodule TextServer.Comments do
   import Ecto.Query, warn: false
   alias TextServer.Repo
 
+  alias TextServer.Commentaries
+  alias TextServer.Commentaries.CanonicalCommentary
   alias TextServer.Comments.Comment
 
   @doc """
@@ -92,41 +94,48 @@ defmodule TextServer.Comments do
   end
 
   @doc """
-  Used only for the API routes. Allows searching comments by `start`,
-  `end`, and `lemma` parameters.
+  Used only for the API routes. Allows searching comments by `commentary_urn`, `start`,
+  `end`, `search` (which searches the `content` field), and `lemma` parameters.
   """
   def search_comments(_current_user, attrs \\ %{}) do
-    query = Comment
-
-    start_n = attrs["start"]
-    end_n = attrs["end"]
-    lemma = attrs["lemma"]
-
     query =
-      cond do
-        is_integer(start_n) and is_integer(end_n) ->
-          range = Range.new(start_n, end_n) |> Range.to_list()
-          query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
-
-        is_integer(start_n) and is_nil(end_n) ->
-          query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") >= ^start_n)
-
-        is_nil(start_n) and is_integer(end_n) ->
-          query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") <= ^end_n)
-
-        true ->
-          query
-      end
-
-    query =
-      unless is_nil(lemma) do
-        s = "%#{lemma}%"
-        query |> where([c], ilike(c.lemma, ^s))
-      else
-        query
-      end
+      Comment
+      |> by_commentary(attrs)
+      |> within_range(attrs)
+      |> with_lemma(attrs)
+      |> search(attrs)
 
     Repo.all(query)
+  end
+
+  defp by_commentary(query, %{"commentary_urn" => commentary_urn}) do
+    {:ok, urn} = CanonicalCommentary.full_urn(commentary_urn)
+
+    commentary = Commentaries.get_canonical_commentary_by(%{urn: urn})
+
+    query |> where([c], c.canonical_commentary_id == ^commentary.id)
+  end
+
+  defp by_commentary(query, _attrs), do: query
+
+  defp search(query, %{"search" => search}) do
+    s = "%#{search}%"
+    query |> where([c], fragment("f_unaccent(?) ILIKE f_unaccent(?)", c.content, ^s))
+  end
+
+  defp search(query, _attrs), do: query
+
+  defp with_lemma(query, %{"lemma" => lemma}) do
+    s = "%#{lemma}%"
+    query |> where([c], ilike(c.lemma, ^s))
+  end
+
+  defp with_lemma(query, _attrs), do: query
+
+  defp within_range(query, %{"start" => start_n, "end" => end_n})
+       when is_integer(start_n) and is_integer(end_n) do
+    range = Range.new(start_n, end_n) |> Range.to_list()
+    query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
   end
 
   @doc """

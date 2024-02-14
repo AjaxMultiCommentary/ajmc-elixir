@@ -49,10 +49,9 @@ defmodule TextServerWeb.CommentController do
     comments =
       if is_nil(params["lemma"]) do
         comments ++
-          LemmalessComments.list_lemmaless_comments_for_lines(
+          LemmalessComments.search_lemmaless_comments(
             "STUB --- THIS ROUTE SHOULD ONLY BE AVAILABLE FOR LOGGED-IN USERS",
-            params["start"],
-            params["end"]
+            params
           )
       else
         comments

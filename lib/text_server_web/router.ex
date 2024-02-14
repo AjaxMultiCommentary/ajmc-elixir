@@ -32,9 +32,8 @@ defmodule TextServerWeb.Router do
     get "/glosses", CommentController, :glosses
 
     resources "/commentaries", CommentaryController, only: [:index, :show], param: "urn" do
-      resources "/glosses", CommentController, only: [:index]
-
-      get "/glosses/lemmas", CommentController, :lemmas
+      get "/glosses", CommentController, :glosses
+      get "/lemmas", CommentController, :lemmas
     end
   end
 

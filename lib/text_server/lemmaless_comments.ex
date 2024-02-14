@@ -6,6 +6,8 @@ defmodule TextServer.LemmalessComments do
   import Ecto.Query, warn: false
   alias TextServer.Repo
 
+  alias TextServer.Commentaries
+  alias TextServer.Commentaries.CanonicalCommentary
   alias TextServer.LemmalessComments.LemmalessComment
 
   @doc """
@@ -78,6 +80,43 @@ defmodule TextServer.LemmalessComments do
     |> where([c], c.canonical_commentary_id in ^commentary_ids)
     |> preload(canonical_commentary: :creators)
     |> Repo.all()
+  end
+
+  @doc """
+  Used only for the API routes. Allows searching comments by `commentary_urn`, `start`,
+  `end`, and `search` (which searches the `content` field) parameters.
+  """
+  def search_lemmaless_comments(_current_user, attrs \\ %{}) do
+    query =
+      LemmalessComment
+      |> by_commentary(attrs)
+      |> within_range(attrs)
+      |> search(attrs)
+
+    Repo.all(query)
+  end
+
+  defp by_commentary(query, %{"commentary_urn" => commentary_urn}) do
+    {:ok, urn} = CanonicalCommentary.full_urn(commentary_urn)
+
+    commentary = Commentaries.get_canonical_commentary_by(%{urn: urn})
+
+    query |> where([c], c.canonical_commentary_id == ^commentary.id)
+  end
+
+  defp by_commentary(query, _attrs), do: query
+
+  defp search(query, %{"search" => search}) do
+    s = "%#{search}%"
+    query |> where([c], fragment("f_unaccent(?) ILIKE f_unaccent(?)", c.content, ^s))
+  end
+
+  defp search(query, _attrs), do: query
+
+  defp within_range(query, %{"start" => start_n, "end" => end_n})
+       when is_integer(start_n) and is_integer(end_n) do
+    range = Range.new(start_n, end_n) |> Range.to_list()
+    query |> where([c], fragment("(? -> ? ->> 0)::int", c.urn, "citations") in ^range)
   end
 
   @doc """
