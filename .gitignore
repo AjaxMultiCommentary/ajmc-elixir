@@ -52,6 +52,8 @@ priv/static/json/*_tess_retrained.json
 priv/static/ajmc_iiif/*
 !priv/static/ajmc_iiif/.gitkeep
 
+priv/seeds/*
+
 venv
 .venv
 

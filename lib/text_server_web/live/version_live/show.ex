@@ -13,6 +13,7 @@ defmodule TextServerWeb.VersionLive.Show do
   alias TextServer.MultiSelect
   alias TextServer.MultiSelect.SelectOption
   alias TextServer.TextNodes
+  alias TextServer.TextNodes.TextNode
   alias TextServer.Versions
   alias TextServer.Versions.Version
 
@@ -193,7 +194,7 @@ defmodule TextServerWeb.VersionLive.Show do
           end_location
         )
 
-      personae_loquentes = get_personae_loquentes(text_nodes)
+      personae_loquentes = TextNode.get_personae_loquentes(text_nodes)
 
       socket =
         socket
@@ -390,27 +391,6 @@ defmodule TextServerWeb.VersionLive.Show do
       first_line_n,
       last_line_n
     )
-  end
-
-  defp get_personae_loquentes(text_nodes) do
-    text_nodes
-    |> Enum.chunk_by(fn tn ->
-      tn.text_elements
-      |> Enum.find(fn te -> te.element_type.name == "speaker" end)
-      |> Map.get(:attributes)
-      |> Map.get("name")
-    end)
-    |> Enum.reduce(%{}, fn chunk, acc ->
-      [node | _rest] = chunk
-
-      speaker_name =
-        node.text_elements
-        |> Enum.find(fn te -> te.element_type.name == "speaker" end)
-        |> Map.get(:attributes)
-        |> Map.get("name")
-
-      Map.put(acc, node.offset, speaker_name)
-    end)
   end
 
   defp highlighted?(comment, highlighted_comment_ids) do

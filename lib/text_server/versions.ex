@@ -191,12 +191,14 @@ defmodule TextServer.Versions do
   """
   def get_version!(id), do: Repo.get!(Version, id) |> Repo.preload(:language)
 
-  def get_version_by_urn!(urn) when is_binary(urn) do
-    get_version_by_urn!(CTS.URN.parse(urn))
+  def get_version_by_urn!(urn, preloads \\ [])
+
+  def get_version_by_urn!(urn, preloads) when is_binary(urn) do
+    get_version_by_urn!(CTS.URN.parse(urn), preloads)
   end
 
-  def get_version_by_urn!(%CTS.URN{} = urn) do
-    version = get_version_by_urn(urn)
+  def get_version_by_urn!(%CTS.URN{} = urn, preloads) do
+    version = get_version_by_urn(urn, preloads)
 
     if is_nil(version) do
       raise "No version found for urn #{urn}"
@@ -210,9 +212,9 @@ defmodule TextServer.Versions do
   the URN to a string that only goes up to the version fragment,
   because longer URNs won't match.
   """
-  def get_version_by_urn(%CTS.URN{} = urn) do
+  def get_version_by_urn(%CTS.URN{} = urn, preloads \\ []) do
     version_urn_s = "#{urn.prefix}:#{urn.protocol}:#{urn.namespace}:#{urn.work_component}"
-    Repo.get_by(Version, urn: version_urn_s)
+    Repo.get_by(Version, urn: version_urn_s) |> Repo.preload(preloads)
   end
 
   defp make_version_urn(version_params, project) do

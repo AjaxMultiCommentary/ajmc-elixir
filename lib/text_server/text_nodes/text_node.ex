@@ -50,6 +50,27 @@ defmodule TextServer.TextNodes.TextNode do
     defstruct [:name, :metadata]
   end
 
+  def get_personae_loquentes(text_nodes) do
+    text_nodes
+    |> Enum.chunk_by(fn tn ->
+      tn.text_elements
+      |> Enum.find(fn te -> te.element_type.name == "speaker" end)
+      |> Map.get(:attributes)
+      |> Map.get("name")
+    end)
+    |> Enum.reduce(%{}, fn chunk, acc ->
+      [node | _rest] = chunk
+
+      speaker_name =
+        node.text_elements
+        |> Enum.find(fn te -> te.element_type.name == "speaker" end)
+        |> Map.get(:attributes)
+        |> Map.get("name")
+
+      Map.put(acc, node.offset, speaker_name)
+    end)
+  end
+
   def get_word_at_offset(text_node, offset, start_or_end \\ :start)
 
   def get_word_at_offset(text_node, offset, start_or_end) when is_nil(offset) do
