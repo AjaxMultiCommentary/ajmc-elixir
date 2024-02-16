@@ -132,26 +132,28 @@ defmodule TextServer.TextNodes do
         start_location,
         end_location
       ) do
-    first_text_node = get_text_node_by(%{location: start_location, version_id: version.id})
-    last_text_node = get_text_node_by(%{location: end_location, version_id: version.id})
+    with first_text_node when not is_nil(first_text_node) <-
+           get_text_node_by(%{location: start_location, version_id: version.id}),
+         last_text_node when not is_nil(last_text_node) <-
+           get_text_node_by(%{location: end_location, version_id: version.id}) do
+      # FIXME: Using the end_location like this is a bit of a hack to get around the
+      # fact that not every line exists or is numbered in every edition.
+      query =
+        from(
+          t in TextNode,
+          where:
+            t.version_id == ^version.id and
+              t.offset >= ^first_text_node.offset and
+              t.offset <= ^last_text_node.offset,
+          order_by: [asc: t.offset],
+          preload: [
+            :version,
+            text_elements: [:element_type, :text_element_users]
+          ]
+        )
 
-    # FIXME: Using the end_location like this is a bit of a hack to get around the
-    # fact that not every line exists or is numbered in every edition.
-    query =
-      from(
-        t in TextNode,
-        where:
-          t.version_id == ^version.id and
-            t.offset >= ^first_text_node.offset and
-            t.offset <= ^last_text_node.offset,
-        order_by: [asc: t.offset],
-        preload: [
-          :version,
-          text_elements: [:element_type, :text_element_users]
-        ]
-      )
-
-    Repo.all(query)
+      Repo.all(query)
+    end
   end
 
   def list_text_nodes_by_version_between_locations(version_id, start_location, end_location)
