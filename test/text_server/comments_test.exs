@@ -8,7 +8,6 @@ defmodule TextServer.CommentsTest do
 
     import TextServer.CommentariesFixtures
     import TextServer.CommentsFixtures
-    import TextServer.TextNodesFixtures
 
     @invalid_attrs %{attributes: nil, content: nil, lemma: nil}
 
