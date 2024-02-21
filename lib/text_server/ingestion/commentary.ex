@@ -254,13 +254,23 @@ defmodule TextServer.Ingestion.Commentary do
        ) do
     maybe_line_ns =
       try do
-        Map.get(comment, "lemma")
-        |> String.replace(~r/\./, "")
-        |> String.replace("A", "4")
-        |> String.replace("B", "8")
-        |> String.replace("S", "5")
-        |> String.trim()
-        |> String.split("-")
+        [first_n, last_n] =
+          Map.get(comment, "lemma")
+          |> String.replace(~r/\./, "")
+          |> String.replace("A", "4")
+          |> String.replace("B", "8")
+          |> String.replace("S", "5")
+          |> String.trim()
+          |> String.split("-")
+
+        # Attempt to normalize abbreviated citations like 160-1 to 160-161
+        if String.length(last_n) < String.length(first_n) do
+          diff = String.length(first_n) - String.length(last_n)
+
+          [first_n, "#{String.slice(first_n, 0, diff)}#{last_n}"]
+        else
+          [first_n, last_n]
+        end
         |> Enum.map(&String.to_integer/1)
       rescue
         _ ->
@@ -460,38 +470,39 @@ defmodule TextServer.Ingestion.Commentary do
     })
   end
 
-  defp get_entity_for_word(entities, word) do
-    entities
-    |> Enum.find(fn ent ->
-      word_range = ent["word_range"]
-      word.index in Enum.at(word_range, 0)..Enum.at(word_range, 1)
-    end)
-  end
+  # defp get_entity_for_word(entities, word) do
+  #   entities
+  #   |> Enum.find(fn ent ->
+  #     word_range = ent["word_range"]
+  #     word.index in Enum.at(word_range, 0)..Enum.at(word_range, 1)
+  #   end)
+  # end
 
-  defp make_glossa_from_words(glossa_words, entities) do
+  defp make_glossa_from_words(glossa_words, _entities) do
     glossa_words
     |> List.flatten()
-    |> Enum.map(fn w ->
-      {Map.get(w, "text"), get_entity_for_word(entities, w)}
-    end)
-    |> Enum.chunk_by(fn {_, entity} -> entity end)
-    |> Enum.map(fn chunk ->
-      entity = chunk |> List.first() |> elem(1)
-      text = chunk |> Enum.map(fn {t, _} -> t end) |> Enum.join(" ")
+    |> Enum.map(&Map.get(&1, "text"))
+    # |> Enum.map(fn w ->
+    #   {Map.get(w, "text"), get_entity_for_word(entities, w)}
+    # end)
+    # |> Enum.chunk_by(fn {_, entity} -> entity end)
+    # |> Enum.map(fn chunk ->
+    #   entity = chunk |> List.first() |> elem(1)
+    #   text = chunk |> Enum.map(fn {t, _} -> t end) |> Enum.join(" ")
 
-      if is_nil(entity) do
-        text
-      else
-        link = entity |> Map.get("wikidata_id")
+    #   if is_nil(entity) do
+    #     text
+    #   else
+    #     link = entity |> Map.get("wikidata_id")
 
-        if is_nil(link) do
-          Logger.warning("Entity found, but no link provided: #{inspect(chunk)}")
-          text
-        else
-          "[#{text}](#{link})"
-        end
-      end
-    end)
+    #     if is_nil(link) do
+    #       Logger.warning("Entity found, but no link provided: #{inspect(chunk)}")
+    #       text
+    #     else
+    #       "[#{text}](#{link})"
+    #     end
+    #   end
+    # end)
     |> Enum.join(" ")
     |> String.trim()
   end
