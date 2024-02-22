@@ -95,7 +95,12 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
           )
 
         ~H"""
-        <span class={@classes} phx-click="highlight-comments" phx-value-comments={@comments |> Jason.encode!()}>
+        <span
+          class={@classes}
+          title={"#{Enum.count(assigns.commentary_ids)} glosses on this lemma"}
+          phx-click="highlight-comments"
+          phx-value-comments={@comments |> Jason.encode!()}
+        >
           <%= @text %>
         </span>
         """
