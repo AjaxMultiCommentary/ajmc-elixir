@@ -60,6 +60,7 @@ defmodule TextServerWeb.Router do
     pipe_through :browser
 
     # /iiif/Wecklein1894/Wecklein1894_0015/full/max/0/default.png
+    get "/:commentary_pid/:image_id/info.json", IiifController, :info
     get "/:commentary_pid/:image_id/full/max/0/default.png", IiifController, :full_image
   end
 

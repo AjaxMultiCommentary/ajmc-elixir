@@ -48,6 +48,7 @@ defmodule TextServer.MixProject do
       {:gettext, "~> 0.18"},
       {:hackney, "~> 1.17"},
       {:html_sanitize_ex, "~> 1.4"},
+      {:image, "~> 0.42"},
       {:iteraptor, "~> 1.12.0"},
       {:jason, "~> 1.3"},
       {:nimble_publisher, "~> 1.1.0"},
