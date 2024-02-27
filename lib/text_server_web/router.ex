@@ -2,7 +2,6 @@ defmodule TextServerWeb.Router do
   use TextServerWeb, :router
 
   import TextServerWeb.UserAuth
-  import TextServerWeb.Plugs.API, only: [authenticate_api_user: 2]
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -22,12 +21,6 @@ defmodule TextServerWeb.Router do
 
   scope "/api", TextServerWeb do
     pipe_through [:api]
-
-    scope "/versions" do
-      pipe_through [:authenticate_api_user]
-
-      get "/:id/download", VersionController, :download
-    end
 
     get "/glosses", CommentController, :glosses
 

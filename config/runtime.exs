@@ -13,7 +13,7 @@ if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
 end
 
 config :text_server,
-  enable_api: System.get_env("ENABLE_AJMC_API") == "true",
+  enable_api: config_env() == :dev or System.get_env("ENABLE_AJMC_API") == "true",
   env: config_env(),
   iiif_root_url: System.get_env("IIIF_ROOT_URL", "/iiif/")
 

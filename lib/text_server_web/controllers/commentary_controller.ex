@@ -6,8 +6,16 @@ defmodule TextServerWeb.CommentaryController do
 
   action_fallback TextServerWeb.FallbackController
 
-  def index(conn, _params) do
-    render(conn, :index, commentaries: Commentaries.list_commentaries())
+  def index(conn, params) do
+    commentaries =
+      if params["public"] do
+        Commentaries.list_public_commentaries()
+      else
+        Commentaries.list_commentaries()
+      end
+
+    conn
+    |> render(:index, commentaries: commentaries)
   end
 
   def show(conn, %{"urn" => urn}) do

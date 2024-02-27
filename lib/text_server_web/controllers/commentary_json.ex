@@ -2,7 +2,7 @@ defmodule TextServerWeb.CommentaryJSON do
   alias TextServer.Commentaries.CanonicalCommentary
 
   def index(%{commentaries: commentaries}) do
-    %{data: for(commentary <- commentaries, do: data(commentary))}
+    %{data: Enum.map(commentaries, &data/1)}
   end
 
   @doc """
@@ -26,7 +26,8 @@ defmodule TextServerWeb.CommentaryJSON do
       source_url: commentary.source_url,
       title: commentary.title,
       urn: to_string(commentary.urn),
-      wikidata_qid: commentary.wikidata_qid
+      wikidata_qid: commentary.wikidata_qid,
+      zotero_id: commentary.zotero_id
     }
   end
 end
