@@ -3,6 +3,10 @@ defmodule TextServerWeb.IiifController do
 
   alias TextServer.Commentaries
 
+  def base(conn, params) do
+    full_image(conn, params)
+  end
+
   @doc """
   Check whether the user can view the commentary,
   then (if the user is authorized) send the image matching the requested page.
@@ -44,11 +48,15 @@ defmodule TextServerWeb.IiifController do
       |> put_resp_content_type(
         "application/ld+json;profile=\"http://iiif.io/api/image/3/context.json\""
       )
+      |> put_secure_browser_headers()
+      |> put_resp_header(
+        "access-control-allow-origin",
+        get_request_origin!(conn)
+      )
       |> render(:info,
-        iiif_id:
-          TextServerWeb.Router.Helpers.iiif_url(conn, :full_image, commentary_pid, image_id),
-        width: width,
-        height: height
+        height: height,
+        iiif_id: TextServerWeb.Router.Helpers.iiif_url(conn, :base, commentary_pid, image_id),
+        width: width
       )
     else
       _ ->
@@ -58,5 +66,9 @@ defmodule TextServerWeb.IiifController do
 
   defp get_image!(commentary_id, image_id) do
     GitHub.API.get_image!(commentary_id, image_id)
+  end
+
+  defp get_request_origin!(conn) do
+    conn |> get_req_header("origin") |> List.first()
   end
 end

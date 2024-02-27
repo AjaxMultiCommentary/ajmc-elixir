@@ -7,7 +7,10 @@ defmodule TextServerWeb.IiifJSON do
       :protocol => "http://iiif.io/api/image",
       :profile => "level0",
       :width => width,
-      :height => height
+      :height => height,
+      :preferredFormats => ["png"],
+      :sizes => [%{width: width, height: height}],
+      :tiles => [%{width: width, height: height, scaleFactors: [1]}]
     }
   end
 end
