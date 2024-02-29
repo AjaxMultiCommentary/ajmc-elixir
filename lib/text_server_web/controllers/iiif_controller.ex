@@ -48,10 +48,9 @@ defmodule TextServerWeb.IiifController do
       |> put_resp_content_type(
         "application/ld+json;profile=\"http://iiif.io/api/image/3/context.json\""
       )
-      |> put_secure_browser_headers()
       |> put_resp_header(
         "access-control-allow-origin",
-        get_request_origin!(conn)
+        "*"
       )
       |> render(:info,
         height: height,
@@ -66,9 +65,5 @@ defmodule TextServerWeb.IiifController do
 
   defp get_image!(commentary_id, image_id) do
     GitHub.API.get_image!(commentary_id, image_id)
-  end
-
-  defp get_request_origin!(conn) do
-    conn |> get_req_header("origin") |> List.first()
   end
 end
