@@ -15,7 +15,8 @@ end
 config :text_server,
   enable_api: config_env() == :dev or System.get_env("ENABLE_AJMC_API") == "true",
   env: config_env(),
-  iiif_root_url: System.get_env("IIIF_ROOT_URL", "/iiif/")
+  iiif_root_url: System.get_env("IIIF_ROOT_URL", "/iiif/"),
+  strip_port_from_urls: config_env() == :prod
 
 config :ex_aws,
   access_key_id: System.get_env("S3_ACCESS_KEY", ""),

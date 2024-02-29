@@ -43,18 +43,23 @@ defmodule TextServerWeb.IiifController do
 
       {width, height, _bands} = Image.shape(image)
 
+      iiif_id =
+        if Application.get_env(:text_server, :strip_port_from_urls) do
+          TextServerWeb.Router.Helpers.iiif_url(conn, :base, commentary_pid, image_id)
+          |> String.replace(~r/:\d{1,5}/, "")
+        else
+          TextServerWeb.Router.Helpers.iiif_url(conn, :base, commentary_pid, image_id)
+        end
+
       conn
       |> put_format("json")
       |> put_resp_content_type(
         "application/ld+json;profile=\"http://iiif.io/api/image/3/context.json\""
       )
-      |> put_resp_header(
-        "access-control-allow-origin",
-        "*"
-      )
+      |> put_resp_header("access-control-allow-origin", "*")
       |> render(:info,
         height: height,
-        iiif_id: TextServerWeb.Router.Helpers.iiif_url(conn, :base, commentary_pid, image_id),
+        iiif_id: iiif_id,
         width: width
       )
     else
