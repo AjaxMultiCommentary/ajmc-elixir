@@ -6,6 +6,8 @@ defmodule TextServer.Ingestion.Commentary do
   alias TextServer.Commentaries
   alias TextServer.Ingestion.WordRange
 
+  @entity_labels ~w(pers.author work.primlit scope)
+
   @moduledoc """
   The main pipeline for ingesting an AjMC Canonical Commentary.
   Exposes a single function, `ingest_commentary/2`, but handles
@@ -308,7 +310,7 @@ defmodule TextServer.Ingestion.Commentary do
       |> Map.get("lemmas", [])
       |> Enum.filter(&Enum.member?(~w(scope-anchor word-anchor), Map.get(&1, "label")))
 
-    entities = children |> Map.get("entities", [])
+    entities = children |> Map.get("entities", []) |> group_primary_full_entities()
 
     pages = children |> Map.get("pages")
 
@@ -330,6 +332,32 @@ defmodule TextServer.Ingestion.Commentary do
     lemmas
     |> Enum.chunk_every(2, 1)
     |> Enum.map(&prepare_lemma(commentaries, pages, words, entities, &1))
+  end
+
+  defp group_primary_full_entities(entities) do
+    entities
+    |> Enum.filter(&(Map.get(&1, "label") == "primary-full"))
+    |> Enum.map(fn primary_full ->
+      [pf_first, pf_last] = Map.get(primary_full, "word_range")
+
+      # filter out entities whose ranges overlap with the
+      # primary-full
+      sub_entities =
+        entities
+        |> Enum.filter(fn ent ->
+          [ent_first, ent_last] = Map.get(ent, "word_range")
+
+          !Range.disjoint?(pf_first..pf_last, ent_first..ent_last) and
+            Map.get(ent, "label") in @entity_labels
+        end)
+
+      with work <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "work.primlit")),
+           wikidata_url <- Map.get(work, "wikidata_id"),
+           scope <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "scope")) do
+        [Map.put(primary_full, "references", {wikidata_url, scope}) | sub_entities]
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 
   defp prepare_lemma(commentaries, pages, words, entities, [lemma]) do
