@@ -8,6 +8,13 @@ defmodule TextServer.Ingestion.Commentary do
 
   @entity_labels ~w(pers.author work.primlit scope)
 
+  @entity_wikidata_to_cts_mapping Application.app_dir(
+                                    :text_server,
+                                    "priv/static/json/wikidata_hucit_mappings.json"
+                                  )
+                                  |> File.read!()
+                                  |> Jason.decode!()
+
   @moduledoc """
   The main pipeline for ingesting an AjMC Canonical Commentary.
   Exposes a single function, `ingest_commentary/2`, but handles
@@ -302,7 +309,7 @@ defmodule TextServer.Ingestion.Commentary do
     do:
       ~r/tei-l@n=(?<first_line_n>\d+)\[(?<first_line_offset>\d+)\]:tei-l@n=(?<last_line_n>\d+)\[(?<last_line_offset>\d+)\]/
 
-  defp prepare_lemmas_from_canonical_json(json) do
+  def prepare_lemmas_from_canonical_json(json) do
     children = json |> Map.get("children")
 
     lemmas =
@@ -310,7 +317,9 @@ defmodule TextServer.Ingestion.Commentary do
       |> Map.get("lemmas", [])
       |> Enum.filter(&Enum.member?(~w(scope-anchor word-anchor), Map.get(&1, "label")))
 
-    entities = children |> Map.get("entities", []) |> group_primary_full_entities()
+    entities = children |> Map.get("entities", [])
+    primary_full_entities = group_primary_full_entities(entities)
+    non_primary_full_entities = remove_primary_full_entities(entities, primary_full_entities)
 
     pages = children |> Map.get("pages")
 
@@ -331,17 +340,24 @@ defmodule TextServer.Ingestion.Commentary do
 
     lemmas
     |> Enum.chunk_every(2, 1)
-    |> Enum.map(&prepare_lemma(commentaries, pages, words, entities, &1))
+    |> Enum.map(
+      &prepare_lemma(
+        commentaries,
+        pages,
+        words,
+        primary_full_entities ++ non_primary_full_entities,
+        &1
+      )
+    )
   end
 
-  defp group_primary_full_entities(entities) do
+  def group_primary_full_entities(entities) do
     entities
     |> Enum.filter(&(Map.get(&1, "label") == "primary-full"))
     |> Enum.map(fn primary_full ->
       [pf_first, pf_last] = Map.get(primary_full, "word_range")
 
-      # filter out entities whose ranges overlap with the
-      # primary-full
+      # get entities whose ranges overlap with the primary-full
       sub_entities =
         entities
         |> Enum.filter(fn ent ->
@@ -352,12 +368,32 @@ defmodule TextServer.Ingestion.Commentary do
         end)
 
       with work <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "work.primlit")),
-           wikidata_url <- Map.get(work, "wikidata_id"),
+           wikidata_url <- Map.get(work || %{}, "wikidata_id"),
            scope <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "scope")) do
-        [Map.put(primary_full, "references", {wikidata_url, scope}) | sub_entities]
+        primary_full
+        |> Map.put("wikidata_id", wikidata_url)
+        |> Map.put("references", {scope, sub_entities})
       end
     end)
     |> Enum.reject(&is_nil/1)
+  end
+
+  def remove_primary_full_entities(entities, primary_full_entities) do
+    primary_full_word_ranges =
+      primary_full_entities
+      |> Enum.map(fn ent ->
+        [f, l] = Map.get(ent, "word_range")
+
+        f..l
+      end)
+
+    entities
+    |> Enum.filter(fn ent ->
+      [f, l] = Map.get(ent, "word_range")
+      word_range = f..l
+
+      Enum.all?(primary_full_word_ranges, fn r -> Range.disjoint?(r, word_range) end)
+    end)
   end
 
   defp prepare_lemma(commentaries, pages, words, entities, [lemma]) do
@@ -498,41 +534,89 @@ defmodule TextServer.Ingestion.Commentary do
     })
   end
 
-  # defp get_entity_for_word(entities, word) do
-  #   entities
-  #   |> Enum.find(fn ent ->
-  #     word_range = ent["word_range"]
-  #     word.index in Enum.at(word_range, 0)..Enum.at(word_range, 1)
-  #   end)
-  # end
+  # When mapping entities to words, it is important to map
+  # `primary-full` references first. Only if the word is not
+  # in a `primary-full` should we check if it belongs to some
+  # other entity. This is because the `primary-full` references
+  # might contain `pers.author` entities, for example, but we
+  # can't have overlapping links.
 
-  defp make_glossa_from_words(glossa_words, _entities) do
+  defp get_entity_for_word(entities, word) do
+    entities
+    |> Enum.find(fn ent ->
+      [f, l] = ent["word_range"]
+      word.index in f..l
+    end)
+  end
+
+  defp make_glossa_from_words(glossa_words, entities) do
     glossa_words
     |> List.flatten()
-    |> Enum.map(&Map.get(&1, "text"))
-    # |> Enum.map(fn w ->
-    #   {Map.get(w, "text"), get_entity_for_word(entities, w)}
-    # end)
-    # |> Enum.chunk_by(fn {_, entity} -> entity end)
-    # |> Enum.map(fn chunk ->
-    #   entity = chunk |> List.first() |> elem(1)
-    #   text = chunk |> Enum.map(fn {t, _} -> t end) |> Enum.join(" ")
+    |> Enum.map(fn w ->
+      {w, get_entity_for_word(entities, w)}
+    end)
+    |> Enum.chunk_by(fn {_, entity} -> entity end)
+    |> Enum.map(fn chunk ->
+      entity = chunk |> List.first() |> elem(1)
+      words = chunk |> Enum.map(fn {w, _} -> w end)
+      text = words |> Enum.map(&Map.get(&1, "text")) |> Enum.join(" ")
 
-    #   if is_nil(entity) do
-    #     text
-    #   else
-    #     link = entity |> Map.get("wikidata_id")
+      if is_nil(entity) do
+        text
+      else
+        link = get_link_for_entity(entity, words)
 
-    #     if is_nil(link) do
-    #       Logger.warning("Entity found, but no link provided: #{inspect(chunk)}")
-    #       text
-    #     else
-    #       "[#{text}](#{link})"
-    #     end
-    #   end
-    # end)
+        if is_nil(link) do
+          Logger.warning("Entity found, but no link provided: #{inspect(chunk)}")
+          text
+        else
+          "[#{text}](#{link})"
+        end
+      end
+    end)
     |> Enum.join(" ")
     |> String.trim()
+  end
+
+  def get_link_for_entity(%{"label" => "primary-full"} = entity, words) do
+    wikidata_id = Map.get(entity, "wikidata_id")
+
+    case Map.get(@entity_wikidata_to_cts_mapping, wikidata_id, %{}) |> Map.get("cts_urn") do
+      "" ->
+        wikidata_id
+
+      nil ->
+        wikidata_id
+
+      urn ->
+        case Map.get(entity, "references") do
+          {scope, _subrefs} ->
+            "https://scaife.perseus.org/reader/#{urn}#{resolve_scope(scope, words)}"
+
+          _ ->
+            "https://scaife.perseus.org/reader/#{urn}"
+        end
+    end
+  end
+
+  def get_link_for_entity(entity, _words) do
+    Map.get(entity, "wikidata_id")
+  end
+
+  def resolve_scope(scope, _words) when is_nil(scope), do: ""
+
+  def resolve_scope(scope, words) do
+    [f, l] = Map.get(scope, "word_range")
+
+    stringified_scope =
+      words
+      |> Enum.filter(fn w ->
+        w.index in f..l
+      end)
+      |> Enum.map(&Map.get(&1, "text"))
+      |> Enum.join("")
+
+    ":#{stringified_scope}"
   end
 
   defp calculate_overlays(pages, words_grouped_by_region) do

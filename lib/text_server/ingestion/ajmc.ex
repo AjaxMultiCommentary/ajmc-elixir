@@ -36,9 +36,12 @@ defmodule TextServer.Ingestion.Ajmc do
           json
           |> Map.get("children")
           |> Map.get("entities")
+          |> TextServer.Ingestion.Commentary.group_primary_full_entities()
+          |> Enum.reject(&is_nil/1)
+          |> List.flatten()
+          |> Enum.filter(&(Map.get(&1, "label") == "work.primlit"))
           |> Enum.map(&Map.get(&1, "wikidata_id"))
           |> Enum.reject(&is_nil/1)
-          |> Enum.uniq()
 
         Map.put(acc, ajmc_id, entities)
       end)
