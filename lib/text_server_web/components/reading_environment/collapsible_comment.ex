@@ -10,6 +10,7 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
   attr :comment, :map, required: true
   attr :color, :string, default: "#fff"
   attr :current_user, Accounts.User
+  attr :debug_info_shown?, :boolean, default: false
   attr :highlighted?, :boolean
   attr :iiif_viewer_shown?, :boolean, default: false
   attr :open?, :boolean, default: false
@@ -67,13 +68,36 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
           <% end %>
         </div>
         <%= unless is_nil(@current_user) do %>
-          <small class="mt-1 text-xs base-content">
-            <%= @comment.attributes["page_ids"] |> Enum.join(", ") %>
+          <div class="flex mt-2 justify-center">
+            <%= if @debug_info_shown? do %>
+              <div>
+                <small class="mt-1 text-xs base-content">
+                  <%= @comment.attributes["page_ids"] |> Enum.join(", ") %>
 
-            <%= for {k, v} <- @comment.canonical_commentary.metadata do %>
-              <p><%= k %>: <%= v %></p>
+                  <%= for {k, v} <- @comment.canonical_commentary.metadata do %>
+                    <p><%= k %>: <%= v %></p>
+                  <% end %>
+                </small>
+                <CoreComponents.button
+                  type="button"
+                  class="btn btn-xs btn-outline btn-warning"
+                  phx-click="hide-debug-info"
+                  phx-target={@myself}
+                >
+                  Hide debug info
+                </CoreComponents.button>
+              </div>
+            <% else %>
+              <CoreComponents.button
+                type="button"
+                class="btn btn-xs btn-outline btn-warning"
+                phx-click="show-debug-info"
+                phx-target={@myself}
+              >
+                Show debug info
+              </CoreComponents.button>
             <% end %>
-          </small>
+          </div>
         <% end %>
       </div>
     </div>
@@ -92,6 +116,14 @@ defmodule TextServerWeb.ReadingEnvironment.CollapsibleComment do
       end
 
     {:noreply, socket}
+  end
+
+  def handle_event("hide-debug-info", _, socket) do
+    {:noreply, socket |> assign(:debug_info_shown?, false)}
+  end
+
+  def handle_event("show-debug-info", _, socket) do
+    {:noreply, socket |> assign(:debug_info_shown?, true)}
   end
 
   def handle_event("show-iiif-viewer", _, socket) do
