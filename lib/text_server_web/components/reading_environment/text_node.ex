@@ -6,6 +6,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
   attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :persona_loquens, :string
+  attr :show_heatmap, :boolean, default: true
   attr :text_node, :map, required: true
 
   @impl true
@@ -20,11 +21,12 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
           <.text_element
             :for={{graphemes, tags} <- @text_node.graphemes_with_tags}
             highlighted_comments={@highlighted_comments}
+            show_heatmap={@show_heatmap}
             tags={tags}
             text={Enum.join(graphemes)}
           />
         </p>
-        <.line_number lemmaless_comments={@lemmaless_comments} location={@text_node.location} />
+        <.line_number lemmaless_comments={@lemmaless_comments} location={@text_node.location} show_heatmap={@show_heatmap} />
       </div>
     </div>
     """
@@ -32,13 +34,14 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   attr :lemmaless_comments, :list, default: []
   attr :location, :string
+  attr :show_heatmap, :boolean, default: true
 
   def line_number(assigns) do
     ~H"""
     <span
       class={[
         "base-content hover:base-content cursor-pointer @@ajmc-comment-box-shadow w-12 text-center inline-block",
-        "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
+        @show_heatmap && "comments-#{min(Enum.count(@lemmaless_comments), 10)}"
       ]}
       phx-click="highlight-comments"
       phx-value-comments={@lemmaless_comments |> Enum.map(& &1.interface_id) |> Jason.encode!()}
@@ -50,6 +53,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
 
   attr :classes, :string, default: ""
   attr :highlighted_comments, :list, default: []
+  attr :show_heatmap, :boolean, default: true
   attr :tags, :list, default: []
   attr :text, :string
 
@@ -89,7 +93,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
             assigns,
             classes: [
               assigns.classes,
-              "comments-#{min(Enum.count(assigns.commentary_ids), 10)}",
+              assigns.show_heatmap && "comments-#{min(Enum.count(assigns.commentary_ids), 10)}",
               highlighted?(assigns.comments, assigns.highlighted_comments)
             ]
           )

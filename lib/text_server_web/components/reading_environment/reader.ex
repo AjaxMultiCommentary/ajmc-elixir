@@ -35,6 +35,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
   attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :personae_loquentes, :map, default: %{}
+  attr :show_heatmap, :boolean, default: true
   attr :text_nodes, :list, required: true
   attr :version_urn, :string, required: true
 
@@ -57,6 +58,7 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
           }
           id={text_node.id}
           persona_loquens={Map.get(@personae_loquentes, text_node.offset)}
+          show_heatmap={@show_heatmap}
           text_node={text_node}
         />
       </section>

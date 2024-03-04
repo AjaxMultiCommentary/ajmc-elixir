@@ -40,6 +40,7 @@ defmodule TextServerWeb.VersionLive.Show do
   attr :location, :list, default: []
   attr :multi_select_filter_value, :string, default: ""
   attr :personae_loquentes, :map, default: %{}
+  attr :show_heatmap, :boolean, default: true
   attr :text_nodes, :list, default: []
   attr :version, Versions.Version, required: true
   attr :versions_for_select, :list, required: true
@@ -49,19 +50,38 @@ defmodule TextServerWeb.VersionLive.Show do
     ~H"""
     <article class="mx-auto">
       <div class="grid grid-cols-10 gap-x-8 gap-y-2 h-screen max-h-[64rem]">
-        <div class="col-span-full">
-          <h1 class="text-2xl font-bold"><em>Ajax</em> Multi-Commentary</h1>
+        <div class="col-span-full flex justify-between">
+          <div>
+            <h1 class="text-2xl font-bold"><em>Ajax</em> Multi-Commentary</h1>
 
-          <p>
-            <%= raw(
-              Earmark.as_html!(
-                gettext("A digital platform for the comparative analysis of commentaries on Sophocles' _Ajax_")
-              )
-            ) %>
-          </p>
+            <p>
+              <%= raw(
+                Earmark.as_html!(
+                  gettext("A digital platform for the comparative analysis of commentaries on Sophocles' _Ajax_")
+                )
+              ) %>
+            </p>
+          </div>
+          <div>
+            <form phx-change="toggle-heatmap">
+              <div class="form-control">
+                <label class="label cursor-pointer">
+                  <span class="label-text mr-2">Highlight lemmata</span>
+                  <input
+                    name="heatmap-toggle"
+                    type="checkbox"
+                    class="toggle"
+                    phx-change="toggle-heatmap"
+                    checked={@show_heatmap}
+                    value="1"
+                  />
+                </label>
+              </div>
+            </form>
+          </div>
         </div>
 
-        <hr class="my-4 col-span-10" />
+        <hr class="my-4 col-span-full" />
 
         <div class="col-span-2">
           <section class="mb-8">
@@ -135,6 +155,7 @@ defmodule TextServerWeb.VersionLive.Show do
             lemmaless_comments={@lemmaless_comments}
             location={@location}
             personae_loquentes={@personae_loquentes}
+            show_heatmap={@show_heatmap}
             text_nodes={@text_nodes}
             version_urn={@version.urn}
           />
@@ -259,6 +280,14 @@ defmodule TextServerWeb.VersionLive.Show do
 
     send(self(), {:comments_highlighted, ids})
     {:noreply, socket |> assign(highlighted_comments: ids)}
+  end
+
+  def handle_event("toggle-heatmap", %{"heatmap-toggle" => "1"}, socket) do
+    {:noreply, socket |> assign(show_heatmap: true)}
+  end
+
+  def handle_event("toggle-heatmap", _, socket) do
+    {:noreply, socket |> assign(show_heatmap: false)}
   end
 
   def handle_event("validate", %{"multi_select" => multi_component}, socket) do
