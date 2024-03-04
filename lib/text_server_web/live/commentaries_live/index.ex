@@ -8,7 +8,8 @@ defmodule TextServerWeb.CommentariesLive.Index do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(commentaries: Commentaries.list_commentaries())}
+     |> assign(commentaries: Commentaries.list_commentaries())
+     |> assign(page_title: "– Bibliography")}
   end
 
   def render(assigns) do

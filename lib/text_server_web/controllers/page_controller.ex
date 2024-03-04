@@ -12,6 +12,6 @@ defmodule TextServerWeb.PageController do
     about = StaticPages.all_pages() |> Enum.find(fn page -> page.id == "about" end)
 
     conn
-    |> render("page.html", page: about)
+    |> render("page.html", page: about, page_title: "– #{about.title}")
   end
 end

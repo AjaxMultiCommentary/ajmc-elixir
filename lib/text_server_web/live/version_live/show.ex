@@ -201,7 +201,6 @@ defmodule TextServerWeb.VersionLive.Show do
         |> assign(
           current_urn: urn,
           form: to_form(params),
-          page_title: version.label,
           personae_loquentes: personae_loquentes,
           text_nodes: text_nodes,
           version: version,
