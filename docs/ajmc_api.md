@@ -47,8 +47,21 @@ GET /api/commentaries/{commentary_urn}
 GET /api/commentaries/{commentary_urn}/glosses
 ```
 
+Supported querystring parameters:
+
+- `lemma`: The lemma of the gloss for which to restrict the request.
+- `start`: The starting line (inclusive) for which to restrict the request
+- `end`: The ending line (inclusive) for which to restrict the request
+- `search`: A string to search for within the _glosses_, as restricted by the other querystring parameters.
+
 ### List lemmata for a given commentary
 
 ```
 GET /api/commentaries/{commentary_urn}/lemmas
 ```
+
+Supported querystring parameters:
+
+- `start`: The starting line (inclusive) for which to restrict the request
+- `end`: The ending line (inclusive) for which to restrict the request
+- `search`: A string to search for within the _glosses_, as restricted by the other querystring parameters.
