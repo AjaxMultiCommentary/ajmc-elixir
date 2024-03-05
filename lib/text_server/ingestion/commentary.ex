@@ -368,8 +368,8 @@ defmodule TextServer.Ingestion.Commentary do
         end)
 
       with work <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "work.primlit")),
-           wikidata_url <- Map.get(work || %{}, "wikidata_id"),
-           scope <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "scope")) do
+           scope <- sub_entities |> Enum.find(&(Map.get(&1, "label") == "scope")),
+           wikidata_url <- Map.get(work || scope || %{}, "wikidata_id") do
         primary_full
         |> Map.put("wikidata_id", wikidata_url)
         |> Map.put("references", {scope, sub_entities})
@@ -615,8 +615,36 @@ defmodule TextServer.Ingestion.Commentary do
       end)
       |> Enum.map(&Map.get(&1, "text"))
       |> Enum.join("")
+      |> String.replace(";", "")
+      |> String.replace(":", "")
+      |> String.replace("ff.", "")
+      |> transform_f()
+      |> remove_trailing_period()
 
     ":#{stringified_scope}"
+  end
+
+  def remove_trailing_period(s) do
+    if String.ends_with?(s, ".") do
+      String.slice(s, 0..-1//1)
+    else
+      s
+    end
+  end
+
+  def transform_f(s) do
+    if String.ends_with?(s, "f.") do
+      without_f = String.replace(s, "f.", "")
+
+      try do
+        n = String.to_integer(without_f)
+        "#{n}-#{n + 1}"
+      rescue
+        _ -> without_f
+      end
+    else
+      s
+    end
   end
 
   defp calculate_overlays(pages, words_grouped_by_region) do

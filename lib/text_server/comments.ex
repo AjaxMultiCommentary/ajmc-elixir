@@ -127,7 +127,7 @@ defmodule TextServer.Comments do
 
   defp with_lemma(query, %{"lemma" => lemma}) do
     s = "%#{lemma}%"
-    query |> where([c], ilike(c.lemma, ^s))
+    query |> where([c], fragment("f_unaccent(?) ILIKE f_unaccent(?)", c.lemma, ^s))
   end
 
   defp with_lemma(query, _attrs), do: query
