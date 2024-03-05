@@ -13,6 +13,14 @@ GET /api/glosses?start={start}&end={end}&search={search}
 
 You can optionally omit these querystring parameters to return _all_ glosses.
 
+Supported querystring parameters:
+
+- `commentary_urn`: The URN of the commentary for which to restrict the request.
+- `lemma`: The lemma of the gloss for which to restrict the request.
+- `start`: The starting line (inclusive) for which to restrict the request
+- `end`: The ending line (inclusive) for which to restrict the request
+- `search`: A string to search for within the glosses, as restricted by the other querystring parameters.
+
 ### List all available commentaries
 
 ```
