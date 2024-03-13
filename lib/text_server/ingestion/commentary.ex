@@ -619,13 +619,14 @@ defmodule TextServer.Ingestion.Commentary do
       |> String.replace(":", "")
       |> String.replace("ff.", "")
       |> transform_f()
-      |> remove_trailing_period()
+      |> remove_trailing_character(".")
+      |> remove_trailing_character(",")
 
     ":#{stringified_scope}"
   end
 
-  def remove_trailing_period(s) do
-    if String.ends_with?(s, ".") do
+  def remove_trailing_character(s, c) do
+    if String.ends_with?(s, c) do
       String.slice(s, 0..-1//1)
     else
       s
