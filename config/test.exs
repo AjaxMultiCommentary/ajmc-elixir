@@ -23,8 +23,6 @@ config :text_server, TextServerWeb.Endpoint,
   secret_key_base: "j0pXE8VvRetrmM5CZLu20cBg52vtcHTb5m0D2GWVw9D0Q/KvtDEUHNUBgNZCbyEP",
   server: false
 
-config :text_server, Oban, testing: :inline
-
 # In test we don't send emails.
 config :text_server, TextServer.Mailer, adapter: Swoosh.Adapters.Test
 

@@ -30,8 +30,6 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
   `nodes`.
   """
 
-  alias TextServerWeb.Components
-
   attr :highlighted_comments, :list, default: []
   attr :lemmaless_comments, :list, default: []
   attr :personae_loquentes, :map, default: %{}
@@ -62,7 +60,6 @@ defmodule TextServerWeb.ReadingEnvironment.Reader do
           text_node={text_node}
         />
       </section>
-      <Components.footnotes footnotes={@footnotes} />
     </article>
     """
   end

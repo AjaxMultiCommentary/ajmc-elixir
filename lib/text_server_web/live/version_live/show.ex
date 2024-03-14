@@ -52,7 +52,21 @@ defmodule TextServerWeb.VersionLive.Show do
       <div class="grid grid-cols-10 gap-x-8 gap-y-2 h-screen max-h-[64rem]">
         <div class="col-span-full flex justify-between">
           <div>
-            <h1 class="text-2xl font-bold"><em>Ajax</em> Multi-Commentary</h1>
+            <div class="flex">
+              <h1 class="text-2xl font-bold">
+                <em>Ajax</em> <%= gettext("Multi-Commentary") %>
+              </h1>
+              <div class="mt-1 ml-2">
+                <Tooltip.info
+                  icon_class="h-5 w-5"
+                  tip={
+                    gettext(
+                      "The highlights below illustrate the \"density\" of comments on a particular lemma or line. Darker shades of blue indicate a greater number of glosses on the highlighted portion of the text."
+                    )
+                  }
+                />
+              </div>
+            </div>
 
             <p>
               <%= raw(
@@ -66,7 +80,7 @@ defmodule TextServerWeb.VersionLive.Show do
             <form phx-change="toggle-heatmap">
               <div class="form-control">
                 <label class="label cursor-pointer">
-                  <span class="label-text mr-2">Highlight lemmata</span>
+                  <span class="label-text mr-2"><%= gettext("Highlight lemmata") %></span>
                   <input
                     name="heatmap-toggle"
                     type="checkbox"

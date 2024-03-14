@@ -29,13 +29,6 @@ config :text_server, TextServerWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
-# Configures Oban for running background jobs (like
-# parsing uploaded/changed exemplars)
-config :text_server, Oban,
-  repo: TextServer.Repo,
-  plugins: [Oban.Plugins.Pruner],
-  queues: [default: 10]
-
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

@@ -34,13 +34,6 @@ config :text_server, TextServer.Mailer, adapter: Swoosh.Adapters.Local
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 
-# Configures Oban for running background jobs (like
-# parsing uploaded/changed versions)
-config :text_server, Oban,
-  repo: TextServer.Repo,
-  plugins: [Oban.Plugins.Pruner],
-  queues: [default: 10]
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.14.0",

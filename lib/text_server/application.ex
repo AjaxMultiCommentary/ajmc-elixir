@@ -15,10 +15,9 @@ defmodule TextServer.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: TextServer.PubSub},
       # Start the Endpoint (http/https)
-      TextServerWeb.Endpoint,
+      TextServerWeb.Endpoint
       # Start a worker by calling: TextServer.Worker.start_link(arg)
       # {TextServer.Worker, arg}
-      {Oban, Application.fetch_env!(:text_server, Oban)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

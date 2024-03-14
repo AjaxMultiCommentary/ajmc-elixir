@@ -5,13 +5,15 @@
         <div class="flex">
           <div class="hidden sm:-my-px sm:flex sm:space-x-8 sm:items-center">
             <.link href={~p"/"} class="link link-hover">
-              Ajax Multi-Commentary
+              <%= gettext("Ajax Multi-Commentary") %>
             </.link>
-            <.link href="#metacommentary" class="link link-hover link-secondary hidden">Meta-Commentary</.link>
+            <.link href="#metacommentary" class="link link-hover link-secondary hidden">
+              <%= gettext("Meta-Commentary") %>
+            </.link>
             <.link href={~p"/bibliography"} class="link link-hover">
-              Available commentaries
+              <%= gettext("Available commentaries") %>
             </.link>
-            <.link href={~p"/about"} class="link link-hover">About</.link>
+            <.link href={~p"/about"} class="link link-hover"><%= gettext("About") %></.link>
             <%= unless is_nil(@current_user) do %>
               <span class="text-secondary">v<%= Application.spec(:text_server, :vsn) %></span>
             <% end %>

@@ -16,28 +16,28 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:19
+#: lib/text_server_web/live/commentaries_live/index.ex:20
 #, elixir-autogen, elixir-format
 msgid "Bibliography"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:33
+#: lib/text_server_web/live/commentaries_live/index.ex:34
 #: lib/text_server_web/live/commentaries_live/show.ex:40
 #, elixir-autogen, elixir-format
 msgid "Languages"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:30
+#: lib/text_server_web/live/commentaries_live/index.ex:31
 #, elixir-autogen, elixir-format
 msgid "Public Domain?"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:29
+#: lib/text_server_web/live/commentaries_live/index.ex:30
 #, elixir-autogen, elixir-format
 msgid "Publication Date"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:26
+#: lib/text_server_web/live/commentaries_live/index.ex:27
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr ""
@@ -48,7 +48,7 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:23
+#: lib/text_server_web/live/commentaries_live/index.ex:24
 #, elixir-autogen, elixir-format
 msgid "Creator(s)"
 msgstr ""
@@ -108,12 +108,12 @@ msgstr ""
 msgid "*Exodos*"
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:105
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:139
 #, elixir-autogen, elixir-format
 msgid "v."
 msgstr ""
 
-#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:103
+#: lib/text_server_web/components/reading_environment/collapsible_comment.ex:137
 #, elixir-autogen, elixir-format
 msgid "vv."
 msgstr ""
@@ -123,12 +123,12 @@ msgstr ""
 msgid "Ancient Greek"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:64
+#: lib/text_server_web/live/version_live/show.ex:104
 #, elixir-autogen, elixir-format
 msgid "Change critical text"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:150
+#: lib/text_server_web/live/version_live/show.ex:191
 #, elixir-autogen, elixir-format
 msgid "Dynamic apparatus"
 msgstr ""
@@ -139,7 +139,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:96
+#: lib/text_server_web/live/version_live/show.ex:136
 #, elixir-autogen, elixir-format
 msgid "Filter glosses"
 msgstr ""
@@ -169,7 +169,7 @@ msgstr ""
 msgid "Latin"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:83
+#: lib/text_server_web/live/version_live/show.ex:123
 #, elixir-autogen, elixir-format
 msgid "Navigation"
 msgstr ""
@@ -179,27 +179,63 @@ msgstr ""
 msgid "Public domain year"
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:154
+#: lib/text_server_web/live/version_live/show.ex:195
 #, elixir-autogen, elixir-format
 msgid "The dynamic apparatus shows the difference between the current critical text and other available critical texts."
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:100
+#: lib/text_server_web/live/version_live/show.ex:140
 #, elixir-autogen, elixir-format
 msgid "Use this filter to show or hide comments on the right. You can search for a commentary by name using the text box."
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:55
-#, elixir-autogen, elixir-format
-msgid "about_the_multi_commentary"
-msgstr ""
-
-#: lib/text_server_web/live/version_live/show.ex:66
+#: lib/text_server_web/live/version_live/show.ex:106
 #, elixir-autogen, elixir-format, fuzzy
 msgid "\n                You can change the edition used for the critical text here.\n                Keep in mind that the lemmata of the glosses are based on the Lloyd-Jones\n                version of the text, so they might not match up if you prefer to use another edition.\n                  "
 msgstr ""
 
-#: lib/text_server_web/live/version_live/show.ex:86
+#: lib/text_server_web/live/version_live/show.ex:126
 #, elixir-autogen, elixir-format, fuzzy
 msgid "This synopsis is based on the Lloyd-Jones edition of the text,\n                and the line numbers might not line up exactly with other editions.\n                Click on a section of the synopsis to view it in the critical text area.\n                "
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:74
+#, elixir-autogen, elixir-format
+msgid "A digital platform for the comparative analysis of commentaries on Sophocles' _Ajax_"
+msgstr ""
+
+#: lib/text_server_web/components/layouts/app.html.heex:8
+#: lib/text_server_web/components/layouts/root.html.heex:8
+#, elixir-autogen, elixir-format
+msgid "Ajax Multi-Commentary"
+msgstr ""
+
+#: lib/text_server_web/components/layouts/app.html.heex:14
+#, elixir-autogen, elixir-format
+msgid "Available commentaries"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:83
+#, elixir-autogen, elixir-format
+msgid "Highlight lemmata"
+msgstr ""
+
+#: lib/text_server_web/components/layouts/app.html.heex:11
+#, elixir-autogen, elixir-format
+msgid "Meta-Commentary"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:57
+#, elixir-autogen, elixir-format
+msgid "Multi-Commentary"
+msgstr ""
+
+#: lib/text_server_web/components/layouts/app.html.heex:16
+#, elixir-autogen, elixir-format
+msgid "About"
+msgstr ""
+
+#: lib/text_server_web/live/version_live/show.ex:63
+#, elixir-autogen, elixir-format, fuzzy
+msgid "The highlights below illustrate the \"density\" of comments on a particular lemma or line. Darker shades of blue indicate a greater number of glosses on the highlighted portion of the text."
 msgstr ""
