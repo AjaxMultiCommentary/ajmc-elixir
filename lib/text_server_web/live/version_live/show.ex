@@ -242,7 +242,7 @@ defmodule TextServerWeb.VersionLive.Show do
           versions_for_select:
             list_versions()
             |> Enum.map(fn v ->
-              {raw("#{v.label} #{v.description}"), CTS.URN.to_string(v.urn)}
+              {raw("#{v.label}. #{v.description}."), CTS.URN.to_string(v.urn)}
             end)
         )
 
