@@ -16,28 +16,28 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:20
+#: lib/text_server_web/live/commentaries_live/index.ex:21
 #, elixir-autogen, elixir-format
 msgid "Bibliography"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:34
+#: lib/text_server_web/live/commentaries_live/index.ex:42
 #: lib/text_server_web/live/commentaries_live/show.ex:40
 #, elixir-autogen, elixir-format
 msgid "Languages"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:31
+#: lib/text_server_web/live/commentaries_live/index.ex:35
 #, elixir-autogen, elixir-format
 msgid "Public Domain?"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:30
+#: lib/text_server_web/live/commentaries_live/index.ex:28
 #, elixir-autogen, elixir-format
 msgid "Publication Date"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:27
+#: lib/text_server_web/live/commentaries_live/index.ex:29
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr ""
@@ -48,7 +48,7 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/text_server_web/live/commentaries_live/index.ex:24
+#: lib/text_server_web/live/commentaries_live/index.ex:25
 #, elixir-autogen, elixir-format
 msgid "Creator(s)"
 msgstr ""
@@ -238,4 +238,24 @@ msgstr ""
 #: lib/text_server_web/live/version_live/show.ex:63
 #, elixir-autogen, elixir-format
 msgid "The highlights below illustrate the \"density\" of comments on a particular lemma or line. Darker shades of blue indicate a greater number of glosses on the highlighted portion of the text."
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:32
+#, elixir-autogen, elixir-format
+msgid "Edition"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:47
+#, elixir-autogen, elixir-format
+msgid "More bibliographic info"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:33
+#, elixir-autogen, elixir-format
+msgid "Place"
+msgstr ""
+
+#: lib/text_server_web/live/commentaries_live/index.ex:34
+#, elixir-autogen, elixir-format
+msgid "Publisher"
 msgstr ""

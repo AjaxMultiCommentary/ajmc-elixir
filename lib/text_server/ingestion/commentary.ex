@@ -120,7 +120,9 @@ defmodule TextServer.Ingestion.Commentary do
         }
       end)
 
+    edition = zotero_data |> Map.get("edition")
     languages = zotero_data |> Map.get("language") |> String.split(", ")
+    place = zotero_data |> Map.get("place")
     publication_date = zotero_data |> Map.get("date")
 
     public_domain_year =
@@ -129,6 +131,8 @@ defmodule TextServer.Ingestion.Commentary do
       else
         zotero_extra |> Map.get("Public Domain Year")
       end
+
+    publisher = zotero_data |> Map.get("publisher")
 
     wikidata_qid = zotero_extra |> Map.get("QID")
     source_url = zotero_data |> Map.get("url")
@@ -141,12 +145,15 @@ defmodule TextServer.Ingestion.Commentary do
     {:ok, commentary} =
       Commentaries.upsert_canonical_commentary(%{
         creators: creators,
+        edition: edition,
         filename: filename,
         languages: languages,
         metadata: metadata,
         pid: pid,
+        place: place,
         publication_date: publication_date,
         public_domain_year: public_domain_year,
+        publisher: publisher,
         source_url: source_url,
         title: title,
         urn: "urn:cts:greekLit:#{urn}",

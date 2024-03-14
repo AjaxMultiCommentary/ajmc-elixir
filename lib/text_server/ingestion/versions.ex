@@ -187,26 +187,27 @@ defmodule TextServer.Ingestion.Versions do
     [
       {"priv/static/xml/tlg0011.tlg003.ajmc-lj.xml",
        %{
-         description: "edited by Hugh Lloyd-Jones",
+         description: "Sophocles' <i>Ajax</i>, edited by Hugh Lloyd-Jones",
          filename: "tlg0011.tlg003.ajmc-lj.xml",
-         label: "Sophocles' <i>Ajax</i>",
+         label: "Lloyd-Jones (1994)",
          urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lj",
          version_type: :edition
        }},
       {"priv/static/xml/tlg0011.tlg003.1st1K-grc1.xml",
        %{
          description:
-           "commentario perpetuo illustravit Christ. Augustus Lobeck. Editio Tertia. Edited by Francis Storr",
+           "Sophoclis Aiax: commentario perpetuo illustravit Christ. Augustus Lobeck. Editio Tertia. Edited by Francis Storr",
          filename: "tlg0011.tlg003.1st1K-grc1.xml",
-         label: "Sophoclis Aiax",
+         label: "Lobeck (1866)",
          urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-lobeck",
          version_type: :edition
        }},
       {"priv/static/xml/tlg0011.tlg003.opp-grc1.xml",
        %{
-         description: "edited by A. C. Pearson",
+         description:
+           "Sophoclis Fabulae: recognovit brevique adnotatione critica instruxit, edited by A. C. Pearson",
          filename: "tlg0011.tlg003.opp-grc1.xml",
-         label: "Sophoclis Fabulae: recognovit brevique adnotatione critica instruxit.",
+         label: "Pearson (1924)",
          urn: "urn:cts:greekLit:tlg0011.tlg003.ajmc-pearson",
          version_type: :edition
        }}

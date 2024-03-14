@@ -10,12 +10,15 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
 
   @derive {Jason.Encoder,
            only: [
+             :edition,
              :filename,
              :languages,
              :metadata,
              :pid,
+             :place,
              :publication_date,
              :public_domain_year,
+             :publisher,
              :source_url,
              :title,
              :urn,
@@ -23,12 +26,15 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
            ]}
 
   schema "canonical_commentaries" do
+    field :edition, :string
     field :filename, :string
     field :languages, {:array, :string}
     field :metadata, :map
     field :pid, :string
+    field :place, :string
     field :publication_date, :integer
     field :public_domain_year, :integer
+    field :publisher, :string
     field :source_url, :string
     field :title, :string
     field :urn, TextServer.Ecto.Types.CTS_URN
@@ -52,12 +58,15 @@ defmodule TextServer.Commentaries.CanonicalCommentary do
   def changeset(canonical_commentary, attrs) do
     canonical_commentary
     |> cast(attrs, [
+      :edition,
       :filename,
       :languages,
       :metadata,
       :pid,
+      :place,
       :publication_date,
       :public_domain_year,
+      :publisher,
       :source_url,
       :title,
       :urn,
