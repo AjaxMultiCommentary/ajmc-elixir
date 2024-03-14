@@ -2,6 +2,27 @@
 
 This repository is a hard fork of the Open Commentaries' [main server](https://github.com/Open-Commentaries/open-commentaries) as of [fd2b294d1ff89a8d73aaeec53b316d31ce038572](https://github.com/Open-Commentaries/open-commentaries/commit/fd2b294d1ff89a8d73aaeec53b316d31ce038572).
 
+## i18n
+
+This project uses the [Gettext](https://hexdocs.pm/phoenix_live_view/using-gettext.html) support that is built into Phoenix. To add a translation, enclose the default
+text in a call to the gettext backend: `gettext("My default text.")`. Then run `mix gettext.extract` and `mix gettext.merge priv/gettext`. These commands will find
+your newly added i18n string and add it to the `default.po` files for each of the languages that the project supports.
+
+**Don't edit the `default.pot` file at the root of the `priv/gettext` directory.**
+
+Instead, find your newly added string (or any strings whose translations you want to modify) in the `default.po` file of the language into which you're translating.
+
+A translation looks something like this:
+
+```
+#: lib/text_server_web/components/layouts/app.html.heex:16
+#, elixir-autogen, elixir-format
+msgid "About"
+msgstr "À propos du projet"
+```
+
+The string from the call to `gettext/1` is the `msgid`, and you can add your translation to this string on the `msgstr` line.
+
 ## Environment variables
 
 In order to start the app locally, you will need to set a few
