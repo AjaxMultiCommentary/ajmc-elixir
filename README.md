@@ -5,7 +5,8 @@ This repository is a hard fork of the Open Commentaries' [main server](https://g
 ## i18n
 
 This project uses the [Gettext](https://hexdocs.pm/phoenix_live_view/using-gettext.html) support that is built into Phoenix. To add a translation, enclose the default
-text in a call to the gettext backend: `gettext("My default text.")`. Then run `mix gettext.extract` and `mix gettext.merge priv/gettext`. These commands will find
+text where you want it to appear in the application in a call to the gettext backend: `gettext("My default text.")`. 
+Then run `mix gettext.extract` and `mix gettext.merge priv/gettext`. These commands will find
 your newly added i18n string and add it to the `default.po` files for each of the languages that the project supports.
 
 **Don't edit the `default.pot` file at the root of the `priv/gettext` directory.**
