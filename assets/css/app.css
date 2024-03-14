@@ -232,10 +232,22 @@
 }
 
 .\@\@ajmc-addition::before {
-    content: "[";
+    content: "<";
 }
 
 .\@\@ajmc-addition::after {
+    content: ">";
+}
+
+.\@\@ajmc-deletion {
+    opacity: 0.7;
+}
+
+.\@\@ajmc-deletion::before {
+    content: "[";
+}
+
+.\@\@ajmc-deletion::after {
     content: "]";
 }
 

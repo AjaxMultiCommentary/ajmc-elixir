@@ -162,7 +162,7 @@ defmodule TextServerWeb.ReadingEnvironment.TextNode do
     case tag.name do
       "add" -> "@@ajmc-addition"
       "comment" -> "@@ajmc-comment-box-shadow cursor-pointer"
-      "del" -> "line-through"
+      "del" -> "@@ajmc-deletion"
       "emph" -> "italic"
       "image" -> "image mt-10"
       "link" -> "link font-bold underline hover:opacity-75 visited:opacity-60"
