@@ -25,6 +25,15 @@ defmodule GitHub.API do
     end)
   end
 
+  def get_pytorch_file!(ajmc_id) do
+    resp = base_req() |> Req.get!(url: "/contents/#{ajmc_id}/canonical")
+    files = resp.body
+
+    Enum.find(files, fn file ->
+      String.ends_with?(file["name"], "_pytorch.json")
+    end)
+  end
+
   defp base_req do
     github_config = Application.get_env(:text_server, GitHub.API)
 

@@ -89,7 +89,7 @@ defmodule TextServer.Ingestion.Commentary do
     ajmc_id = commentary_meta["ajmc_id"]
     Logger.info("Attempting to ingest #{ajmc_id}")
 
-    tess_retrained = GitHub.API.get_tess_retrained_file!(ajmc_id)
+    tess_retrained = GitHub.API.get_pytorch_file!(ajmc_id)
     json = GitHub.API.get_commentary_data!(tess_retrained["download_url"])
 
     commentary = create_commentary(tess_retrained["name"], json, commentary_meta)
