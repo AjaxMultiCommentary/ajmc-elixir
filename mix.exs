@@ -4,7 +4,7 @@ defmodule TextServer.MixProject do
   def project do
     [
       app: :text_server,
-      version: "0.2.3",
+      version: "0.2.4",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
