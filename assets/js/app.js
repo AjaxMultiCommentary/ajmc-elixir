@@ -8,23 +8,23 @@ import hooks from "./hooks";
 import uploaders from "./uploaders";
 
 let csrfToken = document
-  .querySelector("meta[name='csrf-token']")
-  .getAttribute("content");
+	.querySelector("meta[name='csrf-token']")
+	.getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  params: { _csrf_token: csrfToken },
-  hooks,
-  metadata: {
-    click(e, _el) {
-      return {
-        altKey: e.altKey,
-        ctrlKey: e.ctrlKey,
-        metaKey: e.metaKey,
-        pageX: e.pageX,
-        pageY: e.pageY,
-      };
-    },
-  },
-  uploaders,
+	params: { _csrf_token: csrfToken },
+	hooks,
+	metadata: {
+		click(e, _el) {
+			return {
+				altKey: e.altKey,
+				ctrlKey: e.ctrlKey,
+				metaKey: e.metaKey,
+				pageX: e.pageX,
+				pageY: e.pageY,
+			};
+		},
+	},
+	uploaders,
 });
 
 // Show progress bar on live navigation and form submits
@@ -33,38 +33,41 @@ window.addEventListener("phx:page-loading-start", (_info) => topbar.show());
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
 
 window.addEventListener("phx:change-locale", (e) => {
-  setLocale(e.detail.locale);
+	setLocale(e.detail.locale);
 });
 
 const validLocales = ["de", "en", "fr", "it"];
 
 function setLocale(locale = "en") {
-  if (!validLocales.includes(locale)) {
-    return console.error(`Invalid locale: ${locale}.`);
-  }
+	if (!validLocales.includes(locale)) {
+		return console.error(`Invalid locale: ${locale}.`);
+	}
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const currentLocale = searchParams.get("locale");
+	const searchParams = new URLSearchParams(window.location.search);
+	const currentLocale = searchParams.get("locale");
 
-  if (currentLocale === locale) {
-    return;
-  }
+	if (currentLocale === locale) {
+		return;
+	}
 
-  searchParams.set("locale", locale);
+	searchParams.set("locale", locale);
 
-  window.location.search = searchParams;
+	window.location.search = searchParams;
 }
 
 window.addEventListener("phx:scroll-into-view", (e) => {
-  const el = document.getElementById(e.detail.id);
+	const el = document.getElementById(e.detail.id);
+	const scrollBehavior = navigator.userAgent.includes("Chrome")
+		? "auto"
+		: "smooth";
 
-  if (el) {
-    // this is a little janky, but it gives LiveView enough time
-    // to open/close the comments before scrolling them into view
-    window.setTimeout(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 300);
-  }
+	if (el) {
+		// this is a little janky, but it gives LiveView enough time
+		// to open/close the comments before scrolling them into view
+		window.setTimeout(() => {
+			el.scrollIntoView({ behavior: scrollBehavior });
+		}, 200);
+	}
 });
 
 // connect if there are any LiveViews on the page
