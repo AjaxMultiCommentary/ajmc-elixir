@@ -1,4 +1,3 @@
-import CETEI from "CETEIcean";
 import OpenSeadragon from "openseadragon";
 
 const DRAG_ATTRIBUTE_NAME = "phx-drop-target";

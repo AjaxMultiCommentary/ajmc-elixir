@@ -30,7 +30,8 @@ defmodule GitHub.API do
     files = resp.body
 
     Enum.find(files, fn file ->
-      String.ends_with?(file["name"], "_pytorch.json")
+      Map.get(file, "name", "")
+      |> String.ends_with?("_pytorch.json")
     end)
   end
 
